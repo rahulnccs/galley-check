@@ -143,6 +143,20 @@ git push origin v0.2.0
 6. Optional online checks (DOI verification, retractions)
 7. Code signing, so the first-launch warning goes away
 
+## Feedback
+
+Galley is early, and the most useful thing you can send is a case where it's
+**wrong**: something it flagged that was fine, or a real problem it stayed quiet
+about. Two ways to reach me:
+
+- [Tell me how you're using Galley](https://docs.google.com/forms/d/e/1FAIpQLSf-IEokqhT8mjond7SFDCp90sDzUDCupJPK8p26aVls46QYjg/viewform) — a short form.
+  Leave your email if you'd like to hear when new checks land.
+- [Open an issue](https://github.com/rahulnccs/galley-check/issues) for bugs.
+
+To be notified of new versions, click **Watch** at the top of this page, choose
+**Custom**, and tick **Releases**. GitHub emails you when a release is published;
+nothing is collected by Galley itself.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

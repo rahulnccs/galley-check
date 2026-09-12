@@ -37,6 +37,9 @@ SEVERITY = {
     "warning": {"color": "#A86A12", "tint": "#FBEFD9", "name": "warning"},
     "info":    {"color": "#46699C", "tint": "#E4ECF7", "name": "note"},
 }
+# Where the "Get in touch" link goes. Replace with your own form or contact page.
+FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf-IEokqhT8mjond7SFDCp90sDzUDCupJPK8p26aVls46QYjg/viewform"
+
 UI_FONTS = ["Segoe UI", "SF Pro Text", ".AppleSystemUIFont", "Helvetica Neue",
             "Cantarell", "DejaVu Sans"]
 PAPER_FONTS = ["Charter", "Cambria", "Georgia", "Bitstream Charter", "DejaVu Serif"]
@@ -81,6 +84,9 @@ def stylesheet(ui: str) -> str:
     QProgressBar {{ background: {RULE}; border: none; border-radius: 3px; max-height: 6px; }}
     QProgressBar::chunk {{ background: {GREEN_INK}; border-radius: 3px; }}
     #header {{ background: {SHEET}; border-bottom: 1px solid {RULE}; }}
+    #linkButton {{ background: transparent; border: none; color: {INK_SOFT};
+                  padding: 4px 2px; text-decoration: underline; }}
+    #linkButton:hover {{ color: {GREEN_INK}; }}
     #fileName {{ font-size: 17px; font-weight: 600; }}
     """
 
@@ -376,6 +382,20 @@ class ResultsPage(QWidget):
         split.addWidget(self.detail)
         split.setSizes([420, 560])
         b.addWidget(split, 1)
+
+        footer = QHBoxLayout()
+        footer.setContentsMargins(2, 0, 2, 0)
+        prompt = QLabel("Something wrong here, or a check you'd like added?")
+        prompt.setObjectName("muted")
+        contact = QPushButton("Get in touch")
+        contact.setObjectName("linkButton")
+        contact.setCursor(Qt.PointingHandCursor)
+        contact.clicked.connect(
+            lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
+        footer.addWidget(prompt)
+        footer.addWidget(contact)
+        footer.addStretch(1)
+        b.addLayout(footer)
         root.addWidget(body, 1)
 
     # -- data
