@@ -242,7 +242,9 @@ def check_figures(doc: Document) -> list[Issue]:
                                         f"{k.label} is cited in the text but has no {noun}.",
                                         c.para_index, c.text,
                                         f"Add a {noun} for {k.label} or correct the callout."))
-        elif cited:
+        elif cited and group == "main":
+            # Supplementary and Extended Data items are normally submitted as a
+            # separate file, so saying they are missing would be noise.
             issues.append(Issue(CHECK, "info",
                                 f"No {sample.lower()} {noun}s found, so {sample.lower()} "
                                 f"callouts couldn't be matched to {noun}s "

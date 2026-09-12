@@ -148,3 +148,67 @@ def test_quoted_package_names_are_not_undefined_abbreviations():
         ("results", "Values from 'MESS' agreed with manual integration."),
     ])
     assert not any("MESS" in m for _, m in messages(doc))
+
+
+def test_chemical_name_definition_with_a_numeric_prefix():
+    """"6-methylpteridine-2,4-diamine (6-MPDA)" is a definition of MPDA."""
+    doc = make_doc([
+        ("abstract", "We found 6-methylpteridine-2,4-diamine (6-MPDA) in stool."),
+        ("results", "Levels of 6-MPDA rose over time, and 6-MPDA tracked dose."),
+    ])
+    assert messages(doc) == []
+
+
+def test_organization_abbreviations_are_left_alone():
+    doc = make_doc([
+        ("methods", "Mice were housed at UCSF before the study began."),
+        ("methods", "Work was done at the University of California, San Francisco "
+                    "(UCSF) barrier facility."),
+    ])
+    assert not any("UCSF" in m for _, m in messages(doc))
+
+
+def test_instrument_terms_are_standard():
+    doc = make_doc([
+        ("methods", "Data were acquired by MRM on a QTRAP instrument."),
+        ("methods", "MRM transitions were optimized; the QTRAP was calibrated."),
+        ("results", "MRM signals were stable and the QTRAP performed well."),
+    ])
+    assert messages(doc) == []
+
+
+def test_undefined_terms_are_one_note_not_many():
+    doc = make_doc([
+        ("methods", "Cells grew in BHI with CPG added; SKG mice were used."),
+        ("methods", "BHI and CPG were prepared weekly for SKG mice."),
+        ("results", "BHI cultures, CPG levels and SKG arthritis were measured."),
+    ])
+    notes = [m for sev, m in messages(doc) if sev == "info"]
+    assert len(notes) == 1 and "never spelled out" in notes[0]
+
+
+def test_duplicate_definition_names_both_places():
+    doc = make_doc([
+        ("results", "We used the gut transit index (GTI) throughout."),
+        ("results", "Again, the gut transit index (GTI) was measured."),
+        ("results", "GTI rose over time."),
+    ])
+    assert any("paragraph 1, paragraph 2" in m for _, m in messages(doc))
+
+
+def test_definition_written_inside_the_bracket():
+    """"(Analysis of similarities; ANOSIM)" defines ANOSIM."""
+    doc = make_doc([
+        ("results", "Groups differed (Analysis of similarities; ANOSIM, p = 0.001)."),
+        ("results", "ANOSIM also separated the duodenal samples."),
+    ])
+    assert not any("ANOSIM" in m for _, m in messages(doc))
+
+
+def test_supplier_names_are_not_undefined_abbreviations():
+    doc = make_doc([
+        ("methods", "DNA was extracted with the QIAGEN DNeasy kit (QIAGEN, Germany)."),
+        ("methods", "QIAGEN buffers were used throughout."),
+        ("results", "QIAGEN extractions gave consistent yields."),
+    ])
+    assert not any("QIAGEN" in m for _, m in messages(doc))

@@ -53,7 +53,8 @@ limit is worse than none.
 - Numbered references are first cited in ascending order
 - No gaps or repeats in the reference numbering
 - Duplicate entries in the reference list
-- Entries missing a year, and malformed DOIs
+- Entries missing a year, an author list, a journal, or a DOI
+- Malformed DOIs, and missing ones when the rest of the list has them
 
 Supported citation styles: numbered (`[12]`, `[3,5-7]`, superscript, Word
 auto-numbered lists), author-year (`(Smith et al., 2020)`, `[Smith 2020]`,

@@ -84,3 +84,62 @@ def test_figure_mentions_are_not_author_year_citations(text):
     doc = make_doc([text], ["Doe J. A paper. J Test 2020;1:1."])
     assert not any("citation to Figure" in m or "citation to Table" in m
                    for _, m in messages(doc))
+
+
+def test_entry_missing_its_author_list():
+    """An entry that starts with its title lost the authors on import."""
+    refs = ["1\tDoe J. A real paper. J Test 2019;1:1-10.",
+            "2\tPopulation dynamics and habitat sharing of natural worm populations. "
+            "BMC Biol 2012;10:1-19."]
+    doc = make_doc(["Cited [1,2]."], refs)
+    assert any(m.startswith("Reference 2 has no author list") for _, m in messages(doc))
+
+
+def test_organization_and_software_entries_are_not_flagged():
+    """"WHO." and "labdsv:" are legitimate entry openings, not lost authors."""
+    refs = ["1\tWho. Selection and use of essential medicines. Geneva 2021;1:1-5.",
+            "2\tlabdsv: Ordination and multivariate analysis for ecology, v2.1, 2025. "
+            "doi:10.5281/zenodo.1",
+            "3\tConsortium TC. Genome sequence of a nematode. Science 1998;282:2012-8."]
+    doc = make_doc(["Cited [1,2,3]."], refs)
+    assert not any("no author list" in m for _, m in messages(doc))
+
+
+def test_entry_with_no_journal_or_doi():
+    refs = ["1\tDoe J. A real paper. J Test 2019;1:1-10.",
+            "2\tRoe S, Poe A et al. A truncated entry. Oxford Encyclopedia 2017,"]
+    doc = make_doc(["Cited [1,2]."], refs)
+    assert any("has no journal, volume or DOI" in m for _, m in messages(doc))
+
+
+@pytest.mark.parametrize("entry", [
+    "Doe J. A paper. Journal of Fictional Biology, 4, 1-12.",
+    "Doe J. A paper. J Test 2019;1:1-10.",
+    "Doe J. A paper. Nature 2020;580(7802):107.",
+    "Doe J. A paper. bioRxiv 2024. doi:10.1101/2024.01.01.000001",
+    "Doe J. A paper. J Test 2019. https://doi.org/10.1000/abc",
+])
+def test_complete_entries_are_not_flagged(entry):
+    doc = make_doc(["Cited [1]."], [f"1\t{entry}"])
+    assert not any("no journal" in m for _, m in messages(doc))
+
+
+DOI_REFS = [f"{n}\tDoe J. Paper {n}. J Test 20{n:02d};1:1-10. doi:10.1000/test.{n}"
+            for n in range(1, 5)]
+
+
+def test_missing_dois_are_flagged_when_the_list_mostly_has_them():
+    refs = DOI_REFS[:3] + ["4\tRoe S. A paper with no DOI. J Test 2021;2:5-9."]
+    doc = make_doc(["Cited [1,2,3,4]."], refs)
+    assert any("but these don't: 4" in m for _, m in messages(doc))
+
+
+def test_no_doi_anywhere_is_a_style_choice_not_an_error():
+    refs = [f"{n}\tDoe J. Paper {n}. J Test 2019;1:{n}-10." for n in range(1, 5)]
+    doc = make_doc(["Cited [1,2,3,4]."], refs)
+    assert not any("DOI" in m for _, m in messages(doc))
+
+
+def test_complete_doi_coverage_is_silent():
+    doc = make_doc(["Cited [1,2,3,4]."], DOI_REFS)
+    assert not any("DOI" in m for _, m in messages(doc))

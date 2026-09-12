@@ -44,6 +44,14 @@ BRACKET_AUTHOR_YEAR = re.compile(
 # "[Adl19]", "[CD20]", "[ABC+21]", "[Doe2020a]" — a key must contain a digit
 CITATION_KEY = re.compile(
     r"\[([A-Za-z][A-Za-z0-9+'\u2019-]{1,19}(?:\s*[,;]\s*[A-Za-z][A-Za-z0-9+'\u2019-]{1,19})*)\]")
+# "Berg M," / "Doe, J. A." / "Smith et al." at the start of an entry. Case
+# matters here: with IGNORECASE, "Population dynamics" would look like a name.
+AUTHOR_START = re.compile(
+    r"\b[A-Z\u00c0-\u024f][\w'\u2019-]+,?\s+(?:[A-Z]\.?\s?){1,4}\b|\bet al\b|\bEt al\b")
+# A source: a journal with volume/pages, a DOI, a URL, or a publisher year.
+HAS_SOURCE = re.compile(
+    r"\b\d{1,4}\s*[:(;,]\s*\d|\bdoi\b|10\.\d{4,9}/|https?://|\bpp?\.\s*\d"
+    r"|\bpress\b|\bpublish|\bbioRxiv\b|\bmedRxiv\b|\barXiv\b|\bpreprint\b", re.I)
 SURNAME_IN_CITATION = re.compile(r"\b([A-Z][A-Za-z\u00c0-\u024f'\u2019-]{1,25})")
 NOT_A_SURNAME = {"Fig", "Figure", "Figures", "Table", "Tables", "Supplementary", "See",
                  "Data", "Extended", "Ref", "Refs", "Eq", "Equation", "Chapter", "Section",
@@ -69,6 +77,18 @@ class Entry:
         """Surnames near the start of the entry, where the author list sits."""
         head = self.text[:180]
         return {w for w in SURNAME_IN_CITATION.findall(head) if w not in NOT_A_SURNAME}
+
+    @property
+    def first_sentence(self) -> str:
+        return re.split(r"\.\s|\?\s", self.text, 1)[0]
+
+    @property
+    def has_authors(self) -> bool:
+        """False when an entry starts with its title, the author list lost."""
+        head = self.first_sentence
+        if head[:1].islower() or len(head.split()) < 6:
+            return True          # a software name or an organization, not a title
+        return bool(AUTHOR_START.search(head))
 
     @property
     def author_zone(self) -> str:
@@ -433,12 +453,45 @@ def _check_entries(entries: list[Entry]) -> list[Issue]:
         else:
             seen[e.key] = e
 
+    incomplete = [e for e in entries if not e.has_authors]
+    for e in incomplete[:8]:
+        issues.append(Issue(CHECK, "warning",
+                            f"Reference {e.number} has no author list: "
+                            f"{e.first_sentence[:55]}\u2026",
+                            e.para_index, e.text[:45],
+                            "The entry starts with its title. Check that the authors "
+                            "weren't lost when the reference was imported."))
+
+    no_source = [e for e in entries
+                 if e.has_authors and e.year and not HAS_SOURCE.search(e.text)]
+    if no_source and len(no_source) <= max(3, 0.2 * len(entries)):
+        for e in no_source[:6]:
+            issues.append(Issue(CHECK, "warning",
+                                f"Reference {e.number} has no journal, volume or DOI: "
+                                f"{e.text[:55]}\u2026",
+                                e.para_index, e.text[:45],
+                                "The entry may have been truncated."))
+
     missing_year = [e for e in entries if not e.year]
     if missing_year and len(missing_year) <= max(3, 0.2 * len(entries)):
         for e in missing_year[:6]:
             issues.append(Issue(CHECK, "info",
                                 f"Reference {e.number} has no year: {e.text[:55]}…",
                                 e.para_index, e.text[:45]))
+
+    # Missing DOIs are only worth raising when the list mostly has them: a
+    # reference style that doesn't use DOIs at all is a choice, not an error.
+    with_doi = [e for e in entries if DOI.search(e.text)]
+    without = [e for e in entries if not DOI.search(e.text)]
+    if len(with_doi) >= 0.5 * len(entries) and without:
+        listed = ", ".join(str(e.number) for e in without[:12])
+        more = f" and {len(without) - 12} more" if len(without) > 12 else ""
+        issues.append(Issue(
+            CHECK, "info",
+            f"{len(with_doi)} of {len(entries)} references have a DOI, but these "
+            f"don't: {listed}{more}.",
+            without[0].para_index, without[0].text[:45],
+            "Add the missing DOIs, or remove them all, so the list is consistent."))
 
     for e in entries:
         m = DOI.search(e.text)

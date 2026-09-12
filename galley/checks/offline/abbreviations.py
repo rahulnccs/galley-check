@@ -41,10 +41,22 @@ ZONE_NAMES = {"abstract": "the abstract", "main": "the main text",
 # abbreviation, and that is still a definition.
 DEFINITION = re.compile(
     r"(?P<expansion>[A-Za-z][\w'\u2019/-]*(?:[ \u2010-][A-Za-z][\w'\u2019/-]*){0,6})"
-    r"\s*[(\[](?P<abbr>[A-Za-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8})s?"
+    r"\s*[(\[](?P<prefix>\d{1,2}[-\u2010\u2013]\s*)?"
+    r"(?P<abbr>[A-Za-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8})s?"
     r"(?P<extra>\s*[,;]\s*[^)\]]{0,45})?[)\]]")
+# The other order, used for statistical tests: "(Analysis of similarities; ANOSIM)".
+INSIDE_DEFINITION = re.compile(
+    r"[(\[](?P<expansion>[A-Za-z][\w'\u2019/-]*(?:[ \u2010-][A-Za-z][\w'\u2019/-]*){1,6})"
+    r"\s*[;,]\s*(?P<prefix>\d{1,2}[-\u2010\u2013]\s*)?"
+    r"(?P<abbr>[A-Za-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8})s?[)\]]")
 # A use: at least two capitals, optionally with a leading lowercase (pMABG).
-USE = re.compile(r"\b[a-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8}\b")
+USE = re.compile(r"\b(?:\d{1,2}[-\u2010\u2013])?[a-z]?[A-Z][A-Za-z0-9]*[A-Z]"
+                 r"[A-Za-z0-9-]{0,8}\b")
+
+
+def _strip_prefix(token: str) -> str:
+    """6-MPDA and MPDA are the same abbreviation."""
+    return re.sub(r"^\d{1,2}[-\u2010\u2013]\s*", "", token)
 
 # Abbreviations journals don't require anyone to define.
 STANDARD = {
@@ -61,6 +73,13 @@ STANDARD = {
     "BALB", "ATCC", "DSM", "DSMZ", "NCTC", "NCIMB", "JCM", "KCTC", "LB", "BL",
     # Statistics and buffers treated as standard by most journals.
     "FDR", "HEPES", "MOPS", "TAE", "TBE", "PBST", "TBS", "BH", "GLMM", "LMM",
+    # Databases and reference resources.
+    "KEGG", "GO", "COG", "PFAM", "TIGRFAM", "UNIPROT", "SILVA", "GTDB", "METACYC",
+    "BLAST", "HMMER", "SRA", "ENA", "GEO", "KO", "EC", "RDP", "IMG", "JGI",
+    # Instruments and analytical methods.
+    "MRM", "SRM", "PRM", "QTRAP", "QQQ", "UPLC", "UHPLC", "FPLC", "ESI", "APCI",
+    "MALDI", "TOF", "QTOF", "DAD", "PDA", "RID", "ELSD", "CID", "MSMS", "SIM",
+    "PVDF", "PTFE", "TLC", "GCMS", "LCMSMS", "NGS", "WGS", "QC", "LOD", "LOQ",
 }
 # Words that look like abbreviations but aren't, in this context.
 NOT_ABBREVIATIONS = {"FIGURE", "FIGURES", "TABLE", "TABLES", "AND", "THE", "OR", "IN",
@@ -75,6 +94,7 @@ class Mention:
     zone: str                   # "abstract" | "main" | "methods"
     expansion: str | None = None    # only set when the initials matched
     context: str = ""               # the words before the bracket, for display
+    lead: str = ""                  # a wider run-up, used to spot organizations
 
 
 def _zone(p: Paragraph) -> str | None:
@@ -85,6 +105,11 @@ def _zone(p: Paragraph) -> str | None:
 
 
 STOPWORDS = {"of", "the", "and", "for", "in", "on", "to", "a", "an", "with", "by"}
+# An expansion naming an organization means the abbreviation is a proper noun.
+ORGANIZATION = re.compile(
+    r"\b(universit|institut|college|school|hospital|clinic|cent(er|re)|"
+    r"foundation|academy|society|association|consortium|ministry|department|"
+    r"laborator|company|inc|ltd|gmbh|corporation)", re.I)
 
 
 def derive_expansion(words: str, abbr: str) -> str | None:
@@ -111,10 +136,28 @@ def derive_expansion(words: str, abbr: str) -> str | None:
 
 
 def _normalize(abbr: str) -> str:
+    abbr = _strip_prefix(abbr)
     return abbr.rstrip("s") if abbr.endswith("s") and abbr[:-1].isupper() else abbr
 
 
-def _plausible(abbr: str, expansion: str) -> bool:
+def _letters_in_order(text: str, abbr: str) -> bool:
+    """True if the abbreviation's letters appear in order in the text.
+
+    Chemical names work this way: 6-methylpteridine-2,4-diamine gives MPDA
+    without any word initials lining up.
+    """
+    letters = [c.lower() for c in abbr if c.isalpha()]
+    window = text[-(8 * len(letters) + 10):].lower()
+    at = 0
+    for c in letters:
+        at = window.find(c, at)
+        if at == -1:
+            return False
+        at += 1
+    return True
+
+
+def _plausible(abbr: str, expansion: str, lead: str = "") -> bool:
     """Keep definitions that could really be one, and drop coincidences."""
     if abbr.upper() in NOT_ABBREVIATIONS or len(abbr) < 2:
         return False
@@ -124,7 +167,9 @@ def _plausible(abbr: str, expansion: str) -> bool:
     # capitals, or share its first letter — otherwise it's probably an aside.
     capitals = sum(1 for c in abbr if c.isupper())
     words = expansion.split()
-    return len(words) >= min(2, capitals) or words[0][:1].lower() == abbr[:1].lower()
+    return (len(words) >= min(2, capitals)
+            or words[0][:1].lower() == abbr[:1].lower()
+            or _letters_in_order(lead or expansion, abbr))
 
 
 def collect(doc: Document) -> tuple[list[Mention], list[Mention]]:
@@ -136,15 +181,17 @@ def collect(doc: Document) -> tuple[list[Mention], list[Mention]]:
         if zone is None or p.is_heading or not p.text:
             continue
         defined_spans: list[tuple[int, int]] = []
-        for m in DEFINITION.finditer(p.text):
+        for m in list(DEFINITION.finditer(p.text)) + \
+                list(INSIDE_DEFINITION.finditer(p.text)):
             abbr, expansion = _normalize(m.group("abbr")), m.group("expansion").strip()
-            if not _plausible(abbr, expansion):
+            lead = p.text[max(0, m.start() - 90):m.start("abbr")]
+            if not _plausible(abbr, expansion, lead):
                 continue
             derived = derive_expansion(expansion, abbr)
-            if m.group("extra") and not derived:
+            if m.groupdict().get("extra") and not derived:
                 continue        # a vendor or address, not a definition
             definitions.append(Mention(abbr, p.index, m.start("abbr"), zone,
-                                       derived, expansion))
+                                       derived, expansion, lead))
             defined_spans.append(m.span("abbr"))
         for m in USE.finditer(p.text):
             abbr = _normalize(m.group())
@@ -156,14 +203,22 @@ def collect(doc: Document) -> tuple[list[Mention], list[Mention]]:
             after = p.text[m.end():m.end() + 1]
             if before in "'\u2018\u201c\"" and after in "'\u2019\u201d\"":
                 continue
-            if any(a <= m.start() < b for a, b in defined_spans):
+            # The use "6-MPDA" starts one character before the abbreviation
+            # inside the definition, so overlap is what matters, not the start.
+            if any(m.start() < b and m.end() > a for a, b in defined_spans):
                 continue          # the definition itself, already recorded
             uses.append(Mention(abbr, p.index, m.start(), zone))
     return definitions, uses
 
 
+def _is_vendor(token: str, text: str) -> bool:
+    """True for names used as suppliers: "(QIAGEN, Germany)", "(SCIEX, USA)"."""
+    return bool(re.search(rf"[(,]\s*{re.escape(token)}\s*,\s*[^)]{{2,45}}\)", text))
+
+
 def check_abbreviations(doc: Document) -> list[Issue]:
     definitions, uses = collect(doc)
+    full_text = " ".join(p.text for p in doc.paragraphs if p.text)
     if not definitions and not uses:
         return []
     issues: list[Issue] = []
@@ -178,6 +233,8 @@ def check_abbreviations(doc: Document) -> list[Issue]:
     for abbr, defined in sorted(defs_by_abbr.items()):
         if abbr.upper() in STANDARD:
             continue          # nobody is required to define PBS or DNA
+        if any(ORGANIZATION.search(f"{d.lead} {d.context}") for d in defined):
+            continue          # UCSF, NIH and the like are names, not terms
         defined.sort(key=lambda m: (m.para_index, m.position))
         used = sorted(uses_by_abbr.get(abbr, []), key=lambda m: (m.para_index, m.position))
 
@@ -200,11 +257,14 @@ def check_abbreviations(doc: Document) -> list[Issue]:
             # doesn't look like a second definition.
             repeats = [d for d in defined if d.zone == zone and d.expansion]
             if len(repeats) > 1:
+                where = ", ".join(f"paragraph {d.para_index + 1}" for d in repeats)
                 issues.append(Issue(
                     CHECK, "warning",
-                    f"{abbr} is defined {len(repeats)} times in {ZONE_NAMES[zone]}.",
+                    f"{abbr} is defined {len(repeats)} times in {ZONE_NAMES[zone]} "
+                    f"({where}).",
                     repeats[1].para_index, repeats[1].expansion,
-                    "Define an abbreviation once, at its first use."))
+                    "Define an abbreviation once, at its first use. Some journals "
+                    "allow a second definition; check your target journal."))
 
         # 3. Defined with different expansions.
         spellings: dict[str, str] = {}
@@ -240,11 +300,15 @@ def check_abbreviations(doc: Document) -> list[Issue]:
                  and abbr.upper() not in STANDARD
                  and abbr.isupper() and abbr.isalpha()
                  and 3 <= len(abbr) <= 8     # initials like "RB" are usually people
-                 and len(mentions) >= 3]
-    for abbr, mentions in undefined[:5]:
+                 and len(mentions) >= 3
+                 and not _is_vendor(abbr, full_text)]
+    if undefined:
+        names = ", ".join(f"{abbr} ({len(mentions)}\u00d7)"
+                          for abbr, mentions in undefined[:8])
         issues.append(Issue(
             CHECK, "info",
-            f"{abbr} is used {len(mentions)} times but never defined.",
-            mentions[0].para_index, abbr,
-            "Spell it out at the first use, unless your journal treats it as standard."))
+            f"Used repeatedly but never spelled out: {names}.",
+            undefined[0][1][0].para_index, undefined[0][0],
+            "Define any that your journal doesn't treat as standard. Strain, "
+            "product and vendor names don't need defining."))
     return issues
