@@ -36,9 +36,13 @@ ZONE_NAMES = {"abstract": "the abstract", "main": "the main text",
               "methods": "the methods"}
 
 # "complex microbial extract (CME)" — up to seven words before the bracket.
+# "complex microbial extracts (CME)" and also "germ-free (GF, N = 6)": authors
+# often put sample sizes, units or settings in the same bracket as the
+# abbreviation, and that is still a definition.
 DEFINITION = re.compile(
     r"(?P<expansion>[A-Za-z][\w'\u2019/-]*(?:[ \u2010-][A-Za-z][\w'\u2019/-]*){0,6})"
-    r"\s*[(\[](?P<abbr>[A-Za-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8})s?[)\]]")
+    r"\s*[(\[](?P<abbr>[A-Za-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8})s?"
+    r"(?P<extra>\s*[,;]\s*[^)\]]{0,45})?[)\]]")
 # A use: at least two capitals, optionally with a leading lowercase (pMABG).
 USE = re.compile(r"\b[a-z]?[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9-]{0,8}\b")
 
@@ -55,6 +59,8 @@ STANDARD = {
     "SPF", "WT", "KO", "IL", "TNF", "IFN", "LPS", "FBS", "PFA", "HE", "IHC", "FISH",
     # Strain, vendor and collection names — not abbreviations authors define.
     "BALB", "ATCC", "DSM", "DSMZ", "NCTC", "NCIMB", "JCM", "KCTC", "LB", "BL",
+    # Statistics and buffers treated as standard by most journals.
+    "FDR", "HEPES", "MOPS", "TAE", "TBE", "PBST", "TBS", "BH", "GLMM", "LMM",
 }
 # Words that look like abbreviations but aren't, in this context.
 NOT_ABBREVIATIONS = {"FIGURE", "FIGURES", "TABLE", "TABLES", "AND", "THE", "OR", "IN",
@@ -134,12 +140,21 @@ def collect(doc: Document) -> tuple[list[Mention], list[Mention]]:
             abbr, expansion = _normalize(m.group("abbr")), m.group("expansion").strip()
             if not _plausible(abbr, expansion):
                 continue
+            derived = derive_expansion(expansion, abbr)
+            if m.group("extra") and not derived:
+                continue        # a vendor or address, not a definition
             definitions.append(Mention(abbr, p.index, m.start("abbr"), zone,
-                                       derive_expansion(expansion, abbr), expansion))
+                                       derived, expansion))
             defined_spans.append(m.span("abbr"))
         for m in USE.finditer(p.text):
             abbr = _normalize(m.group())
             if abbr.upper() in NOT_ABBREVIATIONS or len(abbr) < 2:
+                continue
+            # Quoted names are software packages, genes or titles, not
+            # abbreviations the author is expected to spell out.
+            before = p.text[max(0, m.start() - 1):m.start()]
+            after = p.text[m.end():m.end() + 1]
+            if before in "'\u2018\u201c\"" and after in "'\u2019\u201d\"":
                 continue
             if any(a <= m.start() < b for a, b in defined_spans):
                 continue          # the definition itself, already recorded
@@ -166,20 +181,18 @@ def check_abbreviations(doc: Document) -> list[Issue]:
         defined.sort(key=lambda m: (m.para_index, m.position))
         used = sorted(uses_by_abbr.get(abbr, []), key=lambda m: (m.para_index, m.position))
 
-        # 1. Used before it is defined (within the same zone).
-        for zone in ZONE_NAMES:
-            first_def = next((d for d in defined if d.zone == zone), None)
-            if not first_def:
-                continue
-            early = [u for u in used if u.zone == zone
-                     and (u.para_index, u.position) < (first_def.para_index,
-                                                       first_def.position)]
-            if early:
-                issues.append(Issue(
-                    CHECK, "warning",
-                    f"{abbr} is used in {ZONE_NAMES[zone]} before it is defined.",
-                    early[0].para_index, abbr,
-                    f"Spell it out at the first use, then abbreviate."))
+        # 1. Used before it is defined anywhere in the paper.
+        first_def = defined[0]
+        early = [u for u in used
+                 if (u.para_index, u.position) < (first_def.para_index,
+                                                  first_def.position)]
+        if early:
+            issues.append(Issue(
+                CHECK, "warning",
+                f"{abbr} is used in {ZONE_NAMES[early[0].zone]} before it is "
+                f"defined.",
+                early[0].para_index, abbr,
+                "Spell it out at the first use, then abbreviate."))
 
         # 2. Defined more than once in the same zone.
         for zone in ZONE_NAMES:

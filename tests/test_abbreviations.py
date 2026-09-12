@@ -53,7 +53,7 @@ def test_inconsistent_expansion_is_caught():
 
 def test_defined_but_never_used():
     doc = make_doc([
-        ("results", "We fitted a linear mixed-effects model (LMM) to the data."),
+        ("results", "We measured the gut transit index (GTI) in each mouse."),
         ("results", "Diversity differed between groups."),
     ])
     assert any("never used again" in m for _, m in messages(doc))
@@ -111,3 +111,40 @@ def test_derive_expansion_matches_initials():
     assert derive_expansion("based on complex microbial extracts", "CME") == \
         "complex microbial extracts"
     assert derive_expansion("the mice were housed", "CME") is None
+
+
+def test_definition_with_extra_content_in_the_bracket():
+    """Authors often put a sample size or unit in the same bracket."""
+    doc = make_doc([
+        ("results", "We compared germ-free (GF, N = 6) and conventional mice."),
+        ("results", "GF mice gained less weight than controls."),
+    ])
+    assert messages(doc) == []
+
+
+def test_vendor_parenthetical_is_not_a_definition():
+    """"(SCIEX, Framingham, MA)" is an address, not an abbreviation definition."""
+    doc = make_doc([
+        ("methods", "Samples were run on a Triple Quad (SCIEX, Framingham, MA)."),
+        ("methods", "Peaks were integrated manually."),
+    ])
+    assert not any("SCIEX" in m for _, m in messages(doc))
+
+
+def test_defined_early_and_reused_later_is_not_used_before_defined():
+    """Defined in the results, used again in the methods: that is normal."""
+    doc = make_doc([
+        ("results", "Mice received vehicle control (VEH) by gavage."),
+        ("methods", "VEH was prepared fresh each week."),
+        ("methods", "Mice in the vehicle control (VEH) arm were housed together."),
+    ])
+    assert not any("before it is defined" in m for _, m in messages(doc))
+
+
+def test_quoted_package_names_are_not_undefined_abbreviations():
+    doc = make_doc([
+        ("methods", "Areas were computed with the 'MESS' package in R."),
+        ("methods", "The 'MESS' package was used again for AUC."),
+        ("results", "Values from 'MESS' agreed with manual integration."),
+    ])
+    assert not any("MESS" in m for _, m in messages(doc))

@@ -45,7 +45,7 @@ if sys.platform == "darwin":
         info_plist={
             "CFBundleName": APP_NAME,
             "CFBundleDisplayName": APP_NAME,
-            "CFBundleShortVersionString": "0.4.0",
+            "CFBundleShortVersionString": "0.4.1",
             "NSHighResolutionCapable": True,
             "CFBundleDocumentTypes": [{
                 "CFBundleTypeName": "Word document",
