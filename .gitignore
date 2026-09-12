@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+dmg/
+.venv/
+venv/
+.DS_Store
+packaging/icon.icns
+packaging/icon.iconset/
+tests/fixtures/corpus/*.docx
+tests/fixtures/sample_manuscript.docx
+*_checked.docx
+*_report.txt

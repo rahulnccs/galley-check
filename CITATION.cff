@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "Galley"
+message: "If you use this software, please cite it."
+type: software
+authors:
+  - family-names: Bodkhe
+    given-names: Rahul
+repository-code: "https://github.com/USERNAME/galley-check"
+license: MIT
+version: 0.2.0
+abstract: >-
+  An offline desktop tool that checks academic manuscript drafts for figure and
+  table callout problems and citation or reference-list errors, without
+  uploading the manuscript anywhere.

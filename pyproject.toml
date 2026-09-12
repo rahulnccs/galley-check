@@ -1,0 +1,24 @@
+[project]
+name = "galley-check"
+version = "0.2.0"
+description = "Galley — offline checks for figures, tables, citations and references in manuscript drafts"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["python-docx>=1.2.0"]
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.6"]
+dev = ["pytest", "PySide6>=6.6"]
+
+[project.scripts]
+galley = "galley.cli:main"
+
+[project.gui-scripts]
+galley-app = "galley.gui.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["galley*"]
