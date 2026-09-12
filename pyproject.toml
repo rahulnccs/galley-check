@@ -1,6 +1,6 @@
 [project]
 name = "galley-check"
-version = "0.2.0"
+version = "0.4.0"
 description = "Galley — offline checks for figures, tables, citations and references in manuscript drafts"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -22,3 +22,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["galley*"]
+
+[tool.setuptools.package-data]
+galley = ["profiles/*.json"]

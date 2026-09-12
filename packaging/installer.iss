@@ -1,6 +1,6 @@
 ; Windows installer, built by Inno Setup on the GitHub runner.
 #define AppName "Galley"
-#define AppVersion "0.2.0"
+#define AppVersion "0.4.0"
 
 [Setup]
 AppName={#AppName}

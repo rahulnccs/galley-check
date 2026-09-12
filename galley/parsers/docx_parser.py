@@ -27,8 +27,13 @@ NOTE_PARTS = {"footnote": "word/footnotes.xml", "endnote": "word/endnotes.xml"}
 SECTION_PATTERNS = [
     (r"abstract|summary", "abstract"),
     (r"introduction|background", "introduction"),
+    # Plain and Cell Press (STAR Methods) headings both land in "methods".
     (r"(materials and )?methods|experimental procedures|star\s*methods"
-     r"|materials and methods", "methods"),
+     r"|method details|key resources? table"
+     r"|experimental model( and subject details)?"
+     r"|quantification and statistical analysis"
+     r"|resource availability|lead contact|materials availability"
+     r"|(data and code|data|code) availability( statement)?", "methods"),
     (r"results( and discussion)?", "results"),
     (r"discussion|conclusions?", "discussion"),
     (r"references|bibliography|literature cited|works cited|reference list",
@@ -37,6 +42,8 @@ SECTION_PATTERNS = [
      r"(\s+(legends?|captions?|titles and legends))?"
      r"|legends to figures|figure legends and tables", FIGURE_LEGENDS),
     (r"acknowledge?ments?", "acknowledgments"),
+    (r"authors?'? contributions?|declarations? of interests?|competing interests?"
+     r"|conflicts? of interest", "back_matter"),
     (r"supplementary (information|material|materials|data)", "supplementary"),
 ]
 _SECTION_RES = [(re.compile(rf"^\s*(\d+[.)]?\s*)?({p})\s*:?\s*$", re.I), name)

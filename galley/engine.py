@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .checks.registry import OFFLINE_CHECKS
+from .checks.registry import OFFLINE_CHECKS, PROFILE_AWARE
 from .model.document import Document, Issue
 from .parsers.docx_parser import parse_docx
 
@@ -22,9 +22,13 @@ def load(path: str | Path) -> Document:
                      f"(use a Word document or a PDF)")
 
 
-def run_checks(doc: Document, only: list[str] | None = None) -> list[Issue]:
+def run_checks(doc: Document, only: list[str] | None = None,
+               profile=None) -> list[Issue]:
+    """Run the checks. `profile` is an optional journal profile (see
+    galley.checks.offline.submission.Profile)."""
     issues: list[Issue] = []
     for name, check in OFFLINE_CHECKS.items():
-        if only is None or name in only:
-            issues.extend(check(doc))
+        if only is not None and name not in only:
+            continue
+        issues.extend(check(doc, profile) if name in PROFILE_AWARE else check(doc))
     return issues

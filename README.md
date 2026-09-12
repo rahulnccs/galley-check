@@ -6,7 +6,7 @@ references. Your paper never leaves your computer.
 A galley proof is the draft an author checks before publication. Galley does the
 mechanical part of that check for you.
 
-[![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
+[![Tests](https://github.com/USERNAME/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/USERNAME/galley-check/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Status:** early development (v0.2). Checks figures, tables, citations, and
@@ -22,6 +22,29 @@ references in `.docx` files. PDF support is experimental and not yet reliable.
 - Cited panels (e.g. "Fig. 3D") exist in the legend
 - Supplementary and Extended Data figures are handled separately
 - Mixed "Fig." / "Figure" usage
+
+**Abbreviations**
+
+- Used before it is defined
+- Defined more than once in the same part of the paper
+- Spelled out differently in different places
+- Defined but never used again
+- Used repeatedly but never defined
+
+The abstract, main text and methods are treated separately, since journals
+expect an abbreviation to be defined once in each.
+
+**Submission readiness**
+
+- Word counts for the title, abstract, main text and methods
+- Reference, figure and table counts
+- Anything over a journal's limit, and any required section that's missing
+
+Limits come from a journal profile — a small JSON file you edit. Copy
+`galley/profiles/example.json`, change the numbers to match your target journal,
+and pass it with `--profile myjournal.json` or the **Use journal limits…** button.
+Galley ships no real journal profiles, because limits change often and a stale
+limit is worse than none.
 
 **Citations and references**
 
@@ -46,7 +69,7 @@ citations inserted by Zotero, Mendeley, and EndNote.
 
 ## Download
 
-Ready-to-run apps are on the [releases page](https://github.com/rahulnccs/galley-check/releases):
+Ready-to-run apps are on the [releases page](https://github.com/USERNAME/galley-check/releases):
 `Galley-macOS.dmg` for Mac and `Galley-Setup.exe` for Windows.
 Nothing else needs installing.
 
@@ -69,11 +92,19 @@ Drop a .docx onto the window, choose it with the button, or paste its path.
 Click any issue to see the exact sentence with the problem highlighted. After fixing
 the file in Word, save it and click **Re-check**.
 
+**Comments in your document.** Click **Save with comments…** and Galley writes a
+copy of your manuscript with a Word comment in the margin at each problem, so you
+can fix them in Word without cross-referencing a report. Your original file is
+never modified.
+
 **Command line:**
 
 ```bash
-galley paper.docx          # text report
-galley paper.docx --json   # machine-readable
+galley paper.docx                       # text report
+galley paper.docx --json                # machine-readable
+galley paper.docx --comments            # also write paper_commented.docx
+galley paper.docx --comments out.docx --comment-level warning
+galley paper.docx --profile myjournal.json
 ```
 
 Exit code is 1 if any errors are found (useful for scripts).
@@ -105,8 +136,8 @@ git push origin v0.2.0
 
 1. ~~docx parser + figure/table checks~~
 2. ~~Reference checks~~
-3. Abbreviations, statistics formatting, placeholders
-4. HTML report + optional comments inserted into a copy of the .docx
+3. ~~Abbreviations~~; statistics formatting and placeholders still to come
+4. ~~Comments inserted into a copy of the .docx~~
 5. ~~Desktop app~~ (done early); one-click installers for Windows and Mac
 6. Optional online checks (DOI verification, retractions)
 7. Code signing, so the first-launch warning goes away

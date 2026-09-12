@@ -1,0 +1,22 @@
+{
+  "name": "Example Journal",
+  "_comment": [
+    "Copy this file, rename it, and edit the numbers to match the journal you are",
+    "submitting to. Galley ships no real journal profiles because limits change",
+    "often and a stale limit is worse than none. Delete any limit you don't want",
+    "checked.",
+    "Limits Galley understands: abstract_words, main_text_words, total_words,",
+    "title_words, references, figures, tables, display_items."
+  ],
+  "limits": {
+    "title_words": 20,
+    "abstract_words": 250,
+    "main_text_words": 5000,
+    "references": 60,
+    "display_items": 8
+  },
+  "required_sections": [
+    "data availability",
+    "acknowledgments"
+  ]
+}

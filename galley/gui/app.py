@@ -10,16 +10,19 @@ import html
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QSize, Qt, QThread, QUrl, Signal
+from PySide6.QtCore import QObject, QSize, Qt, QThread, QTimer, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QListView, QListWidget,
-    QListWidgetItem, QMainWindow, QMessageBox, QProgressBar, QPushButton, QSplitter,
+    QListWidgetItem, QMainWindow, QMessageBox, QProgressBar, QPushButton,
+    QSizePolicy, QSplitter,
     QStackedWidget, QTextBrowser, QVBoxLayout, QWidget,
 )
 
+from ..checks.offline.submission import PROFILE_DIR, Profile
 from ..engine import load, run_checks
 from ..model.document import SEVERITY_ORDER, Document, Issue
+from ..report.docx_comments import annotate, default_output_path
 from ..report.text_report import render_json, render_text
 
 # ---- Design tokens ---------------------------------------------------------
@@ -101,14 +104,15 @@ class CheckWorker(QObject):
     finished = Signal(object, object)   # Document, list[Issue]
     failed = Signal(str)
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, profile=None):
         super().__init__()
         self.path = path
+        self.profile = profile
 
     def run(self):
         try:
             doc = load(self.path)
-            self.finished.emit(doc, run_checks(doc))
+            self.finished.emit(doc, run_checks(doc, profile=self.profile))
         except ValueError as e:
             self.failed.emit(f"{e}. Open the file in Word, save it as .docx, and try again.")
         except Exception as e:  # corrupt or locked file
@@ -175,6 +179,7 @@ class StartPage(QWidget):
     def __init__(self):
         super().__init__()
         self.setObjectName("page")
+        self.profile = None
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         col = QWidget()
@@ -201,6 +206,20 @@ class StartPage(QWidget):
         path_row.addWidget(self.path_edit, 1)
         path_row.addWidget(go)
 
+        profile_row = QHBoxLayout()
+        self.profile_label = QLabel("No journal limits")
+        self.profile_label.setObjectName("muted")
+        choose = QPushButton("Use journal limits…")
+        choose.setCursor(Qt.PointingHandCursor)
+        choose.clicked.connect(self._choose_profile)
+        self.clear_profile = QPushButton("Clear")
+        self.clear_profile.setCursor(Qt.PointingHandCursor)
+        self.clear_profile.clicked.connect(self._clear_profile)
+        self.clear_profile.hide()
+        profile_row.addWidget(self.profile_label, 1)
+        profile_row.addWidget(choose)
+        profile_row.addWidget(self.clear_profile)
+
         self.message = QLabel("")
         self.message.setObjectName("errorText")
         self.message.setWordWrap(True)
@@ -219,11 +238,32 @@ class StartPage(QWidget):
         lay.addSpacing(10)
         lay.addWidget(self.drop)
         lay.addLayout(path_row)
+        lay.addLayout(profile_row)
         lay.addWidget(self.progress)
         lay.addWidget(self.progress_label)
         lay.addWidget(self.message)
         lay.addStretch(2)
         outer.addWidget(col, alignment=Qt.AlignHCenter)
+
+    def _choose_profile(self):
+        """Load a journal profile: word and item limits to check against."""
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Choose a journal profile", str(PROFILE_DIR),
+            "Journal profiles (*.json)")
+        if not path:
+            return
+        try:
+            self.profile = Profile.load(path)
+        except (OSError, ValueError) as e:
+            self.show_error(f"That profile couldn't be read: {e}")
+            return
+        self.profile_label.setText(f"Checking against {self.profile.name}")
+        self.clear_profile.show()
+
+    def _clear_profile(self):
+        self.profile = None
+        self.profile_label.setText("No journal limits")
+        self.clear_profile.hide()
 
     def _check_path(self):
         text = self.path_edit.text().strip().strip('"').strip("'")
@@ -271,17 +311,29 @@ class ResultsPage(QWidget):
         names.setSpacing(2)
         self.file_label = QLabel()
         self.file_label.setObjectName("fileName")
+        self.file_label.setMinimumWidth(80)
+        self.file_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        self._file_name = ""
         self.summary_label = QLabel()
         self.summary_label.setObjectName("muted")
+        self.summary_label.setMinimumWidth(80)
+        self.summary_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        self._summary_text = ""
         names.addWidget(self.file_label)
         names.addWidget(self.summary_label)
-        h.addLayout(names, 1)
+        names_box = QWidget()
+        names_box.setLayout(names)
+        names_box.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        names_box.setMinimumWidth(160)     # the file name keeps a readable share
+        h.addWidget(names_box, 1)
         for text, slot, primary in [("Open in Word", self._open_doc, False),
+                                    ("Save with comments…", self._save_comments, False),
                                     ("Save report…", self._save_report, False),
-                                    ("Check another file", self.newFile.emit, False),
+                                    ("Check another", self.newFile.emit, False),
                                     ("Re-check", self.recheck.emit, True)]:
             b = QPushButton(text)
             b.setCursor(Qt.PointingHandCursor)
+            b.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             if primary:
                 b.setObjectName("primary")
             b.clicked.connect(slot)
@@ -331,11 +383,15 @@ class ResultsPage(QWidget):
         self.doc = doc
         self.issues = sorted(issues, key=lambda i: (
             SEVERITY_ORDER[i.severity], i.para_index if i.para_index is not None else -1))
-        self.file_label.setText(Path(doc.path).name)
+        self._file_name = Path(doc.path).name
+        self._elide_file_name()
+        # The label's real width is only known once the layout has run.
+        QTimer.singleShot(0, self._elide_file_name)
         n_cites = len(doc.citations)
-        self.summary_label.setText(
+        self._summary_text = (
             f"{sum(1 for p in doc.paragraphs if p.text)} paragraphs read, "
             f"{n_cites} reference-manager citation{'s' if n_cites != 1 else ''} found")
+        self.summary_label.setText(self._summary_text)
         for sev, btn in self.filters.items():
             n = sum(1 for i in self.issues if i.severity == sev)
             name = SEVERITY[sev]["name"]
@@ -392,10 +448,57 @@ class ResultsPage(QWidget):
             body = html.escape(text)
         return f"<table width='100%'><tr><td style=\"{style}\">{body}</td></tr></table>"
 
+    def _elide_file_name(self):
+        metrics = self.file_label.fontMetrics()
+        width = max(80, self.file_label.width())
+        self.file_label.setText(
+            metrics.elidedText(self._file_name, Qt.ElideMiddle, width))
+        self.file_label.setToolTip(self._file_name)
+        if self._summary_text:
+            self.summary_label.setText(
+                self.summary_label.fontMetrics().elidedText(
+                    self._summary_text, Qt.ElideRight,
+                    max(80, self.summary_label.width())))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self._file_name:
+            self._elide_file_name()
+
     # -- actions
     def _open_doc(self):
         if self.doc:
             QDesktopServices.openUrl(QUrl.fromLocalFile(self.doc.path))
+
+    def _save_comments(self):
+        """Save a copy of the manuscript with a Word comment at each issue."""
+        if not self.doc:
+            return
+        shown = {sev for sev, btn in self.filters.items() if btn.isChecked()}
+        if not shown:
+            QMessageBox.information(self, "Nothing to comment on",
+                                    "Turn on at least one filter to choose which "
+                                    "issues to add as comments.")
+            return
+        default = str(default_output_path(self.doc.path))
+        path, _ = QFileDialog.getSaveFileName(self, "Save commented copy", default,
+                                              "Word documents (*.docx)")
+        if not path:
+            return
+        try:
+            written = annotate(self.doc, self.issues, path, severities=tuple(shown))
+        except Exception as e:
+            QMessageBox.warning(self, "Copy not saved",
+                                f"Couldn't write the commented copy: {e}")
+            return
+        count = sum(1 for i in self.issues if i.severity in shown)
+        answer = QMessageBox.question(
+            self, "Commented copy saved",
+            f"Added {count} comment{'s' if count != 1 else ''} to a copy of your "
+            f"manuscript.\n\nYour original file is unchanged.\n\nOpen the copy now?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if answer == QMessageBox.Yes:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(written)))
 
     def _save_report(self):
         if not self.doc:
@@ -419,7 +522,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Galley")
         self.resize(1080, 720)
-        self.setMinimumSize(760, 520)
+        self.setMinimumSize(940, 560)
         self.current_path: str | None = None
         self._thread: QThread | None = None
 
@@ -447,7 +550,7 @@ class MainWindow(QMainWindow):
         self.start.set_busy(True, Path(path).name)
 
         self._thread = QThread()
-        self._worker = CheckWorker(path)
+        self._worker = CheckWorker(path, self.start.profile)
         self._worker.moveToThread(self._thread)
         self._thread.started.connect(self._worker.run)
         self._worker.finished.connect(self._done)

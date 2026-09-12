@@ -7,7 +7,7 @@ authors:
     given-names: Rahul
 repository-code: "https://github.com/USERNAME/galley-check"
 license: MIT
-version: 0.2.0
+version: 0.4.0
 abstract: >-
   An offline desktop tool that checks academic manuscript drafts for figure and
   table callout problems and citation or reference-list errors, without
