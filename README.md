@@ -158,6 +158,27 @@ To be notified of new versions, click **Watch** at the top of this page, choose
 **Custom**, and tick **Releases**. GitHub emails you when a release is published;
 nothing is collected by Galley itself.
 
+## Citing Galley
+
+If Galley saved you time on a manuscript, please cite it. Citations are how a
+free tool like this earns a place on a CV, and they help other people find it.
+
+> Bodkhe, R. (2026). *Galley: offline manuscript checks for figures, tables,
+> citations and references* (Version 1.0.0) [Computer software]. Zenodo.
+> https://doi.org/10.5281/zenodo.22733230
+
+DOI: [10.5281/zenodo.22733230](https://doi.org/10.5281/zenodo.22733230)
+
+A BibTeX entry and other formats are available from the
+[Zenodo record](https://doi.org/10.5281/zenodo.22733230), and GitHub's
+**Cite this repository** button (top right of this page) generates a citation
+in several styles.
+
+In a methods section, something like this is enough:
+
+> Figure callouts, citations, references and abbreviations were checked with
+> Galley v1.0.0 (Bodkhe, 2026).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
