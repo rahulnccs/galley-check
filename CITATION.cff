@@ -6,6 +6,7 @@ authors:
   - family-names: Bodkhe
     given-names: Rahul
 repository-code: "https://github.com/rahulnccs/galley-check"
+doi: 10.5281/zenodo.22733230
 license: MIT
 version: 1.0.0
 abstract: >-

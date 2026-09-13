@@ -8,6 +8,7 @@ mechanical part of that check for you.
 
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22733230.svg)](https://doi.org/10.5281/zenodo.22733230)
 
 **Status:** early development (v0.2). Checks figures, tables, citations, and
 references in `.docx` files. PDF support is experimental and not yet reliable.
