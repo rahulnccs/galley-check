@@ -283,7 +283,25 @@ def detect_style(entries: list[Entry], cites: Citations) -> str:
     return best
 
 
-def check_references(doc: Document) -> list[Issue]:
+STYLE_NAMES = {"numbered": "numbered", "author_year": "author-year"}
+
+
+def _check_style_matches_journal(style: str, profile) -> list[Issue]:
+    """Compare the style the manuscript uses with the one the journal wants."""
+    wanted = getattr(profile, "reference_style", None)
+    if not wanted or style not in STYLE_NAMES:
+        return []
+    if style == wanted:
+        return []
+    return [Issue(CHECK, "warning",
+                  f"{profile.name} expects {STYLE_NAMES[wanted]} citations, but "
+                  f"this manuscript uses {STYLE_NAMES[style]} citations.",
+                  None, None,
+                  "Switch the style in your reference manager and re-check. "
+                  "This changes both the in-text citations and the list.")]
+
+
+def check_references(doc: Document, profile=None) -> list[Issue]:
     entries = collect_entries(doc)
     cites = collect_citations(doc)
     cites.named = _dedupe_named(cites.named)
@@ -298,6 +316,11 @@ def check_references(doc: Document) -> list[Issue]:
         return issues
 
     style = detect_style(entries, cites)
+    if profile is not None:
+        issues.extend(_check_style_matches_journal(
+            {"numeric": "numbered", "author_year": "author_year",
+             "key": "author_year", "note": "author_year"}.get(style, style),
+            profile))
     if style == "numeric":
         issues.extend(_check_numeric(entries, cites.numeric))
     elif style == "author_year":

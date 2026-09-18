@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 
 from ...model.document import Document, Issue
@@ -32,9 +33,21 @@ WORD = re.compile(r"[\w\u00c0-\u024f][\w\u00c0-\u024f'\u2019\-]*")
 
 @dataclass
 class Profile:
+    """A journal's submission rules, read from a small JSON file.
+
+    Limits change without notice, so every profile records the date it was
+    checked and a link to the journal's own guidelines. Galley reports both,
+    and warns when a profile is old, rather than implying its numbers are
+    authoritative.
+    """
     name: str = "no journal profile"
     limits: dict[str, int] = field(default_factory=dict)
     required_sections: list[str] = field(default_factory=list)
+    reference_style: str | None = None      # "numbered" | "author_year"
+    guidelines_url: str | None = None
+    verified: str | None = None             # YYYY-MM-DD
+    notes: str | None = None
+    path: Path | None = None
 
     @classmethod
     def load(cls, source: str | Path) -> "Profile":
@@ -42,9 +55,39 @@ class Profile:
         if not path.exists() and not path.suffix:
             path = PROFILE_DIR / f"{source}.json"
         data = json.loads(path.read_text(encoding="utf-8"))
+        style = (data.get("reference_style") or "").strip().lower() or None
+        if style not in (None, "numbered", "author_year"):
+            raise ValueError(f'reference_style must be "numbered" or '
+                             f'"author_year", not "{style}"')
         return cls(name=data.get("name", path.stem),
                    limits={k: int(v) for k, v in (data.get("limits") or {}).items()},
-                   required_sections=list(data.get("required_sections") or []))
+                   required_sections=list(data.get("required_sections") or []),
+                   reference_style=style,
+                   guidelines_url=data.get("guidelines_url"),
+                   verified=data.get("verified"),
+                   notes=data.get("notes"),
+                   path=path)
+
+    @property
+    def months_old(self) -> float | None:
+        if not self.verified:
+            return None
+        try:
+            checked = date.fromisoformat(self.verified)
+        except ValueError:
+            return None
+        return (date.today() - checked).days / 30.44
+
+
+def available_profiles() -> list[Profile]:
+    """Every profile shipped with Galley, sorted by journal name."""
+    out = []
+    for path in sorted(PROFILE_DIR.glob("*.json")):
+        try:
+            out.append(Profile.load(path))
+        except (OSError, ValueError, json.JSONDecodeError):
+            continue
+    return sorted(out, key=lambda p: p.name.lower())
 
 
 LIMIT_LABELS = {
@@ -159,6 +202,40 @@ def check_submission(doc: Document, profile: Profile | None = None) -> list[Issu
         issues.append(Issue(CHECK, "info", f"Manuscript size: {summary}."))
     if profile is None:
         return issues
+
+    # Say which profile is in use, how old it is, and where its rules came
+    # from. A journal's limits change without notice, so an unverified or
+    # stale profile must not read as authoritative.
+    provenance = f'Checked against the "{profile.name}" profile'
+    if profile.verified:
+        provenance += f", last verified {profile.verified}"
+    if profile.guidelines_url:
+        provenance += f". Journal guidelines: {profile.guidelines_url}"
+    issues.append(Issue(CHECK, "info", provenance + "."))
+
+    age = profile.months_old
+    if age is None:
+        issues.append(Issue(
+            CHECK, "warning",
+            f'The "{profile.name}" profile has no verification date, so its '
+            f"limits may be out of date.",
+            None, None,
+            "Check the journal's author guidelines before relying on these "
+            "numbers."))
+    elif age > 12:
+        issues.append(Issue(
+            CHECK, "warning",
+            f'The "{profile.name}" profile was last verified '
+            f"{int(age)} months ago and may be out of date.",
+            None, None,
+            "Confirm the current limits in the journal's author guidelines."))
+    elif age > 6:
+        issues.append(Issue(
+            CHECK, "info",
+            f'The "{profile.name}" profile was last verified '
+            f"{int(age)} months ago; worth confirming against the journal."))
+    if profile.notes:
+        issues.append(Issue(CHECK, "info", profile.notes))
 
     for key, limit in sorted(profile.limits.items()):
         value = _value(counts, key)

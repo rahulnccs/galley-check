@@ -143,3 +143,28 @@ def test_no_doi_anywhere_is_a_style_choice_not_an_error():
 def test_complete_doi_coverage_is_silent():
     doc = make_doc(["Cited [1,2,3,4]."], DOI_REFS)
     assert not any("DOI" in m for _, m in messages(doc))
+
+
+class FakeProfile:
+    """Minimal stand-in for a journal profile."""
+    def __init__(self, style):
+        self.name = "Test Journal"
+        self.reference_style = style
+
+
+def test_style_mismatch_is_flagged():
+    doc = make_doc(["A claim [1] and another [2,3]."], REFS)
+    issues = check_references(doc, FakeProfile("author_year"))
+    assert any("expects author-year citations" in i.message for i in issues)
+
+
+def test_style_match_is_silent():
+    doc = make_doc(["A claim [1] and another [2,3]."], REFS)
+    issues = check_references(doc, FakeProfile("numbered"))
+    assert not any("expects" in i.message for i in issues)
+
+
+def test_no_style_in_profile_means_no_opinion():
+    doc = make_doc(["A claim [1] and another [2,3]."], REFS)
+    issues = check_references(doc, FakeProfile(None))
+    assert not any("expects" in i.message for i in issues)

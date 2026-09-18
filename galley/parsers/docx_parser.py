@@ -53,6 +53,7 @@ W_TAGS_TEXT_BREAK = {"tab": "\t", "br": " ", "cr": " ", "noBreakHyphen": "-"}
 # Private markers wrap superscript text so its position survives whitespace
 # cleanup; they are removed once the spans are recorded.
 SUP_OPEN, SUP_CLOSE = "\u0001", "\u0002"
+ITALIC_OPEN, ITALIC_CLOSE = "\u0003", "\u0004"
 SKIP_SUBTREES = {"del", "moveFrom", "pPr", "rPr", "instrText"}
 
 
@@ -149,10 +150,16 @@ def _walk(el, para_index: int, fields: _FieldTracker, out: list[str], flags: dic
     if tag == "r":
         vert = el.find(f"{qn('w:rPr')}/{qn('w:vertAlign')}")
         superscript = vert is not None and vert.get(qn("w:val")) == "superscript"
+        ital = el.find(f"{qn('w:rPr')}/{qn('w:i')}")
+        italic = ital is not None and ital.get(qn("w:val")) not in ("0", "false")
         if superscript:
             out.append(SUP_OPEN)
+        if italic:
+            out.append(ITALIC_OPEN)
         for child in el:
             _walk(child, para_index, fields, out, flags)
+        if italic:
+            out.append(ITALIC_CLOSE)
         if superscript:
             out.append(SUP_CLOSE)
         return
@@ -168,23 +175,35 @@ def _walk(el, para_index: int, fields: _FieldTracker, out: list[str], flags: dic
         _walk(child, para_index, fields, out, flags)
 
 
-def _extract_superscripts(text: str) -> tuple[str, list[tuple[int, int]]]:
-    """Remove the superscript markers, returning the text and the spans."""
-    clean, spans, depth, start = [], [], 0, 0
+MARKERS = (SUP_OPEN, SUP_CLOSE, ITALIC_OPEN, ITALIC_CLOSE)
+
+
+def _extract_spans(text: str) -> tuple[str, list[tuple[int, int]],
+                                       list[tuple[int, int]]]:
+    """Remove the formatting markers, returning the text and the spans.
+
+    Superscript and italic are tracked independently; a run can be both.
+    """
+    clean: list[str] = []
+    spans = {SUP_OPEN: [], ITALIC_OPEN: []}
+    depth = {SUP_OPEN: 0, ITALIC_OPEN: 0}
+    start = {SUP_OPEN: 0, ITALIC_OPEN: 0}
+    closes = {SUP_CLOSE: SUP_OPEN, ITALIC_CLOSE: ITALIC_OPEN}
     length = 0
     for ch in text:
-        if ch == SUP_OPEN:
-            if depth == 0:
-                start = length
-            depth += 1
-        elif ch == SUP_CLOSE:
-            depth = max(0, depth - 1)
-            if depth == 0 and length > start:
-                spans.append((start, length))
+        if ch in (SUP_OPEN, ITALIC_OPEN):
+            if depth[ch] == 0:
+                start[ch] = length
+            depth[ch] += 1
+        elif ch in closes:
+            key = closes[ch]
+            depth[key] = max(0, depth[key] - 1)
+            if depth[key] == 0 and length > start[key]:
+                spans[key].append((start[key], length))
         else:
             clean.append(ch)
             length += 1
-    return "".join(clean), spans
+    return "".join(clean), spans[SUP_OPEN], spans[ITALIC_OPEN]
 
 
 def _read_notes(path: str) -> dict[int, Note]:
@@ -263,8 +282,9 @@ def parse_docx(path: str) -> Document:
         raw = re.sub(r"[ \u00a0]+", " ", "".join(out))
         # _extract_superscripts already works on the stripped text, so the
         # spans it returns need no further adjustment.
-        text, spans = _extract_superscripts(raw.strip())
+        text, spans, italics = _extract_spans(raw.strip())
         spans = [(a, b) for a, b in spans if text[a:b].strip()]
+        italics = [(a, b) for a, b in italics if text[a:b].strip()]
         style = _style_name(d, p_el)
         is_list_item = (p_el.find(f"{qn('w:pPr')}/{qn('w:numPr')}") is not None
                         or style.lower().startswith(("list number", "list bullet")))
@@ -282,6 +302,7 @@ def parse_docx(path: str) -> Document:
             is_heading=is_heading, in_table=in_table,
             in_bibliography_field=flags["bibliography"],
             is_list_item=is_list_item, superscript_spans=spans,
+            italic_spans=italics,
             footnote_ids=flags.get("notes", [])))
 
     doc.citations = fields.citations

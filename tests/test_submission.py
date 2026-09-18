@@ -1,5 +1,6 @@
 """Submission-readiness counts and journal-profile limits."""
 import json
+from datetime import date
 
 import pytest
 
@@ -37,7 +38,9 @@ def test_size_note_without_a_profile():
 
 
 def profile(**limits):
-    return Profile(name="Test Journal", limits=limits)
+    """A profile verified today, so the staleness warning stays quiet."""
+    return Profile(name="Test Journal", limits=limits,
+                   verified=date.today().isoformat())
 
 
 def test_over_a_word_limit_is_a_warning():
@@ -59,6 +62,7 @@ def test_close_to_a_limit_is_a_note():
 def test_missing_required_section_is_an_error():
     issues = check_submission(make_doc(BODY),
                               Profile(name="Test Journal",
+                                      verified=date.today().isoformat(),
                                       required_sections=["data availability"]))
     assert any(i.severity == "error" and "data availability" in i.message
                for i in issues)
@@ -72,6 +76,7 @@ def test_missing_required_section_is_an_error():
 def test_required_section_matches_real_world_headings(heading):
     doc = make_doc(BODY + [("methods", f"{heading}. Raw data are in the SRA.")])
     issues = check_submission(doc, Profile(name="Test Journal",
+                                           verified=date.today().isoformat(),
                                            required_sections=["data availability"]))
     assert not [i for i in issues if i.severity == "error"]
 
@@ -92,3 +97,30 @@ def test_profile_loads_from_a_file(tmp_path):
 def test_shipped_example_profile_is_valid():
     p = Profile.load("example")
     assert p.limits and p.name
+
+
+def test_profile_provenance_is_reported():
+    p = Profile(name="Test Journal", verified="2026-09-01",
+                guidelines_url="https://example.org/authors")
+    messages = [i.message for i in check_submission(make_doc(BODY), p)]
+    assert any("last verified 2026-09-01" in m and "example.org" in m
+               for m in messages)
+
+
+def test_profile_with_no_date_warns():
+    issues = check_submission(make_doc(BODY), Profile(name="Test Journal"))
+    assert any(i.severity == "warning" and "no verification date" in i.message
+               for i in issues)
+
+
+def test_stale_profile_warns():
+    p = Profile(name="Test Journal", verified="2020-01-01")
+    issues = check_submission(make_doc(BODY), p)
+    assert any(i.severity == "warning" and "may be out of date" in i.message
+               for i in issues)
+
+
+def test_shipped_profiles_all_load():
+    from galley.checks.offline.submission import available_profiles
+    profiles = available_profiles()
+    assert profiles and all(p.name for p in profiles)

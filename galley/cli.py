@@ -6,7 +6,9 @@ import sys
 
 from .checks.registry import OFFLINE_CHECKS
 from .engine import load, run_checks
-from .checks.offline.submission import PROFILE_DIR, Profile
+from .checks.offline.submission import PROFILE_DIR, Profile, available_profiles
+from .report.compare_versions import compare, highlight, summarize
+from .report.compare_versions import default_output_path as changes_path
 from .report.docx_comments import annotate, default_output_path
 from .report.text_report import render_json, render_text
 
@@ -14,13 +16,18 @@ from .report.text_report import render_json, render_text
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="galley",
                                  description="Offline sanity checks for manuscript drafts.")
-    ap.add_argument("file", help="manuscript (.docx)")
+    ap.add_argument("file", nargs="?", help="manuscript (.docx)")
     ap.add_argument("--json", action="store_true", help="output JSON instead of text")
     ap.add_argument("--only", nargs="+", choices=sorted(OFFLINE_CHECKS),
                     help="run only these checks")
     ap.add_argument("--profile", metavar="NAME_OR_FILE",
                     help="journal profile with word and item limits (a JSON file, "
                          f"or a name from {PROFILE_DIR})")
+    ap.add_argument("--list-profiles", action="store_true",
+                    help="show the journal profiles Galley ships with, and exit")
+    ap.add_argument("--compare-with", metavar="OLD.docx",
+                    help="compare against an earlier version and save a copy of "
+                         "this file with the changed sentences highlighted")
     ap.add_argument("--comments", nargs="?", const="", metavar="OUT.docx",
                     help="also save a copy of the manuscript with Word comments "
                          "at each problem (the original is never changed)")
@@ -29,6 +36,17 @@ def main(argv: list[str] | None = None) -> int:
                     help="lowest severity to comment on (default: info, meaning all)")
     args = ap.parse_args(argv)
 
+    if args.list_profiles:
+        profiles = available_profiles()
+        if not profiles:
+            print("No journal profiles are installed.")
+        for p in profiles:
+            checked = f"verified {p.verified}" if p.verified else "no date"
+            print(f"  {p.path.stem:20s} {p.name}  ({checked})")
+        return 0
+
+    if not args.file:
+        ap.error("a manuscript file is required")
     try:
         doc = load(args.file)
     except Exception as e:  # unreadable or unsupported file
@@ -43,6 +61,16 @@ def main(argv: list[str] | None = None) -> int:
             return 2
     issues = run_checks(doc, args.only, profile=profile)
     print(render_json(doc, issues) if args.json else render_text(doc, issues))
+
+    if args.compare_with:
+        try:
+            old = load(args.compare_with)
+            changes = compare(old, doc)
+            out = highlight(doc, changes, changes_path(args.file))
+            print(f"\n{summarize(old, doc, changes)}")
+            print(f"Highlighted copy saved to {out}")
+        except Exception as e:
+            print(f"\nCouldn't compare versions: {e}", file=sys.stderr)
 
     if args.comments is not None:
         levels = {"error": ("error",), "warning": ("error", "warning"),

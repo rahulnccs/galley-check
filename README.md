@@ -8,7 +8,6 @@ mechanical part of that check for you.
 
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22733230.svg)](https://doi.org/10.5281/zenodo.22733230)
 
 **Status:** early development (v0.2). Checks figures, tables, citations, and
 references in `.docx` files. PDF support is experimental and not yet reliable.
@@ -41,11 +40,39 @@ expect an abbreviation to be defined once in each.
 - Reference, figure and table counts
 - Anything over a journal's limit, and any required section that's missing
 
-Limits come from a journal profile — a small JSON file you edit. Copy
-`galley/profiles/example.json`, change the numbers to match your target journal,
-and pass it with `--profile myjournal.json` or the **Use journal limits…** button.
-Galley ships no real journal profiles, because limits change often and a stale
-limit is worse than none.
+Limits come from a journal profile: a small JSON file naming the word and item
+limits, any required sections, and the reference style the journal expects.
+Pick one from the **Journal** dropdown, or pass `--profile myjournal.json`.
+
+Every profile records the date its rules were checked and a link to the
+journal's own guidelines, and Galley reports both. A profile with no date, or
+one older than a year, produces a warning rather than quietly implying its
+numbers are current.
+
+Galley ships a template rather than real journals, because a stale limit is
+worse than none. Copy `galley/profiles/example.json`, edit it, and set
+`verified` to the date you read the guidelines. Profiles for journals you
+submit to are welcome as pull requests.
+
+**Comparing two versions**
+
+Choose **Document → Compare with an earlier version…**, or run
+`galley revised.docx --compare-with old.docx`. Galley works out which sentences
+are new or edited and saves a copy of the revised file with those sentences
+highlighted — useful when sending a revision back to reviewers. Comparison is at
+sentence level, so reordering a paragraph doesn't light up the whole page, and
+the original file is never modified.
+
+**Species names**
+
+- Italicized in some places and not others
+- Genus abbreviated before it has been spelled out in full
+- "sp." and "spp." used inconsistently
+- Genus written in lower case
+
+A phrase is only treated as a species when the manuscript gives evidence it is
+one — italics somewhere, an abbreviated form, or a "sp." usage — so ordinary
+prose like "Alpha diversity" is never mistaken for a binomial.
 
 **Citations and references**
 

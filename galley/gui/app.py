@@ -13,13 +13,16 @@ from pathlib import Path
 from PySide6.QtCore import QObject, QSize, Qt, QThread, QTimer, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
-    QApplication, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit, QListView, QListWidget,
+    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
+    QListView, QListWidget,
     QListWidgetItem, QMainWindow, QMessageBox, QProgressBar, QPushButton,
-    QSizePolicy, QSplitter,
+    QMenu, QSizePolicy, QSplitter, QToolButton,
     QStackedWidget, QTextBrowser, QVBoxLayout, QWidget,
 )
 
-from ..checks.offline.submission import PROFILE_DIR, Profile
+from ..checks.offline.submission import PROFILE_DIR, Profile, available_profiles
+from ..report.compare_versions import compare, highlight, summarize
+from ..report.compare_versions import default_output_path as changes_path
 from ..engine import load, run_checks
 from ..model.document import SEVERITY_ORDER, Document, Issue
 from ..report.docx_comments import annotate, default_output_path
@@ -69,11 +72,20 @@ def stylesheet(ui: str) -> str:
                           font-weight: 600; }}
     QPushButton#primary:hover {{ background: #175642; }}
     QPushButton#primary:disabled {{ background: #9DB9AE; }}
+    QToolButton#menuButton {{ background: {SHEET}; border: 1px solid {RULE};
+                             border-radius: 8px; padding: 8px 14px; }}
+    QToolButton#menuButton:hover {{ border-color: {INK_SOFT}; }}
+    QMenu {{ background: {SHEET}; border: 1px solid {RULE}; padding: 4px; }}
+    QMenu::item {{ padding: 7px 18px; border-radius: 6px; }}
+    QMenu::item:selected {{ background: #E9EEF6; }}
     QPushButton#chip {{ border-radius: 12px; padding: 4px 14px; background: {SHEET}; }}
     QPushButton#chip:checked {{ background: #E9EEF6; border: 1px solid {INK_SOFT}; }}
     QPushButton#chip:disabled {{ color: #A3AAB8; }}
     QLineEdit {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
                 padding: 8px 10px; }}
+    QComboBox {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
+                padding: 7px 10px; }}
+    QComboBox:focus {{ border: 2px solid {GREEN_INK}; }}
     QLineEdit:focus {{ border: 2px solid {GREEN_INK}; }}
     QListWidget {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 10px;
                   padding: 4px; outline: none; }}
@@ -215,15 +227,23 @@ class StartPage(QWidget):
         profile_row = QHBoxLayout()
         self.profile_label = QLabel("No journal limits")
         self.profile_label.setObjectName("muted")
+        self.journal_box = QComboBox()
+        self.journal_box.addItem("No journal limits", None)
+        for p in available_profiles():
+            self.journal_box.addItem(p.name, p)
+        self.journal_box.addItem("Choose a profile file…", "file")
+        self.journal_box.currentIndexChanged.connect(self._journal_chosen)
         choose = QPushButton("Use journal limits…")
         choose.setCursor(Qt.PointingHandCursor)
         choose.clicked.connect(self._choose_profile)
+        choose.hide()          # the dropdown replaces it
         self.clear_profile = QPushButton("Clear")
         self.clear_profile.setCursor(Qt.PointingHandCursor)
         self.clear_profile.clicked.connect(self._clear_profile)
         self.clear_profile.hide()
-        profile_row.addWidget(self.profile_label, 1)
-        profile_row.addWidget(choose)
+        profile_row.addWidget(QLabel("Journal:"))
+        profile_row.addWidget(self.journal_box, 1)
+        profile_row.addWidget(self.profile_label)
         profile_row.addWidget(self.clear_profile)
 
         self.message = QLabel("")
@@ -251,6 +271,30 @@ class StartPage(QWidget):
         lay.addStretch(2)
         outer.addWidget(col, alignment=Qt.AlignHCenter)
 
+    def _journal_chosen(self, index: int):
+        value = self.journal_box.itemData(index)
+        if value == "file":
+            self._choose_profile()
+            return
+        self.profile = value
+        self._describe_profile()
+
+    def _describe_profile(self):
+        """Say how old the profile is; a stale limit is worse than none."""
+        if self.profile is None:
+            self.profile_label.setText("")
+            self.clear_profile.hide()
+            return
+        age = self.profile.months_old
+        if age is None:
+            note = "no verification date"
+        elif age > 12:
+            note = f"verified {self.profile.verified} — may be out of date"
+        else:
+            note = f"verified {self.profile.verified}"
+        self.profile_label.setText(note)
+        self.clear_profile.show()
+
     def _choose_profile(self):
         """Load a journal profile: word and item limits to check against."""
         path, _ = QFileDialog.getOpenFileName(
@@ -263,12 +307,16 @@ class StartPage(QWidget):
         except (OSError, ValueError) as e:
             self.show_error(f"That profile couldn't be read: {e}")
             return
-        self.profile_label.setText(f"Checking against {self.profile.name}")
-        self.clear_profile.show()
+        self.journal_box.blockSignals(True)
+        self.journal_box.insertItem(1, self.profile.name, self.profile)
+        self.journal_box.setCurrentIndex(1)
+        self.journal_box.blockSignals(False)
+        self._describe_profile()
 
     def _clear_profile(self):
         self.profile = None
-        self.profile_label.setText("No journal limits")
+        self.journal_box.setCurrentIndex(0)
+        self.profile_label.setText("")
         self.clear_profile.hide()
 
     def _check_path(self):
@@ -332,10 +380,25 @@ class ResultsPage(QWidget):
         names_box.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
         names_box.setMinimumWidth(160)     # the file name keeps a readable share
         h.addWidget(names_box, 1)
-        for text, slot, primary in [("Open in Word", self._open_doc, False),
-                                    ("Save with comments…", self._save_comments, False),
-                                    ("Save report…", self._save_report, False),
-                                    ("Check another", self.newFile.emit, False),
+        # Four document actions live in one menu; six buttons in a row crowd
+        # the file name off the header.
+        actions = QToolButton()
+        actions.setText("Document \u25be")
+        actions.setPopupMode(QToolButton.InstantPopup)
+        actions.setCursor(Qt.PointingHandCursor)
+        actions.setObjectName("menuButton")
+        menu = QMenu(actions)
+        for text, slot in [("Open in Word", self._open_doc),
+                           ("Compare with an earlier version…",
+                            self._compare_versions),
+                           ("Save with comments…", self._save_comments),
+                           ("Save report…", self._save_report)]:
+            menu.addAction(text, slot)
+        actions.setMenu(menu)
+        actions.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        h.addWidget(actions)
+
+        for text, slot, primary in [("Check another", self.newFile.emit, False),
                                     ("Re-check", self.recheck.emit, True)]:
             b = QPushButton(text)
             b.setCursor(Qt.PointingHandCursor)
@@ -490,6 +553,42 @@ class ResultsPage(QWidget):
         if self.doc:
             QDesktopServices.openUrl(QUrl.fromLocalFile(self.doc.path))
 
+    def _compare_versions(self):
+        """Highlight what changed since an earlier version of this manuscript."""
+        if not self.doc:
+            return
+        old_path, _ = QFileDialog.getOpenFileName(
+            self, "Choose the earlier version", str(Path(self.doc.path).parent),
+            "Word documents (*.docx)")
+        if not old_path:
+            return
+        if Path(old_path).resolve() == Path(self.doc.path).resolve():
+            QMessageBox.information(self, "Same file",
+                                    "That is the file you just checked. Choose "
+                                    "the earlier version to compare against.")
+            return
+        default = str(changes_path(self.doc.path))
+        out_path, _ = QFileDialog.getSaveFileName(
+            self, "Save highlighted copy", default, "Word documents (*.docx)")
+        if not out_path:
+            return
+        try:
+            old = load(old_path)
+            changes = compare(old, self.doc)
+            written = highlight(self.doc, changes, out_path)
+        except Exception as e:
+            QMessageBox.warning(self, "Couldn't compare",
+                                f"The two versions couldn't be compared: {e}")
+            return
+        answer = QMessageBox.question(
+            self, "Comparison saved",
+            f"{summarize(old, self.doc, changes)}\n\nThe changed sentences are "
+            f"highlighted in a copy of your manuscript. Your original file is "
+            f"unchanged.\n\nOpen the copy now?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if answer == QMessageBox.Yes:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(written)))
+
     def _save_comments(self):
         """Save a copy of the manuscript with a Word comment at each issue."""
         if not self.doc:
@@ -542,7 +641,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Galley")
         self.resize(1080, 720)
-        self.setMinimumSize(940, 560)
+        self.setMinimumSize(860, 560)
         self.current_path: str | None = None
         self._thread: QThread | None = None
 

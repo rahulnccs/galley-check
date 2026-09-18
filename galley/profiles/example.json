@@ -1,12 +1,19 @@
 {
   "name": "Example Journal",
-  "_comment": [
-    "Copy this file, rename it, and edit the numbers to match the journal you are",
-    "submitting to. Galley ships no real journal profiles because limits change",
-    "often and a stale limit is worse than none. Delete any limit you don't want",
-    "checked.",
+  "guidelines_url": "https://example.org/authors/submission-guidelines",
+  "verified": "2026-09-16",
+  "reference_style": "numbered",
+  "notes": "This is a template, not a real journal. Copy it, rename it, and edit the numbers to match the journal you are submitting to.",
+  "_how_to_use": [
+    "Copy this file and rename it after the journal, e.g. microbiome.json.",
+    "Set 'verified' to the date you actually read the journal's guidelines.",
+    "Set 'guidelines_url' so anyone using the profile can check it themselves.",
+    "Delete any limit you don't want checked; nothing here is required.",
+    "reference_style is 'numbered' or 'author_year', or leave it out.",
     "Limits Galley understands: abstract_words, main_text_words, total_words,",
-    "title_words, references, figures, tables, display_items."
+    "title_words, references, figures, tables, display_items.",
+    "Galley ships no real journal profiles, because a stale limit is worse",
+    "than none. If you build one for your journal, a pull request is welcome."
   ],
   "limits": {
     "title_words": 20,

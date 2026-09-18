@@ -7,14 +7,16 @@ engine passes it when one is available.
 from .offline.abbreviations import check_abbreviations
 from .offline.figures import check_figures
 from .offline.references import check_references
+from .offline.species import check_species
 from .offline.submission import check_submission
 
 OFFLINE_CHECKS = {
     "figures": check_figures,
     "references": check_references,
     "abbreviations": check_abbreviations,
+    "species": check_species,
     "submission": check_submission,
 }
 
 # Checks that accept a journal profile as their second argument.
-PROFILE_AWARE = {"submission"}
+PROFILE_AWARE = {"submission", "references"}

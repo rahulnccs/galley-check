@@ -26,6 +26,7 @@ class Paragraph:
     is_list_item: bool = False          # part of a Word auto-numbered/bulleted list
     footnote_ids: list[int] = field(default_factory=list)   # notes anchored here
     superscript_spans: list[tuple[int, int]] = field(default_factory=list)
+    italic_spans: list[tuple[int, int]] = field(default_factory=list)
 
     def superscripts(self) -> list[str]:
         return [self.text[a:b] for a, b in self.superscript_spans]
