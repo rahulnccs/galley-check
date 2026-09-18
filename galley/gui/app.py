@@ -75,6 +75,9 @@ def stylesheet(ui: str) -> str:
     QToolButton#menuButton {{ background: {SHEET}; border: 1px solid {RULE};
                              border-radius: 8px; padding: 8px 14px; }}
     QToolButton#menuButton:hover {{ border-color: {INK_SOFT}; }}
+    /* macOS draws its own menu arrow outside the padding, on top of ours. */
+    QToolButton#menuButton::menu-indicator {{ image: none; width: 0; }}
+    QToolButton#menuButton::menu-button {{ border: none; width: 0; }}
     QMenu {{ background: {SHEET}; border: 1px solid {RULE}; padding: 4px; }}
     QMenu::item {{ padding: 7px 18px; border-radius: 6px; }}
     QMenu::item:selected {{ background: #E9EEF6; }}
@@ -383,7 +386,7 @@ class ResultsPage(QWidget):
         # Four document actions live in one menu; six buttons in a row crowd
         # the file name off the header.
         actions = QToolButton()
-        actions.setText("Document \u25be")
+        actions.setText("Document  \u2304")
         actions.setPopupMode(QToolButton.InstantPopup)
         actions.setCursor(Qt.PointingHandCursor)
         actions.setObjectName("menuButton")

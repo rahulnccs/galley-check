@@ -8,7 +8,7 @@ authors:
 repository-code: "https://github.com/rahulnccs/galley-check"
 doi: 10.5281/zenodo.22733230
 license: MIT
-version: 1.1.0
+version: 1.1.1
 abstract: >-
   An offline desktop tool that checks academic manuscript drafts for figure and
   table callout problems and citation or reference-list errors, without
