@@ -10,7 +10,8 @@ import html
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QObject, QSize, Qt, QThread, QTimer, QUrl, Signal
+from PySide6.QtCore import (
+    QObject, QSettings, QSize, Qt, QThread, QTimer, QUrl, Signal)
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
@@ -20,9 +21,11 @@ from PySide6.QtWidgets import (
     QStackedWidget, QTextBrowser, QVBoxLayout, QWidget,
 )
 
-from ..checks.offline.submission import PROFILE_DIR, Profile, available_profiles
+from ..checks.offline.submission import (
+    PROFILE_DIR, Profile, available_profiles, delete_profile, is_user_profile)
 from ..report.compare_versions import compare, highlight, summarize
 from ..report.compare_versions import default_output_path as changes_path
+from .journal_dialog import JournalDialog
 from ..engine import load, run_checks
 from ..model.document import SEVERITY_ORDER, Document, Issue
 from ..report.docx_comments import annotate, default_output_path
@@ -35,6 +38,14 @@ PAPER = "#F4F6F9"       # window background
 SHEET = "#FFFFFF"       # surfaces
 RULE = "#DCE1E8"        # borders
 GREEN_INK = "#1E6B52"   # primary action: an editor's green pen
+CHECK_LABELS = {
+    "figures": "FIGURES AND TABLES",
+    "references": "CITATIONS AND REFERENCES",
+    "abbreviations": "ABBREVIATIONS",
+    "species": "SPECIES NAMES",
+    "submission": "JOURNAL REQUIREMENTS",
+}
+CHECK_ORDER = ["figures", "references", "abbreviations", "species", "submission"]
 SEVERITY = {
     "error":   {"color": "#C0392B", "tint": "#FBE3E0", "name": "error"},
     "warning": {"color": "#A86A12", "tint": "#FBEFD9", "name": "warning"},
@@ -89,6 +100,12 @@ def stylesheet(ui: str) -> str:
     QComboBox {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
                 padding: 7px 10px; }}
     QComboBox:focus {{ border: 2px solid {GREEN_INK}; }}
+    QDialog {{ background: {PAPER}; }}
+    QSpinBox {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
+               padding: 7px 10px; }}
+    QSpinBox:focus {{ border: 2px solid {GREEN_INK}; }}
+    QCheckBox {{ spacing: 8px; }}
+    QDialogButtonBox QPushButton {{ min-width: 92px; }}
     QLineEdit:focus {{ border: 2px solid {GREEN_INK}; }}
     QListWidget {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 10px;
                   padding: 4px; outline: none; }}
@@ -99,6 +116,10 @@ def stylesheet(ui: str) -> str:
     QProgressBar {{ background: {RULE}; border: none; border-radius: 3px; max-height: 6px; }}
     QProgressBar::chunk {{ background: {GREEN_INK}; border-radius: 3px; }}
     #header {{ background: {SHEET}; border-bottom: 1px solid {RULE}; }}
+    #stats {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
+             padding: 9px 14px; color: {INK_SOFT}; }}
+    #dialogTitle {{ font-size: 19px; font-weight: 600; }}
+    #rule {{ color: {RULE}; }}
     #linkButton {{ background: transparent; border: none; color: {INK_SOFT};
                   padding: 4px 2px; text-decoration: underline; }}
     #linkButton:hover {{ color: {GREEN_INK}; }}
@@ -210,8 +231,9 @@ class StartPage(QWidget):
 
         title = QLabel("Galley")
         title.setObjectName("title")
-        sub = QLabel("Checks figures, tables, citations and references before "
-                     "reviewers do. Your manuscript stays on this computer.")
+        sub = QLabel("Checks figures, tables, citations, references, "
+                     "abbreviations and species names before reviewers do. "
+                     "Your manuscript stays on this computer.")
         sub.setObjectName("subtitle")
         sub.setWordWrap(True)
 
@@ -231,23 +253,34 @@ class StartPage(QWidget):
         self.profile_label = QLabel("No journal limits")
         self.profile_label.setObjectName("muted")
         self.journal_box = QComboBox()
+        self.journal_box.setMinimumWidth(190)
         self.journal_box.addItem("No journal limits", None)
         for p in available_profiles():
             self.journal_box.addItem(p.name, p)
-        self.journal_box.addItem("Choose a profile file…", "file")
+        self.journal_box.addItem("Enter journal requirements\u2026", "new")
+        self.journal_box.addItem("Open a profile file\u2026", "file")
         self.journal_box.currentIndexChanged.connect(self._journal_chosen)
         choose = QPushButton("Use journal limits…")
         choose.setCursor(Qt.PointingHandCursor)
         choose.clicked.connect(self._choose_profile)
         choose.hide()          # the dropdown replaces it
+        self.edit_profile = QPushButton("Edit")
+        self.edit_profile.setCursor(Qt.PointingHandCursor)
+        self.edit_profile.clicked.connect(self._edit_profile)
+        self.edit_profile.hide()
+        self.remove_profile = QPushButton("Remove")
+        self.remove_profile.setCursor(Qt.PointingHandCursor)
+        self.remove_profile.clicked.connect(self._remove_profile)
+        self.remove_profile.hide()
         self.clear_profile = QPushButton("Clear")
         self.clear_profile.setCursor(Qt.PointingHandCursor)
         self.clear_profile.clicked.connect(self._clear_profile)
         self.clear_profile.hide()
+        profile_row.setSpacing(8)
         profile_row.addWidget(QLabel("Journal:"))
         profile_row.addWidget(self.journal_box, 1)
-        profile_row.addWidget(self.profile_label)
-        profile_row.addWidget(self.clear_profile)
+        profile_row.addWidget(self.edit_profile)
+        profile_row.addWidget(self.remove_profile)
 
         self.message = QLabel("")
         self.message.setObjectName("errorText")
@@ -268,26 +301,50 @@ class StartPage(QWidget):
         lay.addWidget(self.drop)
         lay.addLayout(path_row)
         lay.addLayout(profile_row)
+        lay.addWidget(self.profile_label)
         lay.addWidget(self.progress)
         lay.addWidget(self.progress_label)
         lay.addWidget(self.message)
         lay.addStretch(2)
         outer.addWidget(col, alignment=Qt.AlignHCenter)
+        self._restore_last_profile()
 
     def _journal_chosen(self, index: int):
         value = self.journal_box.itemData(index)
+        if value == "new":
+            self._new_profile()
+            return
         if value == "file":
             self._choose_profile()
             return
         self.profile = value
         self._describe_profile()
 
+    def _new_profile(self):
+        """Fill in a journal's requirements by hand, and keep them."""
+        dialog = JournalDialog(self)
+        if dialog.exec() != JournalDialog.Accepted or not dialog.saved_path:
+            self.journal_box.setCurrentIndex(0)
+            return
+        try:
+            self.profile = Profile.load(dialog.saved_path)
+        except (OSError, ValueError) as e:
+            self.show_error(f"The profile was saved but couldn't be read: {e}")
+            self.journal_box.setCurrentIndex(0)
+            return
+        self._rebuild_journal_box(select=self.profile)
+
     def _describe_profile(self):
         """Say how old the profile is; a stale limit is worse than none."""
+        mine = self.profile is not None and is_user_profile(self.profile)
+        self.edit_profile.setVisible(mine)
+        self.remove_profile.setVisible(mine)
         if self.profile is None:
             self.profile_label.setText("")
             self.clear_profile.hide()
+            self._remember(None)
             return
+        self._remember(self.profile)
         age = self.profile.months_old
         if age is None:
             note = "no verification date"
@@ -310,11 +367,79 @@ class StartPage(QWidget):
         except (OSError, ValueError) as e:
             self.show_error(f"That profile couldn't be read: {e}")
             return
+        self._rebuild_journal_box(select=self.profile)
+
+    def _edit_profile(self):
+        """Change a journal's requirements; limits move, and typos happen."""
+        if self.profile is None:
+            return
+        dialog = JournalDialog(self, profile=self.profile)
+        if dialog.exec() != JournalDialog.Accepted or not dialog.saved_path:
+            return
+        try:
+            updated = Profile.load(dialog.saved_path)
+        except (OSError, ValueError) as e:
+            self.show_error(f"The profile was saved but couldn't be read: {e}")
+            return
+        # A rename writes a new file; drop the old one so it isn't listed twice.
+        if (self.profile.path and dialog.saved_path != self.profile.path
+                and is_user_profile(self.profile)):
+            delete_profile(self.profile)
+        self.profile = updated
+        self._rebuild_journal_box(select=updated)
+
+    def _remove_profile(self):
+        if self.profile is None:
+            return
+        name = self.profile.name
+        answer = QMessageBox.question(
+            self, "Remove journal",
+            f"Remove the requirements you saved for {name}?\n\n"
+            f"This deletes the profile file. Your manuscript is not affected.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if answer != QMessageBox.Yes:
+            return
+        if not delete_profile(self.profile):
+            self.show_error(f"{name} couldn't be removed.")
+            return
+        self.profile = None
+        self._rebuild_journal_box()
+
+    def _rebuild_journal_box(self, select: Profile | None = None):
+        """Refresh the dropdown after a profile is added, edited or removed."""
         self.journal_box.blockSignals(True)
-        self.journal_box.insertItem(1, self.profile.name, self.profile)
-        self.journal_box.setCurrentIndex(1)
+        self.journal_box.clear()
+        self.journal_box.addItem("No journal limits", None)
+        chosen = 0
+        for profile in available_profiles():
+            self.journal_box.addItem(profile.name, profile)
+            if select is not None and profile.path == select.path:
+                chosen = self.journal_box.count() - 1
+        self.journal_box.addItem("Enter journal requirements\u2026", "new")
+        self.journal_box.addItem("Open a profile file\u2026", "file")
+        self.journal_box.setCurrentIndex(chosen)
         self.journal_box.blockSignals(False)
+        self.profile = self.journal_box.itemData(chosen) if chosen else None
         self._describe_profile()
+
+    def _remember(self, profile: Profile | None):
+        """Keep the last journal, so a second manuscript doesn't need re-picking."""
+        settings = QSettings("Galley", "Galley")
+        if profile is None or profile.path is None:
+            settings.remove("last_profile")
+        else:
+            settings.setValue("last_profile", str(profile.path))
+
+    def _restore_last_profile(self):
+        path = QSettings("Galley", "Galley").value("last_profile")
+        if not path or not Path(str(path)).exists():
+            return
+        try:
+            profile = Profile.load(Path(str(path)))
+        except (OSError, ValueError):
+            return
+        self.profile = profile
+        self._rebuild_journal_box(select=profile)
 
     def _clear_profile(self):
         self.profile = None
@@ -417,6 +542,14 @@ class ResultsPage(QWidget):
         b.setContentsMargins(24, 16, 24, 20)
         b.setSpacing(12)
 
+        # The manuscript's size, shown as a strip rather than buried in the
+        # list: it is context for every finding, not a finding itself.
+        self.stats = QLabel("")
+        self.stats.setObjectName("stats")
+        self.stats.setWordWrap(True)
+        self.stats.hide()
+        b.addWidget(self.stats)
+
         self.filters: dict[str, QPushButton] = {}
         frow = QHBoxLayout()
         frow.setSpacing(8)
@@ -477,6 +610,13 @@ class ResultsPage(QWidget):
         self._summary_text = (
             f"{sum(1 for p in doc.paragraphs if p.text)} paragraphs read, "
             f"{n_cites} reference-manager citation{'s' if n_cites != 1 else ''} found")
+
+        size = next((i.message for i in self.issues
+                     if i.check == "submission" and i.message.startswith(
+                         "Manuscript size:")), "")
+        self.issues = [i for i in self.issues if i.message != size or not size]
+        self.stats.setText(size.replace("Manuscript size: ", "").rstrip("."))
+        self.stats.setVisible(bool(size))
         self.summary_label.setText(self._summary_text)
         for sev, btn in self.filters.items():
             n = sum(1 for i in self.issues if i.severity == sev)
@@ -486,22 +626,53 @@ class ResultsPage(QWidget):
         self._refresh_list()
 
     def _refresh_list(self):
+        """Rebuild the list, grouped by which check produced each finding."""
         self.list.clear()
         shown = [i for i in self.issues if self.filters[i.severity].isChecked()]
-        for issue in shown:
-            item = QListWidgetItem(dot_icon(SEVERITY[issue.severity]["color"]), issue.message)
-            item.setData(Qt.UserRole, issue)
-            self.list.addItem(item)
-        if shown:
-            self.list.setCurrentRow(0)
+
+        first_row = None
+        for check in CHECK_ORDER:
+            group = [i for i in shown if i.check == check]
+            if not group:
+                continue
+            heading = QListWidgetItem(
+                f"{CHECK_LABELS.get(check, check.title())}   {len(group)}")
+            heading.setFlags(Qt.NoItemFlags)          # a label, not a choice
+            heading.setData(Qt.UserRole + 1, True)
+            font = heading.font()
+            font.setBold(True)
+            font.setPointSizeF(font.pointSizeF() * 0.92)
+            heading.setFont(font)
+            heading.setForeground(QColor(INK_SOFT))
+            self.list.addItem(heading)
+            for issue in group:
+                item = QListWidgetItem(
+                    dot_icon(SEVERITY[issue.severity]["color"]), issue.message)
+                item.setData(Qt.UserRole, issue)
+                self.list.addItem(item)
+                if first_row is None:
+                    first_row = self.list.row(item)
+
+        if first_row is not None:
+            self.list.setCurrentRow(first_row)
         else:
+            self.list.setCurrentItem(None)
             self.detail.setHtml(self._empty_html())
 
     def _empty_html(self) -> str:
         if not self.issues:
-            return (f"<h2 style='color:{GREEN_INK}'>No problems found</h2>"
-                    "<p>Every figure and table is cited, has a legend, and appears in order.</p>")
-        return "<p>All issues are hidden. Turn a filter back on to see them.</p>"
+            return (
+                f"<div style='margin-top:28px'>"
+                f"<p style='font-size:40px; margin:0; color:{GREEN_INK}'>\u2713</p>"
+                f"<h2 style='color:{GREEN_INK}; margin:6px 0 2px 0'>"
+                f"Nothing to fix</h2>"
+                f"<p style='color:{INK_SOFT}'>Figures, tables, citations, "
+                f"references, abbreviations and species names all check out.</p>"
+                f"<p style='color:{INK_SOFT}; font-size:13px'>Galley only "
+                f"checks a manuscript against itself, so this is not a "
+                f"substitute for reading it.</p></div>")
+        return (f"<p style='color:{INK_SOFT}; margin-top:24px'>Every finding is "
+                f"hidden. Turn a filter back on to see them.</p>")
 
     def _show_detail(self, item: QListWidgetItem | None):
         if item is None or self.doc is None:

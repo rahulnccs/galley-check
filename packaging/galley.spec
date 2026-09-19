@@ -21,6 +21,9 @@ EXCLUDES = [
 a = Analysis(
     [str(ROOT / "packaging" / "launch.py")],
     pathex=[str(ROOT)],
+    # Journal profiles are data, not code: without this they are missing from
+    # the packaged app and the Journal dropdown comes up empty.
+    datas=[(str(ROOT / "galley" / "profiles"), "galley/profiles")],
     hiddenimports=["galley.parsers.docx_parser"],
     excludes=EXCLUDES,
     noarchive=False,
@@ -45,7 +48,7 @@ if sys.platform == "darwin":
         info_plist={
             "CFBundleName": APP_NAME,
             "CFBundleDisplayName": APP_NAME,
-            "CFBundleShortVersionString": "1.1.1",
+            "CFBundleShortVersionString": "1.2.1",
             "NSHighResolutionCapable": True,
             "CFBundleDocumentTypes": [{
                 "CFBundleTypeName": "Word document",

@@ -35,6 +35,7 @@ SENTENCE_END = re.compile(
     r"(?<![A-Z][a-z]\.)(?<!\b[A-Z]\.)(?<!\be\.g\.)(?<!\bi\.e\.)(?<!\bvs\.)"
     r"(?<!\bFig\.)(?<!\bcf\.)(?<!\bet al\.)(?<=[.!?])\s+(?=[A-Z\u201c(])")
 WORD = re.compile(r"[\w\u00c0-\u024f'\u2019-]+")
+NUMBER = re.compile(r"\d[\d.,:\u2013-]*")
 SIMILAR_ENOUGH = 0.55      # below this, a sentence counts as new, not edited
 
 
@@ -50,16 +51,26 @@ def split_sentences(text: str) -> list[str]:
     return [s for s in SENTENCE_END.split(text) if s.strip()]
 
 
-def _key(sentence: str) -> str:
-    return " ".join(WORD.findall(sentence.lower()))
+def _key(sentence: str, ignore_numbers: bool = True) -> str:
+    """The comparable form of a sentence.
+
+    Numbers are replaced by a placeholder by default, so a sentence whose only
+    difference is a figure ("p = 0.03" to "p = 0.003") is not reported as an
+    edit. Pass ignore_numbers=False to treat those as changes.
+    """
+    text = sentence.lower()
+    if ignore_numbers:
+        text = NUMBER.sub(" # ", text)
+    return " ".join(WORD.findall(text))
 
 
-def compare(old: Document, revised: Document) -> list[Change]:
+def compare(old: Document, revised: Document,
+            ignore_numbers: bool = True) -> list[Change]:
     """Sentences in `revised` that are new or altered relative to `old`."""
     old_sentences = {}
     for p in old.paragraphs:
         for s in split_sentences(p.text):
-            old_sentences.setdefault(_key(s), s)
+            old_sentences.setdefault(_key(s, ignore_numbers), s)
 
     changes: list[Change] = []
     old_keys = list(old_sentences)
@@ -67,7 +78,7 @@ def compare(old: Document, revised: Document) -> list[Change]:
         if not p.text or p.is_heading:
             continue
         for sentence in split_sentences(p.text):
-            key = _key(sentence)
+            key = _key(sentence, ignore_numbers)
             if not key or key in old_sentences:
                 continue
             close = difflib.get_close_matches(key, old_keys, n=1,

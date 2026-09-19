@@ -14,7 +14,9 @@ journal's current rules.
 from __future__ import annotations
 
 import json
+import os
 import re
+import sys
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -24,6 +26,22 @@ from ...model.document import Document, Issue
 CHECK = "submission"
 
 PROFILE_DIR = Path(__file__).resolve().parents[2] / "profiles"
+
+
+def user_profile_dir() -> Path:
+    """Where profiles the user creates are kept.
+
+    Separate from the bundled folder, which lives inside the installed app and
+    is not writable once Galley is packaged.
+    """
+    home = Path.home()
+    if sys.platform == "darwin":
+        base = home / "Library" / "Application Support" / "Galley"
+    elif sys.platform.startswith("win"):
+        base = Path(os.environ.get("APPDATA", home)) / "Galley"
+    else:
+        base = Path(os.environ.get("XDG_CONFIG_HOME", home / ".config")) / "galley"
+    return base / "profiles"
 # Sections whose words count towards a main-text limit.
 MAIN_TEXT = {"introduction", "results", "discussion", "conclusions"}
 COUNTED_SEPARATELY = {"abstract", "methods", "references", "figure_legends",
@@ -44,6 +62,9 @@ class Profile:
     limits: dict[str, int] = field(default_factory=dict)
     required_sections: list[str] = field(default_factory=list)
     reference_style: str | None = None      # "numbered" | "author_year"
+    max_authors_listed: int | None = None   # before "et al." in the reference list
+    require_doi: bool = False
+    template: bool = False                  # documentation, not a real journal
     guidelines_url: str | None = None
     verified: str | None = None             # YYYY-MM-DD
     notes: str | None = None
@@ -63,6 +84,10 @@ class Profile:
                    limits={k: int(v) for k, v in (data.get("limits") or {}).items()},
                    required_sections=list(data.get("required_sections") or []),
                    reference_style=style,
+                   max_authors_listed=(int(data["max_authors_listed"])
+                                       if data.get("max_authors_listed") else None),
+                   require_doi=bool(data.get("require_doi")),
+                   template=bool(data.get("template")),
                    guidelines_url=data.get("guidelines_url"),
                    verified=data.get("verified"),
                    notes=data.get("notes"),
@@ -79,15 +104,62 @@ class Profile:
         return (date.today() - checked).days / 30.44
 
 
-def available_profiles() -> list[Profile]:
-    """Every profile shipped with Galley, sorted by journal name."""
-    out = []
-    for path in sorted(PROFILE_DIR.glob("*.json")):
+def available_profiles(include_templates: bool = False) -> list[Profile]:
+    """Profiles the user has made, plus any real ones shipped with Galley.
+
+    The bundled example is a template with invented numbers, so it stays out of
+    the list a user picks from: a fake journal in the dropdown is worse than an
+    empty one.
+    """
+    out, seen = [], set()
+    for folder in (user_profile_dir(), PROFILE_DIR):
         try:
-            out.append(Profile.load(path))
-        except (OSError, ValueError, json.JSONDecodeError):
+            paths = sorted(folder.glob("*.json"))
+        except OSError:
             continue
+        for path in paths:
+            if path.name in seen:
+                continue
+            try:
+                profile = Profile.load(path)
+                if profile.template and not include_templates:
+                    continue
+                out.append(profile)
+                seen.add(path.name)
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
     return sorted(out, key=lambda p: p.name.lower())
+
+
+def is_user_profile(profile: "Profile") -> bool:
+    """True for a profile the user made, as opposed to one shipped with Galley."""
+    try:
+        return (profile.path is not None
+                and profile.path.parent.resolve() == user_profile_dir().resolve())
+    except OSError:
+        return False
+
+
+def delete_profile(profile: "Profile") -> bool:
+    """Remove a profile the user made. Bundled profiles are left alone."""
+    if not is_user_profile(profile):
+        return False
+    try:
+        profile.path.unlink()
+    except OSError:
+        return False
+    return True
+
+
+def save_profile(data: dict, filename: str | None = None) -> Path:
+    """Write a profile the user filled in, and return where it went."""
+    folder = user_profile_dir()
+    folder.mkdir(parents=True, exist_ok=True)
+    stem = filename or re.sub(r"[^a-z0-9]+", "-",
+                              str(data.get("name", "journal")).lower()).strip("-")
+    path = folder / f"{stem or 'journal'}.json"
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    return path
 
 
 LIMIT_LABELS = {

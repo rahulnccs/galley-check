@@ -40,9 +40,17 @@ expect an abbreviation to be defined once in each.
 - Reference, figure and table counts
 - Anything over a journal's limit, and any required section that's missing
 
-Limits come from a journal profile: a small JSON file naming the word and item
-limits, any required sections, and the reference style the journal expects.
-Pick one from the **Journal** dropdown, or pass `--profile myjournal.json`.
+Choose **Journal → Enter journal requirements…** and fill in what the journal
+asks for: abstract, main text and total word limits, title length, maximum
+references and display items, required sections, the citation style, how many
+authors an entry lists before "et al.", and whether every reference needs a DOI.
+Anything left blank isn't checked.
+
+The profile is saved under your user folder and appears in the dropdown next
+time, so you fill it in once per journal. Galley remembers the last journal you
+used, and profiles you made can be edited or removed from the same row. Profiles are small JSON files, so you
+can also share one with your lab, or pass it on the command line with
+`--profile myjournal.json`.
 
 Every profile records the date its rules were checked and a link to the
 journal's own guidelines, and Galley reports both. A profile with no date, or
@@ -50,9 +58,8 @@ one older than a year, produces a warning rather than quietly implying its
 numbers are current.
 
 Galley ships a template rather than real journals, because a stale limit is
-worse than none. Copy `galley/profiles/example.json`, edit it, and set
-`verified` to the date you read the guidelines. Profiles for journals you
-submit to are welcome as pull requests.
+worse than none, and there is no way for the app to know when a journal changed
+its rules. Profiles for journals you submit to are welcome as pull requests.
 
 **Comparing two versions**
 
@@ -61,7 +68,8 @@ Choose **Document → Compare with an earlier version…**, or run
 are new or edited and saves a copy of the revised file with those sentences
 highlighted — useful when sending a revision back to reviewers. Comparison is at
 sentence level, so reordering a paragraph doesn't light up the whole page, and
-the original file is never modified.
+the original file is never modified. Changes to numbers alone — a p-value or an
+n — are treated as unchanged text.
 
 **Species names**
 

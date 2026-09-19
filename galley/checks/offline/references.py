@@ -79,6 +79,18 @@ class Entry:
         return {w for w in SURNAME_IN_CITATION.findall(head) if w not in NOT_A_SURNAME}
 
     @property
+    def author_count(self) -> int | None:
+        """How many authors are listed before the title, if that is countable."""
+        zone = self.author_zone
+        if not zone or "et al" in zone.lower():
+            return None            # truncated with et al., so not a full count
+        # "Doe J, Roe S, Poe A." or "Doe, J., Roe, S., & Poe, A."
+        parts = [p for p in re.split(r",|;|\band\b|&", zone) if p.strip()]
+        names = [p for p in parts
+                 if re.search(r"[A-Z][a-z\u00c0-\u024f'-]{2,}", p)]
+        return len(names) or None
+
+    @property
     def first_sentence(self) -> str:
         return re.split(r"\.\s|\?\s", self.text, 1)[0]
 
@@ -340,6 +352,41 @@ def check_references(doc: Document, profile=None) -> list[Issue]:
                             "Citation style wasn't recognized, so citations and "
                             "references weren't compared. Everything else was checked."))
     issues.extend(_check_entries(entries))
+    if profile is not None:
+        issues.extend(_check_entries_against_journal(entries, profile))
+    return issues
+
+
+def _check_entries_against_journal(entries: list[Entry], profile) -> list[Issue]:
+    """Rules that only exist because a particular journal asks for them."""
+    issues: list[Issue] = []
+
+    limit = getattr(profile, "max_authors_listed", None)
+    if limit:
+        over = [e for e in entries
+                if e.author_count and e.author_count > limit]
+        if over:
+            listed = ", ".join(str(e.number) for e in over[:12])
+            more = f" and {len(over) - 12} more" if len(over) > 12 else ""
+            issues.append(Issue(
+                CHECK, "warning",
+                f"{profile.name} lists at most {limit} authors before "
+                f"\u201cet al.\u201d, but {len(over)} entries list more: "
+                f"{listed}{more}.",
+                over[0].para_index, over[0].text[:45],
+                f"Set your reference manager to truncate after {limit} authors."))
+
+    if getattr(profile, "require_doi", False):
+        without = [e for e in entries if not DOI.search(e.text)]
+        if without:
+            listed = ", ".join(str(e.number) for e in without[:12])
+            more = f" and {len(without) - 12} more" if len(without) > 12 else ""
+            issues.append(Issue(
+                CHECK, "warning",
+                f"{profile.name} requires a DOI for every reference, but "
+                f"{len(without)} entries have none: {listed}{more}.",
+                without[0].para_index, without[0].text[:45],
+                "Add the missing DOIs before submitting."))
     return issues
 
 

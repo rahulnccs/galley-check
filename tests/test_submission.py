@@ -121,6 +121,7 @@ def test_stale_profile_warns():
 
 
 def test_shipped_profiles_all_load():
+    """The template is excluded by default, so ask for it explicitly."""
     from galley.checks.offline.submission import available_profiles
-    profiles = available_profiles()
+    profiles = available_profiles(include_templates=True)
     assert profiles and all(p.name for p in profiles)

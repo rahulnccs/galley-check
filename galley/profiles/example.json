@@ -1,5 +1,6 @@
 {
   "name": "Example Journal",
+  "template": true,
   "guidelines_url": "https://example.org/authors/submission-guidelines",
   "verified": "2026-09-16",
   "reference_style": "numbered",
