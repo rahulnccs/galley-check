@@ -115,3 +115,28 @@ def test_bundled_profiles_cannot_be_removed():
     assert is_user_profile(template) is False
     assert delete_profile(template) is False
     assert template.path.exists()
+
+
+@pytest.mark.parametrize("entry, expected", [
+    # The title follows the authors and contains commas; it must not be counted.
+    ("Shreiner AB, Kao JY, Young VB. The gut microbiome in health and disease. "
+     "Curr Opin Gastroenterol 2015;31(1):69-75.", 3),
+    ("Berg M, Zhou XY, Shapira M. Host-specific functional significance. "
+     "Front Microbiol 2016;7:1622.", 3),
+    ("Doe J. A single-author paper. J Test 2019;1:1-10.", 1),
+    ("Doe J and Roe S. Two authors, one comma. J Test 2020;2:1-9.", 2),
+    ("Doe, J. A., Roe, S. B., & Poe, A. Another paper. Fict Chem 2020;7:55-70.", 3),
+    ("Doe J, Roe S, Poe A, Moe B, Loe C. Five of them. J Test 2021;3:1-9.", 5),
+])
+def test_author_count(entry, expected):
+    from galley.checks.offline.references import Entry
+    assert Entry(1, 1, entry, 0).author_count == expected
+
+
+def test_three_authors_is_not_over_a_limit_of_three():
+    """The bug this guards: the title was being counted as a fourth author."""
+    refs = ["1\tShreiner AB, Kao JY, Young VB. The gut microbiome in health and "
+            "disease. Curr Opin Gastroenterol 2015;31(1):69-75."]
+    doc = make_doc(["Cited [1]."], refs)
+    issues = check_references(doc, Journal(max_authors_listed=3))
+    assert not any("lists at most" in i.message for i in issues)

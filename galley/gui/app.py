@@ -12,7 +12,7 @@ from pathlib import Path
 
 from PySide6.QtCore import (
     QObject, QSettings, QSize, Qt, QThread, QTimer, QUrl, Signal)
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
+from PySide6.QtGui import QBrush, QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
     QListView, QListWidget,
@@ -36,7 +36,8 @@ INK = "#1F2A44"         # body text
 INK_SOFT = "#5B6478"    # secondary text
 PAPER = "#F4F6F9"       # window background
 SHEET = "#FFFFFF"       # surfaces
-RULE = "#DCE1E8"        # borders
+RULE = "#DCE1E8"
+ROW_TINT = "#EDF1F7"    # every other row in the journal list        # borders
 GREEN_INK = "#1E6B52"   # primary action: an editor's green pen
 CHECK_LABELS = {
     "figures": "FIGURES AND TABLES",
@@ -100,6 +101,14 @@ def stylesheet(ui: str) -> str:
     QComboBox {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
                 padding: 7px 10px; }}
     QComboBox:focus {{ border: 2px solid {GREEN_INK}; }}
+    QComboBox QAbstractItemView {{ background: {SHEET}; border: 1px solid {RULE};
+                                  selection-background-color: #E9EEF6;
+                                  selection-color: {INK}; outline: none;
+                                  padding: 4px; }}
+    QComboBox QAbstractItemView::item {{ padding: 7px 10px; min-height: 22px; }}
+    QComboBox QAbstractItemView::item:alternate {{ background: #EBEFF5; }}
+    QComboBox QAbstractItemView::separator {{ height: 1px; background: {RULE};
+                                             margin: 5px 8px; }}
     QDialog {{ background: {PAPER}; }}
     QSpinBox {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
                padding: 7px 10px; }}
@@ -257,13 +266,10 @@ class StartPage(QWidget):
         self.journal_box.addItem("No journal limits", None)
         for p in available_profiles():
             self.journal_box.addItem(p.name, p)
+        self.journal_box.insertSeparator(self.journal_box.count())
         self.journal_box.addItem("Enter journal requirements\u2026", "new")
-        self.journal_box.addItem("Open a profile file\u2026", "file")
         self.journal_box.currentIndexChanged.connect(self._journal_chosen)
-        choose = QPushButton("Use journal limits…")
-        choose.setCursor(Qt.PointingHandCursor)
-        choose.clicked.connect(self._choose_profile)
-        choose.hide()          # the dropdown replaces it
+        self.journal_box.view().setAlternatingRowColors(True)
         self.edit_profile = QPushButton("Edit")
         self.edit_profile.setCursor(Qt.PointingHandCursor)
         self.edit_profile.clicked.connect(self._edit_profile)
@@ -272,10 +278,6 @@ class StartPage(QWidget):
         self.remove_profile.setCursor(Qt.PointingHandCursor)
         self.remove_profile.clicked.connect(self._remove_profile)
         self.remove_profile.hide()
-        self.clear_profile = QPushButton("Clear")
-        self.clear_profile.setCursor(Qt.PointingHandCursor)
-        self.clear_profile.clicked.connect(self._clear_profile)
-        self.clear_profile.hide()
         profile_row.setSpacing(8)
         profile_row.addWidget(QLabel("Journal:"))
         profile_row.addWidget(self.journal_box, 1)
@@ -314,9 +316,6 @@ class StartPage(QWidget):
         if value == "new":
             self._new_profile()
             return
-        if value == "file":
-            self._choose_profile()
-            return
         self.profile = value
         self._describe_profile()
 
@@ -341,7 +340,6 @@ class StartPage(QWidget):
         self.remove_profile.setVisible(mine)
         if self.profile is None:
             self.profile_label.setText("")
-            self.clear_profile.hide()
             self._remember(None)
             return
         self._remember(self.profile)
@@ -353,21 +351,6 @@ class StartPage(QWidget):
         else:
             note = f"verified {self.profile.verified}"
         self.profile_label.setText(note)
-        self.clear_profile.show()
-
-    def _choose_profile(self):
-        """Load a journal profile: word and item limits to check against."""
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Choose a journal profile", str(PROFILE_DIR),
-            "Journal profiles (*.json)")
-        if not path:
-            return
-        try:
-            self.profile = Profile.load(path)
-        except (OSError, ValueError) as e:
-            self.show_error(f"That profile couldn't be read: {e}")
-            return
-        self._rebuild_journal_box(select=self.profile)
 
     def _edit_profile(self):
         """Change a journal's requirements; limits move, and typos happen."""
@@ -413,10 +396,14 @@ class StartPage(QWidget):
         chosen = 0
         for profile in available_profiles():
             self.journal_box.addItem(profile.name, profile)
+            row = self.journal_box.count() - 1
+            if row % 2 == 0:
+                self.journal_box.setItemData(row, QBrush(QColor(ROW_TINT)),
+                                             Qt.BackgroundRole)
             if select is not None and profile.path == select.path:
-                chosen = self.journal_box.count() - 1
+                chosen = row
+        self.journal_box.insertSeparator(self.journal_box.count())
         self.journal_box.addItem("Enter journal requirements\u2026", "new")
-        self.journal_box.addItem("Open a profile file\u2026", "file")
         self.journal_box.setCurrentIndex(chosen)
         self.journal_box.blockSignals(False)
         self.profile = self.journal_box.itemData(chosen) if chosen else None
@@ -440,12 +427,6 @@ class StartPage(QWidget):
             return
         self.profile = profile
         self._rebuild_journal_box(select=profile)
-
-    def _clear_profile(self):
-        self.profile = None
-        self.journal_box.setCurrentIndex(0)
-        self.profile_label.setText("")
-        self.clear_profile.hide()
 
     def _check_path(self):
         text = self.path_edit.text().strip().strip('"').strip("'")

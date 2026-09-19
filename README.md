@@ -48,7 +48,8 @@ Anything left blank isn't checked.
 
 The profile is saved under your user folder and appears in the dropdown next
 time, so you fill it in once per journal. Galley remembers the last journal you
-used, and profiles you made can be edited or removed from the same row. Profiles are small JSON files, so you
+used, and profiles you made can be edited or removed from the same row. They are
+small JSON files, so one can also be shared with a labmate. Profiles are small JSON files, so you
 can also share one with your lab, or pass it on the command line with
 `--profile myjournal.json`.
 

@@ -48,6 +48,14 @@ CITATION_KEY = re.compile(
 # matters here: with IGNORECASE, "Population dynamics" would look like a name.
 AUTHOR_START = re.compile(
     r"\b[A-Z\u00c0-\u024f][\w'\u2019-]+,?\s+(?:[A-Z]\.?\s?){1,4}\b|\bet al\b|\bEt al\b")
+# One author at the start of an entry: "Shreiner AB", "Doe, J. A.", "Kao JY".
+AUTHOR_NAME = re.compile(
+    r"[A-Z\u00c0-\u024f][A-Za-z\u00c0-\u024f'\u2019-]{1,24}"      # surname
+    r"(?:\s+[A-Z][a-z]+)?"                                        # compound surname
+    r",?\s+[A-Z]\.?(?:\s*[A-Z]\.?){0,3}")                          # initials
+# What separates one author from the next.
+# ", " but also ", & " and " and ", which APA style puts before the last author.
+SEPARATOR = re.compile(r"(?:\s*[,;&]\s*|\s+and\s+)+")
 # A source: a journal with volume/pages, a DOI, a URL, or a publisher year.
 HAS_SOURCE = re.compile(
     r"\b\d{1,4}\s*[:(;,]\s*\d|\bdoi\b|10\.\d{4,9}/|https?://|\bpp?\.\s*\d"
@@ -80,15 +88,28 @@ class Entry:
 
     @property
     def author_count(self) -> int | None:
-        """How many authors are listed before the title, if that is countable."""
-        zone = self.author_zone
-        if not zone or "et al" in zone.lower():
+        """How many authors an entry lists, when that can be counted reliably.
+
+        Counting by splitting on commas overcounts, because the title that
+        follows the authors contains commas too. Instead the author names are
+        matched one after another from the start of the entry, and counting
+        stops at the first thing that isn't a name — which is the title.
+        """
+        text = self.text.strip()
+        if not text or "et al" in text[:220].lower():
             return None            # truncated with et al., so not a full count
-        # "Doe J, Roe S, Poe A." or "Doe, J., Roe, S., & Poe, A."
-        parts = [p for p in re.split(r",|;|\band\b|&", zone) if p.strip()]
-        names = [p for p in parts
-                 if re.search(r"[A-Z][a-z\u00c0-\u024f'-]{2,}", p)]
-        return len(names) or None
+        count, at = 0, 0
+        while at < len(text):
+            m = AUTHOR_NAME.match(text, at)
+            if not m:
+                break
+            count += 1
+            at = m.end()
+            sep = SEPARATOR.match(text, at)
+            if not sep:
+                break
+            at = sep.end()
+        return count or None
 
     @property
     def first_sentence(self) -> str:

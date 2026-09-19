@@ -1,6 +1,6 @@
 [project]
 name = "galley-check"
-version = "1.2.1"
+version = "1.2.2"
 description = "Galley — offline checks for figures, tables, citations and references in manuscript drafts"
 readme = "README.md"
 requires-python = ">=3.10"
