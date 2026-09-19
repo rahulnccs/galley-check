@@ -28,7 +28,8 @@ SECTION_PATTERNS = [
     (r"abstract|summary", "abstract"),
     (r"introduction|background", "introduction"),
     # Plain and Cell Press (STAR Methods) headings both land in "methods".
-    (r"(materials and )?methods|experimental procedures|star\s*methods"
+    (r"(materials?\s+(and|&)\s+)?methods(\s+and\s+materials)?"
+     r"|experimental (procedures|section|methods)|star\s*methods"
      r"|method details|key resources? table"
      r"|experimental model( and subject details)?"
      r"|quantification and statistical analysis"

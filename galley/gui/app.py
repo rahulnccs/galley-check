@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import html
 import sys
+from collections import Counter
 from pathlib import Path
 
 from PySide6.QtCore import (
@@ -32,25 +33,38 @@ from ..report.docx_comments import annotate, default_output_path
 from ..report.text_report import render_json, render_text
 
 # ---- Design tokens ---------------------------------------------------------
-INK = "#1F2A44"         # body text
-INK_SOFT = "#5B6478"    # secondary text
-PAPER = "#F4F6F9"       # window background
-SHEET = "#FFFFFF"       # surfaces
-RULE = "#DCE1E8"
-ROW_TINT = "#EDF1F7"    # every other row in the journal list        # borders
-GREEN_INK = "#1E6B52"   # primary action: an editor's green pen
+# The tile palette: soft, saturated cards on a light background.
+INK = "#2B2F36"          # body text
+INK_SOFT = "#6B7480"     # secondary text
+PAPER = "#F2F3F5"        # window background
+SHEET = "#FFFFFF"        # surfaces
+RULE = "#DEE1E6"         # borders
+# Tints for the journal list, so each kind of row reads differently.
+ROW_NONE = "#EDEFF2"     # "No journal limits"
+ROW_JOURNAL = "#E7EFFA"  # a saved journal
+ROW_ACTION = "#FBEEF2"   # "Enter journal requirements…"
+GREEN_INK = "#3E7BC4"    # primary action
+
+TILE = {
+    "all":      "#4A4E54",   # dark slate
+    "error":    "#DE837C",   # red
+    "warning":  "#E7B279",   # amber
+    "info":     "#7BA7E0",   # blue
+    "clean":    "#93A0A8",   # grey
+    "accent":   "#E48AA6",   # pink
+}
 CHECK_LABELS = {
-    "figures": "FIGURES AND TABLES",
-    "references": "CITATIONS AND REFERENCES",
-    "abbreviations": "ABBREVIATIONS",
-    "species": "SPECIES NAMES",
-    "submission": "JOURNAL REQUIREMENTS",
+    "figures": "Figures and tables",
+    "references": "Citations and references",
+    "abbreviations": "Abbreviations",
+    "species": "Species names",
+    "submission": "Journal requirements",
 }
 CHECK_ORDER = ["figures", "references", "abbreviations", "species", "submission"]
 SEVERITY = {
-    "error":   {"color": "#C0392B", "tint": "#FBE3E0", "name": "error"},
-    "warning": {"color": "#A86A12", "tint": "#FBEFD9", "name": "warning"},
-    "info":    {"color": "#46699C", "tint": "#E4ECF7", "name": "note"},
+    "error":   {"color": "#B4463D", "tint": "#F8DFDC", "name": "error"},
+    "warning": {"color": "#9A6416", "tint": "#FAEBD6", "name": "warning"},
+    "info":    {"color": "#3E6DA8", "tint": "#E3ECF9", "name": "note"},
 }
 # Where the "Get in touch" link goes. Replace with your own form or contact page.
 FEEDBACK_URL = "https://docs.google.com/forms/d/e/1FAIpQLSf-IEokqhT8mjond7SFDCp90sDzUDCupJPK8p26aVls46QYjg/viewform"
@@ -82,8 +96,8 @@ def stylesheet(ui: str) -> str:
     QPushButton:focus {{ border: 2px solid {GREEN_INK}; }}
     QPushButton#primary {{ background: {GREEN_INK}; color: white; border: none;
                           font-weight: 600; }}
-    QPushButton#primary:hover {{ background: #175642; }}
-    QPushButton#primary:disabled {{ background: #9DB9AE; }}
+    QPushButton#primary:hover {{ background: #33669F; }}
+    QPushButton#primary:disabled {{ background: #A9C2DF; }}
     QToolButton#menuButton {{ background: {SHEET}; border: 1px solid {RULE};
                              border-radius: 8px; padding: 8px 14px; }}
     QToolButton#menuButton:hover {{ border-color: {INK_SOFT}; }}
@@ -105,8 +119,8 @@ def stylesheet(ui: str) -> str:
                                   selection-background-color: #E9EEF6;
                                   selection-color: {INK}; outline: none;
                                   padding: 4px; }}
-    QComboBox QAbstractItemView::item {{ padding: 7px 10px; min-height: 22px; }}
-    QComboBox QAbstractItemView::item:alternate {{ background: #EBEFF5; }}
+    QComboBox QAbstractItemView::item {{ padding: 11px 12px; min-height: 26px;
+                                        border-radius: 8px; margin: 2px; }}
     QComboBox QAbstractItemView::separator {{ height: 1px; background: {RULE};
                                              margin: 5px 8px; }}
     QDialog {{ background: {PAPER}; }}
@@ -125,9 +139,14 @@ def stylesheet(ui: str) -> str:
     QProgressBar {{ background: {RULE}; border: none; border-radius: 3px; max-height: 6px; }}
     QProgressBar::chunk {{ background: {GREEN_INK}; border-radius: 3px; }}
     #header {{ background: {SHEET}; border-bottom: 1px solid {RULE}; }}
-    #stats {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 8px;
-             padding: 9px 14px; color: {INK_SOFT}; }}
-    #dialogTitle {{ font-size: 19px; font-weight: 600; }}
+    #stats {{ background: {SHEET}; border: 1px solid {RULE}; border-radius: 10px;
+             padding: 10px 14px; color: {INK_SOFT}; }}
+    #paneTitle {{ font-weight: 600; color: {INK_SOFT}; }}
+    #manuscript, #detail {{ background: {SHEET}; border: 1px solid {RULE};
+                           border-radius: 12px; padding: 16px; }}
+    #dialogTitle {{ font-size: 17px; font-weight: 600; }}
+    #dialogBanner {{ background: {TILE["info"]}; color: white; font-size: 19px;
+                    font-weight: 600; border-radius: 12px; padding: 16px 18px; }}
     #rule {{ color: {RULE}; }}
     #linkButton {{ background: transparent; border: none; color: {INK_SOFT};
                   padding: 4px 2px; text-decoration: underline; }}
@@ -264,12 +283,7 @@ class StartPage(QWidget):
         self.journal_box = QComboBox()
         self.journal_box.setMinimumWidth(190)
         self.journal_box.addItem("No journal limits", None)
-        for p in available_profiles():
-            self.journal_box.addItem(p.name, p)
-        self.journal_box.insertSeparator(self.journal_box.count())
-        self.journal_box.addItem("Enter journal requirements\u2026", "new")
         self.journal_box.currentIndexChanged.connect(self._journal_chosen)
-        self.journal_box.view().setAlternatingRowColors(True)
         self.edit_profile = QPushButton("Edit")
         self.edit_profile.setCursor(Qt.PointingHandCursor)
         self.edit_profile.clicked.connect(self._edit_profile)
@@ -309,6 +323,7 @@ class StartPage(QWidget):
         lay.addWidget(self.message)
         lay.addStretch(2)
         outer.addWidget(col, alignment=Qt.AlignHCenter)
+        self._rebuild_journal_box()
         self._restore_last_profile()
 
     def _journal_chosen(self, index: int):
@@ -393,17 +408,19 @@ class StartPage(QWidget):
         self.journal_box.blockSignals(True)
         self.journal_box.clear()
         self.journal_box.addItem("No journal limits", None)
+        self.journal_box.setItemData(0, QBrush(QColor(ROW_NONE)), Qt.BackgroundRole)
         chosen = 0
         for profile in available_profiles():
             self.journal_box.addItem(profile.name, profile)
             row = self.journal_box.count() - 1
-            if row % 2 == 0:
-                self.journal_box.setItemData(row, QBrush(QColor(ROW_TINT)),
-                                             Qt.BackgroundRole)
+            self.journal_box.setItemData(row, QBrush(QColor(ROW_JOURNAL)),
+                                         Qt.BackgroundRole)
             if select is not None and profile.path == select.path:
                 chosen = row
         self.journal_box.insertSeparator(self.journal_box.count())
         self.journal_box.addItem("Enter journal requirements\u2026", "new")
+        self.journal_box.setItemData(self.journal_box.count() - 1,
+                                     QBrush(QColor(ROW_ACTION)), Qt.BackgroundRole)
         self.journal_box.setCurrentIndex(chosen)
         self.journal_box.blockSignals(False)
         self.profile = self.journal_box.itemData(chosen) if chosen else None
@@ -450,8 +467,41 @@ class StartPage(QWidget):
         self.message.setText(text)
 
 
+
+class Tile(QPushButton):
+    """A coloured count card. Clicking one filters the issue list."""
+
+    def __init__(self, key: str, label: str, color: str):
+        super().__init__()
+        self.key = key
+        self.label = label
+        self.color = color
+        self.setCheckable(True)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setMinimumHeight(74)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setStyleSheet(f"""
+            QPushButton {{ background: {color}; border: none; border-radius: 12px;
+                          color: white; text-align: left; padding: 12px 14px; }}
+            QPushButton:hover {{ background: {color}; border: 2px solid white; }}
+            QPushButton:checked {{ border: 3px solid {INK}; }}
+        """)
+        self.set_count(0)
+
+    def set_count(self, count: int):
+        self.setText(f"{count}\n{self.label}")
+        self.setEnabled(True)
+
+
 # ---- Results screen --------------------------------------------------------
 class ResultsPage(QWidget):
+    """Three panes: what was checked, the manuscript, and what was found.
+
+    The manuscript is shown as text with every problem highlighted where it
+    occurs. Clicking a finding scrolls the manuscript to that spot. Galley
+    cannot reproduce a Word file's page layout — that needs a Word renderer —
+    so this is the document's text, not its pages.
+    """
     recheck = Signal()
     newFile = Signal()
 
@@ -461,36 +511,112 @@ class ResultsPage(QWidget):
         self.paper_font = paper_font
         self.doc: Document | None = None
         self.issues: list[Issue] = []
+        self._file_name = ""
+        self._summary_text = ""
+        self._severity_filter = "all"
 
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
+        root.addWidget(self._build_header())
 
+        body = QWidget()
+        b = QVBoxLayout(body)
+        b.setContentsMargins(20, 14, 20, 16)
+        b.setSpacing(12)
+
+        self.tiles: dict[str, Tile] = {}
+        tiles = QHBoxLayout()
+        tiles.setSpacing(10)
+        for key, label, color in [("all", "All findings", TILE["all"]),
+                                  ("error", "Errors", TILE["error"]),
+                                  ("warning", "Warnings", TILE["warning"]),
+                                  ("info", "Notes", TILE["info"])]:
+            tile = Tile(key, label, color)
+            tile.clicked.connect(lambda _=False, k=key: self._filter(k))
+            self.tiles[key] = tile
+            tiles.addWidget(tile)
+        self.tiles["all"].setChecked(True)
+        b.addLayout(tiles)
+
+        self.stats = QLabel("")
+        self.stats.setObjectName("stats")
+        self.stats.setWordWrap(True)
+        self.stats.hide()
+        b.addWidget(self.stats)
+
+        split = QSplitter(Qt.Horizontal)
+        split.setHandleWidth(12)
+
+        self.manuscript = QTextBrowser()
+        self.manuscript.setObjectName("manuscript")
+        self.manuscript.setOpenLinks(False)
+        self.manuscript.anchorClicked.connect(self._anchor_clicked)
+        split.addWidget(self.manuscript)
+
+        right = QWidget()
+        r = QVBoxLayout(right)
+        r.setContentsMargins(0, 0, 0, 0)
+        r.setSpacing(8)
+        self.found_label = QLabel("Findings")
+        self.found_label.setObjectName("paneTitle")
+        r.addWidget(self.found_label)
+        self.list = QListWidget()
+        self.list.setWordWrap(True)
+        self.list.setResizeMode(QListView.Adjust)
+        self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.list.setIconSize(QSize(14, 14))
+        self.list.currentItemChanged.connect(self._issue_selected)
+        r.addWidget(self.list, 1)
+        self.detail = QTextBrowser()
+        self.detail.setObjectName("detail")
+        self.detail.setMaximumHeight(210)
+        r.addWidget(self.detail)
+        split.addWidget(right)
+
+        split.setStretchFactor(0, 3)
+        split.setStretchFactor(1, 2)
+        split.setSizes([620, 460])
+        b.addWidget(split, 1)
+
+        footer = QHBoxLayout()
+        prompt = QLabel("Something wrong here, or a check you'd like added?")
+        prompt.setObjectName("muted")
+        contact = QPushButton("Get in touch")
+        contact.setObjectName("linkButton")
+        contact.setCursor(Qt.PointingHandCursor)
+        contact.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
+        footer.addWidget(prompt)
+        footer.addWidget(contact)
+        footer.addStretch(1)
+        b.addLayout(footer)
+        root.addWidget(body, 1)
+
+    # -- header
+    def _build_header(self) -> QWidget:
         header = QFrame()
         header.setObjectName("header")
         h = QHBoxLayout(header)
-        h.setContentsMargins(24, 14, 24, 14)
+        h.setContentsMargins(20, 12, 20, 12)
+
         names = QVBoxLayout()
         names.setSpacing(2)
         self.file_label = QLabel()
         self.file_label.setObjectName("fileName")
         self.file_label.setMinimumWidth(80)
         self.file_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-        self._file_name = ""
         self.summary_label = QLabel()
         self.summary_label.setObjectName("muted")
         self.summary_label.setMinimumWidth(80)
         self.summary_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-        self._summary_text = ""
         names.addWidget(self.file_label)
         names.addWidget(self.summary_label)
-        names_box = QWidget()
-        names_box.setLayout(names)
-        names_box.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
-        names_box.setMinimumWidth(160)     # the file name keeps a readable share
-        h.addWidget(names_box, 1)
-        # Four document actions live in one menu; six buttons in a row crowd
-        # the file name off the header.
+        box = QWidget()
+        box.setLayout(names)
+        box.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
+        box.setMinimumWidth(160)
+        h.addWidget(box, 1)
+
         actions = QToolButton()
         actions.setText("Document  \u2304")
         actions.setPopupMode(QToolButton.InstantPopup)
@@ -498,85 +624,24 @@ class ResultsPage(QWidget):
         actions.setObjectName("menuButton")
         menu = QMenu(actions)
         for text, slot in [("Open in Word", self._open_doc),
-                           ("Compare with an earlier version…",
+                           ("Compare with an earlier version\u2026",
                             self._compare_versions),
-                           ("Save with comments…", self._save_comments),
-                           ("Save report…", self._save_report)]:
+                           ("Save with comments\u2026", self._save_comments),
+                           ("Save report\u2026", self._save_report)]:
             menu.addAction(text, slot)
         actions.setMenu(menu)
         actions.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         h.addWidget(actions)
-
         for text, slot, primary in [("Check another", self.newFile.emit, False),
                                     ("Re-check", self.recheck.emit, True)]:
-            b = QPushButton(text)
-            b.setCursor(Qt.PointingHandCursor)
-            b.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            button = QPushButton(text)
+            button.setCursor(Qt.PointingHandCursor)
+            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             if primary:
-                b.setObjectName("primary")
-            b.clicked.connect(slot)
-            h.addWidget(b)
-        root.addWidget(header)
-
-        body = QWidget()
-        b = QVBoxLayout(body)
-        b.setContentsMargins(24, 16, 24, 20)
-        b.setSpacing(12)
-
-        # The manuscript's size, shown as a strip rather than buried in the
-        # list: it is context for every finding, not a finding itself.
-        self.stats = QLabel("")
-        self.stats.setObjectName("stats")
-        self.stats.setWordWrap(True)
-        self.stats.hide()
-        b.addWidget(self.stats)
-
-        self.filters: dict[str, QPushButton] = {}
-        frow = QHBoxLayout()
-        frow.setSpacing(8)
-        for sev in ("error", "warning", "info"):
-            btn = QPushButton()
-            btn.setObjectName("chip")
-            btn.setToolTip("Show or hide these issues")
-            btn.setCheckable(True)
-            btn.setChecked(True)
-            btn.setIcon(dot_icon(SEVERITY[sev]["color"]))
-            btn.setCursor(Qt.PointingHandCursor)
-            btn.toggled.connect(self._refresh_list)
-            self.filters[sev] = btn
-            frow.addWidget(btn)
-        frow.addStretch(1)
-        b.addLayout(frow)
-
-        split = QSplitter(Qt.Horizontal)
-        split.setHandleWidth(12)
-        self.list = QListWidget()
-        self.list.setWordWrap(True)
-        self.list.setResizeMode(QListView.Adjust)
-        self.list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.list.setIconSize(QSize(14, 14))
-        self.list.currentItemChanged.connect(self._show_detail)
-        self.detail = QTextBrowser()
-        self.detail.setOpenExternalLinks(False)
-        split.addWidget(self.list)
-        split.addWidget(self.detail)
-        split.setSizes([420, 560])
-        b.addWidget(split, 1)
-
-        footer = QHBoxLayout()
-        footer.setContentsMargins(2, 0, 2, 0)
-        prompt = QLabel("Something wrong here, or a check you'd like added?")
-        prompt.setObjectName("muted")
-        contact = QPushButton("Get in touch")
-        contact.setObjectName("linkButton")
-        contact.setCursor(Qt.PointingHandCursor)
-        contact.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
-        footer.addWidget(prompt)
-        footer.addWidget(contact)
-        footer.addStretch(1)
-        b.addLayout(footer)
-        root.addWidget(body, 1)
+                button.setObjectName("primary")
+            button.clicked.connect(slot)
+            h.addWidget(button)
+        return header
 
     # -- data
     def show_results(self, doc: Document, issues: list[Issue]):
@@ -585,31 +650,46 @@ class ResultsPage(QWidget):
             SEVERITY_ORDER[i.severity], i.para_index if i.para_index is not None else -1))
         self._file_name = Path(doc.path).name
         self._elide_file_name()
-        # The label's real width is only known once the layout has run.
         QTimer.singleShot(0, self._elide_file_name)
+
         n_cites = len(doc.citations)
         self._summary_text = (
             f"{sum(1 for p in doc.paragraphs if p.text)} paragraphs read, "
             f"{n_cites} reference-manager citation{'s' if n_cites != 1 else ''} found")
+        self.summary_label.setText(self._summary_text)
 
         size = next((i.message for i in self.issues
-                     if i.check == "submission" and i.message.startswith(
-                         "Manuscript size:")), "")
-        self.issues = [i for i in self.issues if i.message != size or not size]
-        self.stats.setText(size.replace("Manuscript size: ", "").rstrip("."))
+                     if i.check == "submission"
+                     and i.message.startswith("Manuscript size:")), "")
+        if size:
+            self.issues = [i for i in self.issues if i.message != size]
+            self.stats.setText(size.replace("Manuscript size: ", "").rstrip("."))
         self.stats.setVisible(bool(size))
-        self.summary_label.setText(self._summary_text)
-        for sev, btn in self.filters.items():
-            n = sum(1 for i in self.issues if i.severity == sev)
-            name = SEVERITY[sev]["name"]
-            btn.setText(f"{n} {name}{'s' if n != 1 else ''}")
-            btn.setEnabled(n > 0)
+
+        counts = Counter(i.severity for i in self.issues)
+        self.tiles["all"].set_count(len(self.issues))
+        for key in ("error", "warning", "info"):
+            self.tiles[key].set_count(counts[key])
+        self._filter("all")
+        self._render_manuscript()
+
+    def _filter(self, key: str):
+        self._severity_filter = key
+        for name, tile in self.tiles.items():
+            tile.setChecked(name == key)
         self._refresh_list()
 
+    def _shown(self) -> list[Issue]:
+        if self._severity_filter == "all":
+            return self.issues
+        return [i for i in self.issues if i.severity == self._severity_filter]
+
     def _refresh_list(self):
-        """Rebuild the list, grouped by which check produced each finding."""
+        """Rebuild the findings list, grouped by the check that produced each."""
         self.list.clear()
-        shown = [i for i in self.issues if self.filters[i.severity].isChecked()]
+        shown = self._shown()
+        self.found_label.setText(
+            f"Findings ({len(shown)})" if shown else "Findings")
 
         first_row = None
         for check in CHECK_ORDER:
@@ -618,8 +698,7 @@ class ResultsPage(QWidget):
                 continue
             heading = QListWidgetItem(
                 f"{CHECK_LABELS.get(check, check.title())}   {len(group)}")
-            heading.setFlags(Qt.NoItemFlags)          # a label, not a choice
-            heading.setData(Qt.UserRole + 1, True)
+            heading.setFlags(Qt.NoItemFlags)
             font = heading.font()
             font.setBold(True)
             font.setPointSizeF(font.pointSizeF() * 0.92)
@@ -640,51 +719,81 @@ class ResultsPage(QWidget):
             self.list.setCurrentItem(None)
             self.detail.setHtml(self._empty_html())
 
+    # -- the manuscript pane
+    def _render_manuscript(self):
+        """The document's text, with every finding highlighted in place."""
+        if self.doc is None:
+            return
+        marks: dict[int, list[Issue]] = {}
+        for issue in self.issues:
+            if issue.para_index is not None:
+                marks.setdefault(issue.para_index, []).append(issue)
+
+        parts = [f"<style>body {{ font-family:'{self.paper_font}'; "
+                 f"font-size:15px; line-height:155%; color:{INK}; }}"
+                 f"h3 {{ font-family:'{self.paper_font}'; font-size:16px; "
+                 f"margin:18px 0 6px 0; }}</style>"]
+        for p in self.doc.paragraphs:
+            if not p.text.strip():
+                continue
+            body = html.escape(p.text)
+            for issue in marks.get(p.index, []):
+                sev = SEVERITY[issue.severity]
+                if issue.anchor and issue.anchor in p.text:
+                    marked = html.escape(issue.anchor)
+                    body = body.replace(
+                        marked,
+                        f"<span style='background:{sev['tint']}; "
+                        f"color:{sev['color']}'>{marked}</span>", 1)
+            tag = "h3" if p.is_heading else "p"
+            parts.append(f'<a name="p{p.index}"></a><{tag}>{body}</{tag}>')
+        self.manuscript.setHtml("".join(parts))
+
+    def _anchor_clicked(self, url: QUrl):
+        self.manuscript.scrollToAnchor(url.toString().lstrip("#"))
+
+    def _issue_selected(self, item: QListWidgetItem | None):
+        self._show_detail(item)
+        if item is None:
+            return
+        issue: Issue = item.data(Qt.UserRole)
+        if issue is not None and issue.para_index is not None:
+            self.manuscript.scrollToAnchor(f"p{issue.para_index}")
+            bar = self.manuscript.verticalScrollBar()
+            bar.setValue(max(0, bar.value() - 40))
+
     def _empty_html(self) -> str:
         if not self.issues:
             return (
-                f"<div style='margin-top:28px'>"
-                f"<p style='font-size:40px; margin:0; color:{GREEN_INK}'>\u2713</p>"
-                f"<h2 style='color:{GREEN_INK}; margin:6px 0 2px 0'>"
-                f"Nothing to fix</h2>"
+                f"<div style='margin-top:10px'>"
+                f"<p style='font-size:30px; margin:0; color:{TILE['clean']}'>"
+                f"\u2713</p>"
+                f"<h3 style='margin:4px 0 2px 0'>Nothing to fix</h3>"
                 f"<p style='color:{INK_SOFT}'>Figures, tables, citations, "
-                f"references, abbreviations and species names all check out.</p>"
-                f"<p style='color:{INK_SOFT}; font-size:13px'>Galley only "
-                f"checks a manuscript against itself, so this is not a "
-                f"substitute for reading it.</p></div>")
-        return (f"<p style='color:{INK_SOFT}; margin-top:24px'>Every finding is "
-                f"hidden. Turn a filter back on to see them.</p>")
+                f"references, abbreviations and species names all check "
+                f"out.</p></div>")
+        return (f"<p style='color:{INK_SOFT}'>No findings at this filter. "
+                f"Choose another tile.</p>")
 
     def _show_detail(self, item: QListWidgetItem | None):
         if item is None or self.doc is None:
             return
         issue: Issue = item.data(Qt.UserRole)
+        if issue is None:
+            return
         sev = SEVERITY[issue.severity]
         parts = [f"<p style='color:{sev['color']}; font-weight:600; margin:0'>"
                  f"{sev['name'].capitalize()}</p>",
-                 f"<h3 style='margin-top:4px'>{html.escape(issue.message)}</h3>"]
+                 f"<h3 style='margin:4px 0 6px 0'>{html.escape(issue.message)}</h3>"]
         if issue.suggestion:
-            parts.append(f"<p style='color:{INK_SOFT}'>{html.escape(issue.suggestion)}</p>")
+            parts.append(f"<p style='color:{INK_SOFT}'>"
+                         f"{html.escape(issue.suggestion)}</p>")
         if issue.para_index is not None:
             p = self.doc.paragraph(issue.para_index)
             where = p.section.replace("_", " ").capitalize()
-            parts.append(f"<p style='color:{INK_SOFT}; margin-top:18px'>"
+            parts.append(f"<p style='color:{INK_SOFT}; margin-top:10px'>"
                          f"{where}, paragraph {p.index + 1}</p>")
-            parts.append(self._paragraph_html(p.text, issue.anchor, sev))
         self.detail.setHtml("".join(parts))
-
-    def _paragraph_html(self, text: str, anchor: str | None, sev: dict) -> str:
-        style = (f"font-family:'{self.paper_font}'; font-size:16px; line-height:150%; "
-                 f"border-left:3px solid {RULE}; padding-left:14px")
-        if anchor and anchor in text:
-            before, after = text.split(anchor, 1)
-            body = (html.escape(before)
-                    + f"<span style='background:{sev['tint']}; color:{sev['color']}; "
-                      f"font-weight:600; text-decoration:underline'>{html.escape(anchor)}</span>"
-                    + html.escape(after))
-        else:
-            body = html.escape(text)
-        return f"<table width='100%'><tr><td style=\"{style}\">{body}</td></tr></table>"
 
     def _elide_file_name(self):
         metrics = self.file_label.fontMetrics()

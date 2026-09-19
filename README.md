@@ -72,6 +72,11 @@ sentence level, so reordering a paragraph doesn't light up the whole page, and
 the original file is never modified. Changes to numbers alone — a p-value or an
 n — are treated as unchanged text.
 
+Galley also copes with manuscripts where every printed line is a separate
+paragraph — files converted from PDF, and some journal templates. In those,
+citations, reference entries and figure legends are split across paragraphs,
+and are rejoined before checking.
+
 **Species names**
 
 - Italicized in some places and not others
@@ -125,7 +130,10 @@ The package installs as `galley-check` (the name `galley` was already taken on
 PyPI) and provides two commands: `galley` for the command line and `galley-app`
 for the desktop window.
 
-**Desktop app:** run `galley-app`, or double-click `Galley.pyw`.
+**Desktop app:** run `galley-app`, or double-click `Galley.pyw`. The window
+shows the manuscript's text beside the findings: clicking a finding scrolls the
+text to that spot, where the problem is highlighted in place. The coloured tiles
+along the top filter by severity.
 Drop a .docx onto the window, choose it with the button, or paste its path.
 Click any issue to see the exact sentence with the problem highlighted. After fixing
 the file in Word, save it and click **Re-check**.

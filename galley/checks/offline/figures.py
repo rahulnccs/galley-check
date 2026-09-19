@@ -172,6 +172,9 @@ def _legend_panels(text: str) -> set[str]:
     for a, b in re.findall(r"\(([A-Za-z])\s*[\u2013\u2014-]\s*([A-Za-z])\)", text):
         found |= _letters(a, b)
     found |= {x.upper() for x in re.findall(r"\(([A-Za-z])\)", text)}
+    # "(B, C)" and "(A, C, E)" label several panels in one bracket.
+    for group in re.findall(r"\(([A-Za-z](?:\s*,\s*[A-Za-z])+)\)", text):
+        found |= {x.strip().upper() for x in group.split(",") if x.strip()}
     found |= {x for x in re.findall(r"(?:^|[.;:]\s+)([A-Z])[.)]\s", text)}
     panels, c = set(), "A"
     while c in found:
@@ -180,19 +183,50 @@ def _legend_panels(text: str) -> set[str]:
     return panels
 
 
+PANEL_START = re.compile(r"^\s*\(?[A-Za-z]\)")
+
+
+def _legend_continuation(doc: Document, index: int) -> tuple[str, set[int]]:
+    """Text of the paragraphs that continue a legend, and their indices.
+
+    A legend is often split across paragraphs — in files converted from PDF,
+    every printed line is its own paragraph — leaving panel (B) stranded below
+    panel (A). Only lines that open with a panel marker are absorbed, so
+    ordinary text following a legend is left alone.
+    """
+    extra, taken = [], set()
+    for position, p in enumerate(doc.paragraphs[index + 1:]):
+        if not p.text.strip() or p.is_heading or LEGEND_RE.match(p.text):
+            break
+        # The first continuation must open with a panel marker, which is what
+        # proves this legend is wrapped rather than followed by ordinary text.
+        # After that, the rest of the legend runs to the next blank line.
+        if position == 0 and not PANEL_START.match(p.text):
+            break
+        extra.append(p.text)
+        taken.add(p.index)
+    return " ".join(extra), taken
+
+
 def find_callouts_and_legends(doc: Document) -> tuple[list[Callout], list[Legend]]:
     callouts: list[Callout] = []
     legends: list[Legend] = []
+    consumed: set[int] = set()
     for p in doc.paragraphs:
         if not p.text or p.is_heading or p.in_bibliography_field:
+            continue
+        if p.index in consumed:
             continue
         lm = LEGEND_RE.match(p.text)
         if lm and not _looks_like_reference(p.text):
             kind = "figure" if lm.group("kind").lower().startswith("fig") else "table"
             num = lm.group("num")
             key = ItemKey(kind, _group(lm.group("prefix"), num), int(re.sub(r"\D", "", num)))
-            legends.append(Legend(key, p.index, p.text, lm.group(0).strip(),
-                                  _legend_panels(p.text) if kind == "figure" else set()))
+            more, taken = _legend_continuation(doc, p.index)
+            consumed |= taken
+            full = f"{p.text} {more}".strip()
+            legends.append(Legend(key, p.index, full, lm.group(0).strip(),
+                                  _legend_panels(full) if kind == "figure" else set()))
             continue  # mentions inside legends aren't text callouts
         if p.section == REFERENCES:
             continue  # reference entries are not text callouts

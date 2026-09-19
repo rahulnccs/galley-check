@@ -167,6 +167,7 @@ class NumericCitation:
     number: int
     para_index: int
     anchor: str
+    bracket: str = "["     # "[" for [12], "(" for (12)
 
 
 @dataclass
@@ -208,27 +209,119 @@ def _expand(spec: str) -> list[int]:
     return numbers
 
 
+def _looks_complete(text: str) -> bool:
+    """Whether a reference entry appears to have ended.
+
+    Documents converted from PDF put every printed line in its own paragraph,
+    so one entry can be spread over four or five of them. An entry that has a
+    year and ends with a full stop is finished; anything else is still running.
+    """
+    stripped = text.rstrip()
+    return bool(YEAR.search(text)) and stripped.endswith((".", "\u2019", "\u201d", '"'))
+
+
 def collect_entries(doc: Document) -> list[Entry]:
     entries: list[Entry] = []
     for p in doc.paragraphs:
-        if p.section != REFERENCES or p.is_heading or len(p.text) < 25:
+        if p.section != REFERENCES or p.is_heading or not p.text.strip():
             continue
         m = LEADING_NUMBER.match(p.text)
         stated = int(m.group(1)) if m else None
-        text = p.text[m.end():] if m else p.text
-        if not (p.is_list_item or stated or YEAR.search(text) or "et al" in text.lower()):
+        text = (p.text[m.end():] if m else p.text).strip()
+
+        # A numbered entry always begins a new reference. Otherwise a line
+        # continues the one before it until that one looks finished — unless
+        # the line itself opens with an author name and the previous entry
+        # already has its year, which means a new entry started early.
+        only_a_link = bool(re.fullmatch(r"(?:https?://|doi:)\S+\.?", text, re.I))
+        starts_entry = (
+            not only_a_link and (
+            bool(stated) or not entries
+            or _looks_complete(entries[-1].text)
+            or (AUTHOR_START.match(text) and YEAR.search(entries[-1].text))))
+        if not starts_entry:
+            entries[-1].text = f"{entries[-1].text} {text}".strip()
             continue
-        entries.append(Entry(len(entries) + 1, stated, text.strip(), p.index))
+
+        if len(text) < 25:
+            continue
+        if not (p.is_list_item or stated or YEAR.search(text)
+                or "et al" in text.lower()):
+            continue
+        entries.append(Entry(len(entries) + 1, stated, text, p.index))
     return entries
 
 
+NOT_BODY = {REFERENCES, "back_matter", "acknowledgments"}
+
+
 def _is_body(p: Paragraph) -> bool:
-    return (p.section in BODY_SECTIONS and not p.is_heading
-            and not p.in_bibliography_field and p.section != REFERENCES)
+    """Every part of the manuscript that can hold a citation.
+
+    Anything outside the reference list counts, including sections whose
+    heading Galley doesn't recognize — an unrecognized heading is still prose,
+    and a citation inside it is still a citation.
+    """
+    return (p.section not in NOT_BODY and not p.is_heading
+            and not p.in_bibliography_field)
+
+
+def _joined_body(doc: Document) -> tuple[str, list[tuple[int, int]]]:
+    """Body text as one string, with a map back to (paragraph, offset).
+
+    Documents converted from PDF put every printed line in its own paragraph,
+    so a citation like "(Kulshrestha & Gupta, 2022)" is split in two and is
+    invisible to a regex run paragraph by paragraph. Scanning the joined text
+    finds those, and the map turns a match back into a paragraph reference.
+    """
+    parts: list[str] = []
+    index: list[tuple[int, int]] = []
+    for p in doc.paragraphs:
+        if not p.text or not _is_body(p):
+            continue
+        for offset in range(len(p.text)):
+            index.append((p.index, offset))
+        parts.append(p.text)
+        index.append((p.index, len(p.text)))     # the joining space
+        parts.append(" ")
+    return "".join(parts), index
+
+
+def _locate(index: list[tuple[int, int]], at: int) -> int:
+    """The paragraph a match in the joined text belongs to."""
+    return index[min(at, len(index) - 1)][0] if index else 0
 
 
 def collect_citations(doc: Document) -> Citations:
     found = Citations()
+
+    # Citations that can be split over a line break are found in the joined
+    # text; superscripts and footnote marks are per-paragraph by nature.
+    joined, index = _joined_body(doc)
+    for m in CITATION_KEY.finditer(joined):
+        for part in re.split(r"[,;]", m.group(1)):
+            part = part.strip()
+            if part and any(c.isdigit() for c in part) and not part.isdigit():
+                found.keys.append(KeyCitation(part, _locate(index, m.start()),
+                                              m.group(0)))
+    for m in list(PAREN_AUTHOR_YEAR.finditer(joined)) + \
+            list(BRACKET_AUTHOR_YEAR.finditer(joined)):
+        for chunk in re.split(r";", m.group(1)):
+            ym = YEAR.search(chunk)
+            if not ym:
+                continue
+            names = {w for w in SURNAME_IN_CITATION.findall(chunk)
+                     if w not in NOT_A_SURNAME}
+            if names:
+                found.named.append(NameCitation(names, ym.group(1),
+                                                _locate(index, m.start()),
+                                                m.group(0)[:60]))
+    for m in NARRATIVE_AUTHOR_YEAR.finditer(joined):
+        if m.group(1) not in NOT_A_SURNAME:
+            found.named.append(NameCitation({m.group(1)}, m.group(2),
+                                            _locate(index, m.start()),
+                                            m.group(0)[:60]))
+
     for p in doc.paragraphs:
         if not p.text or not _is_body(p):
             continue
@@ -237,33 +330,13 @@ def collect_citations(doc: Document) -> Citations:
                                                                m.group(1)):
                 continue
             for n in _expand(m.group(1)):
-                found.numeric.append(NumericCitation(n, p.index, m.group(0)))
+                found.numeric.append(NumericCitation(n, p.index, m.group(0),
+                                                     bracket=m.group(0)[0]))
         for a, b in p.superscript_spans:
             token = p.text[a:b]
             if re.fullmatch(r"[\d\s,;\u2013\u2014-]+", token) and any(c.isdigit() for c in token):
                 for n in _expand(token):
                     found.numeric.append(NumericCitation(n, p.index, token))
-        for m in CITATION_KEY.finditer(p.text):
-            for part in re.split(r"[,;]", m.group(1)):
-                part = part.strip()
-                if part and any(c.isdigit() for c in part) and not part.isdigit():
-                    found.keys.append(KeyCitation(part, p.index, m.group(0)))
-        for m in list(PAREN_AUTHOR_YEAR.finditer(p.text)) + \
-                list(BRACKET_AUTHOR_YEAR.finditer(p.text)):
-            inside = m.group(1)
-            for chunk in re.split(r";", inside):
-                ym = YEAR.search(chunk)
-                if not ym:
-                    continue
-                names = {w for w in SURNAME_IN_CITATION.findall(chunk)
-                         if w not in NOT_A_SURNAME}
-                if names:
-                    found.named.append(NameCitation(names, ym.group(1), p.index,
-                                                    m.group(0)[:60]))
-        for m in NARRATIVE_AUTHOR_YEAR.finditer(p.text):
-            if m.group(1) not in NOT_A_SURNAME:
-                found.named.append(NameCitation({m.group(1)}, m.group(2), p.index,
-                                                m.group(0)[:60]))
         for note_id in p.footnote_ids:
             note = doc.notes.get(note_id)
             if note is None:
@@ -416,6 +489,11 @@ def _check_numeric(entries: list[Entry], cites: list[NumericCitation]) -> list[I
     total = len(entries)
     by_number = {e.stated_number or e.number: e for e in entries}
 
+    # Round brackets hold phone numbers, years and quantities as well as
+    # citations, so a parenthesised number beyond the end of the list is
+    # almost certainly not a citation. Square brackets are taken at face value.
+    cites = [c for c in cites
+             if c.bracket != "(" or c.number <= max(total, 1)]
     first: dict[int, NumericCitation] = {}
     for c in cites:
         first.setdefault(c.number, c)

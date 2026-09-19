@@ -48,7 +48,11 @@ class JournalDialog(QDialog):
         root.setContentsMargins(26, 24, 26, 20)
         root.setSpacing(14)
 
-        title = QLabel("Journal requirements")
+        banner = QLabel("Journal requirements")
+        banner.setObjectName("dialogBanner")
+        root.addWidget(banner)
+
+        title = QLabel("What does the journal ask for?")
         title.setObjectName("dialogTitle")
         blurb = QLabel(
             "Fill this in from the journal's author guidelines. Anything you "
