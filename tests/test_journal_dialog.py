@@ -13,7 +13,13 @@ from galley.gui.journal_dialog import JournalDialog  # noqa: E402
 
 @pytest.fixture(scope="module")
 def app():
-    return QApplication.instance() or QApplication([])
+    existing = QApplication.instance()
+    if existing is not None:
+        return existing
+    try:
+        return QApplication([])
+    except Exception as e:                  # no usable Qt platform at all
+        pytest.skip(f"Qt cannot start here: {e}")
 
 
 def test_filled_form_produces_a_profile(app):
