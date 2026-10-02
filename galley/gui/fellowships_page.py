@@ -20,9 +20,12 @@ from PySide6.QtWidgets import (
 )
 
 from ..fellowships import (ELIGIBLE, NOT_ELIGIBLE, POSSIBLE, STATUSES,
-                           check_draft, load_applications, load_fellowships,
+                           check_application, check_document,
+                           load_applications, load_fellowships, pdf_supported,
                            match, match_all, plan, reminders,
                            save_applications, start_application)
+from ..fellowships.application_check import FAIL, PASS, WARN
+from ..fellowships.application_check import INFO as NOTE
 from ..fellowships.match import INFO, MET, NOT_MET, UNSURE
 from ..fellowships.model import (FIELDS, Researcher, Stay,
                                  delete_custom_fellowship, load_researcher,
@@ -51,6 +54,7 @@ STATUS_COLOR = {ELIGIBLE: APPLE["green"], POSSIBLE: APPLE["orange"],
 STATUS_LABEL = {ELIGIBLE: "Eligible", POSSIBLE: "Check", NOT_ELIGIBLE: "Not eligible"}
 REASON_MARK = {MET: ("✓", APPLE["green"]), NOT_MET: ("✕", APPLE["red"]),
                UNSURE: ("?", APPLE["orange"]), INFO: ("i", APPLE["blue"])}
+FINDING_MARK = {PASS: MET, FAIL: NOT_MET, WARN: UNSURE, NOTE: INFO}
 URGENCY_COLOR = {"overdue": APPLE["red"], "changed": APPLE["orange"],
                  "soon": APPLE["orange"], "upcoming": APPLE["blue"]}
 APP_STATUS_LABEL = {"planning": "Preparing", "submitted": "Submitted",
@@ -198,7 +202,10 @@ class Segmented(QWidget):
     def set_title(self, index: int, title: str):
         b = self.buttons[index]
         b.setText(title)
+        b.ensurePolished()      # measure with the stylesheet's bold font
         b.setMinimumWidth(b.sizeHint().width())     # never clip a longer title
+        self.layout().invalidate()
+        self.updateGeometry()   # let the surrounding layout make room
 
 
 class Switch(QAbstractButton):
@@ -356,8 +363,10 @@ class ScrollPage(QScrollArea):
         outer.addStretch(1)
         self.setWidget(body)
 
-    def header(self, text: str):
-        h = label(text.upper(), "sectionHeader")
+    def header(self, text: str, detail: str = ""):
+        """An upper-case section heading; `detail` (a file name) keeps its case."""
+        h = label(text.upper() + (f" · {detail}" if detail else ""),
+                  "sectionHeader")
         h.setContentsMargins(16, 14, 0, 2)
         self.col.addWidget(h)
 
@@ -726,7 +735,8 @@ class FellowshipsPage(QWidget):
                 if doc.sections:
                     limits.append("sections: " + ", ".join(doc.sections))
                 check = plain_button("Check Draft…")
-                check.clicked.connect(lambda _=False, doc=doc: self._check_draft(doc))
+                check.clicked.connect(lambda _=False, doc=doc:
+                                      self._check_draft(doc, f.id))
                 card.add(Row(doc.name, "; ".join(limits) or (doc.notes or ""),
                              trailing=check))
             if req.cv_format:
@@ -778,20 +788,63 @@ class FellowshipsPage(QWidget):
         page.finish()
         self._push(page)
 
-    def _check_draft(self, doc):
-        path, _ = QFileDialog.getOpenFileName(self, f"Check your {doc.name}", "",
-                                              "Word documents (*.docx)")
+    def _choose_file(self, title: str) -> str | None:
+        kinds = "*.docx *.pdf" if pdf_supported() else "*.docx"
+        path, _ = QFileDialog.getOpenFileName(self, title, "",
+                                              f"Documents ({kinds})")
+        return path or None
+
+    def _check_draft(self, doc, fid: str):
+        path = self._choose_file(f"Check your {doc.name}")
         if not path:
             return
         try:
-            issues = check_draft(path, doc)
+            findings = check_document(path, doc)
         except Exception as e:      # an unreadable file shouldn't crash the app
             QMessageBox.warning(self, "Couldn't read the file", str(e))
             return
-        lines = [("✕ " if i.severity == "error" else
-                  "! " if i.severity == "warning" else "• ") + i.message
-                 for i in issues] or ["Nothing to report."]
-        QMessageBox.information(self, doc.name, "\n\n".join(lines))
+        from pathlib import Path
+        self._show_report(doc.name, "Back", lambda: self.open_fellowship(fid),
+                          [(doc.name, Path(path).name, findings)], [])
+
+    def _show_report(self, title: str, back_text: str, on_back,
+                     sections: list, general: list):
+        """A results page: a summary, then each document's findings."""
+        page = ScrollPage()
+        page.add(nav_bar(back_text, on_back))
+        problems = sum(1 for *_, fs in sections for f in fs if f.outcome == FAIL)
+        warnings = sum(1 for *_, fs in sections for f in fs if f.outcome == WARN)
+        if problems:
+            head, color = (f"{problems} thing{'s' if problems != 1 else ''} to fix",
+                           APPLE["red"])
+        elif warnings:
+            head, color = (f"Ready, with {warnings} thing{'s' if warnings != 1 else ''}"
+                           f" to check", APPLE["orange"])
+        else:
+            head, color = "Ready to submit", APPLE["green"]
+        page.add(label(title, "detailTitle", wrap=True))
+        summary = label(head, wrap=True)
+        summary.setStyleSheet(f"color:{color}; font-size:17px; font-weight:600;")
+        page.add(summary)
+        order = {FAIL: 0, WARN: 1, PASS: 2, NOTE: 3}
+        for heading, detail, findings in sections:
+            page.header(heading, detail)
+            card = page.add(Card())
+            for f in sorted(findings, key=lambda f: order[f.outcome]):
+                card.add(Row(f.text, f.suggestion or "",
+                             leading=mark(FINDING_MARK[f.outcome]), plain=True))
+            if not findings:
+                card.add(Row("Nothing in the requirements to check.",
+                             leading=mark(INFO), plain=True))
+        if general:
+            page.header("Also remember")
+            card = page.add(Card())
+            for f in general:
+                card.add(Row(f.text, leading=mark(FINDING_MARK[f.outcome]), plain=True))
+        page.footnote("Galley checks the format the funder sets out. Read the "
+                      "official guidance too; it has the final word.")
+        page.finish()
+        self._push(page)
 
     def _add_application(self, fid: str):
         start_application(self.apps, self.by_id[fid], self.today)
@@ -919,6 +972,31 @@ class FellowshipsPage(QWidget):
             self.save_apps()
         interview.dateChanged.connect(interview_changed)
 
+        req = f.requirements
+        if req and req.documents:
+            page.header("Check your application")
+            card = page.add(Card())
+            from pathlib import Path
+            for doc in req.documents:
+                path = app.files.get(doc.name)
+                sub = Path(path).name if path else "Not attached"
+                attach = plain_button("Change…" if path else "Attach…")
+                attach.clicked.connect(lambda _=False, doc=doc:
+                                       self._attach(fid, doc.name))
+                card.add(Row(doc.name, sub, trailing=attach))
+            run = QWidget()
+            rl = QHBoxLayout(run)
+            rl.setContentsMargins(16, 12, 16, 12)
+            check = filled_button("Check Application")
+            check.setEnabled(bool(app.files))
+            check.clicked.connect(lambda: self._check_application(fid))
+            rl.addWidget(check)
+            rl.addStretch(1)
+            card.add(run)
+            page.footnote("Attach each document to check it against this "
+                          "fellowship's format: pages, words, sections, text "
+                          "size and margins. Files stay where they are.")
+
         steps = plan(f, self.today)
         if steps:
             page.header("Plan")
@@ -974,6 +1052,26 @@ class FellowshipsPage(QWidget):
         card.add(actions)
         page.finish()
         self._push(page)
+
+    def _attach(self, fid: str, document: str):
+        path = self._choose_file(f"Attach your {document}")
+        if not path:
+            return
+        self.apps[fid].files[document] = path
+        save_applications(self.apps)
+        self.open_application(fid)
+
+    def _check_application(self, fid: str):
+        f, app = self.by_id[fid], self.apps[fid]
+        report = check_application(f, app.files)
+        if report.ready and all(d.path for d in report.documents):
+            app.mark_done("final_check")    # the plan's "check every document"
+            self.save_apps()
+        from pathlib import Path
+        sections = [(d.name, Path(d.path).name if d.path else "", d.findings)
+                    for d in report.documents]
+        self._show_report(f.name, "Application", lambda: self.open_application(fid),
+                          sections, report.general)
 
     @staticmethod
     def _tick_style(done: bool) -> str:

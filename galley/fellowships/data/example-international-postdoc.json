@@ -43,7 +43,9 @@
           "Approach",
           "Feasibility"
         ],
-        "template_url": "https://example.org/fellowships/proposal-template.docx"
+        "template_url": "https://example.org/fellowships/proposal-template.docx",
+        "min_margin_cm": 2,
+        "file_format": "pdf"
       },
       {
         "name": "Career statement",

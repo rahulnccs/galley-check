@@ -69,7 +69,15 @@ date, nationality, field, places you've lived) and Galley lists the
 life-science fellowships you're eligible for, the ones worth checking, and the
 ones you can't apply for, with the reason for each. Add a fellowship to **My
 Applications** to get a preparation plan worked back from its deadline, and
-reminders whenever you open Galley. Fellowships Galley doesn't list, like an
+reminders whenever you open Galley.
+
+Before you submit, attach your documents to the application and choose
+**Check Application**. Galley checks each one against that fellowship's
+format: page and word limits, required sections, smallest text size, margins
+and file type. It then lists what passes and what to fix. Word files are
+always supported; PDFs too if you install with `pip install -e ".[pdf]"`.
+
+Fellowships Galley doesn't list, like an
 institute's internal scheme, can be added by hand. Your profile and
 applications are saved on your computer only.
 

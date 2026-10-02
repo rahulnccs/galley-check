@@ -6,10 +6,12 @@ from urllib.parse import parse_qs, urlparse
 import docx
 import pytest
 
-from galley.fellowships import (Fellowship, check_draft, load_applications,
-                                plan, reminders, save_applications,
-                                start_application)
-from galley.fellowships.requirements import Requirements, _saved_page_count
+from galley.fellowships import (Fellowship, check_application, check_document,
+                                load_applications, plan, reminders,
+                                save_applications, start_application)
+from galley.fellowships.application_check import (FAIL, PASS, WARN,
+                                                  _docx_saved_pages)
+from galley.fellowships.requirements import Requirements
 
 TODAY = date(2026, 10, 1)
 FINAL = date(2027, 1, 15)
@@ -47,10 +49,18 @@ def test_requirements_parsed():
     assert f.requirements.document("research proposal").max_words == 50
 
 
-def make_draft(path, paragraphs, pages=None):
+def make_draft(path, paragraphs, pages=None, size=None, margin_cm=None):
+    from docx.shared import Cm, Pt
     d = docx.Document()
     for kind, text in paragraphs:
-        (d.add_heading(text, level=1) if kind == "h" else d.add_paragraph(text))
+        p = d.add_heading(text, level=1) if kind == "h" else d.add_paragraph(text)
+        if size and kind != "h":
+            for run in p.runs:
+                run.font.size = Pt(size)
+    if margin_cm is not None:
+        for section in d.sections:
+            section.left_margin = section.right_margin = Cm(margin_cm)
+            section.top_margin = section.bottom_margin = Cm(margin_cm)
     d.save(path)
     if pages is not None:   # what Word writes on save
         tmp = str(path) + ".tmp"
@@ -65,36 +75,102 @@ def make_draft(path, paragraphs, pages=None):
     return str(path)
 
 
-def messages(issues):
-    return [(i.severity, i.message) for i in issues]
+def outcomes(findings):
+    return [(f.outcome, f.text) for f in findings]
+
+
+def doc_req(**kw):
+    return Requirements.from_dict({"documents": [dict(name="Research proposal", **kw)]}
+                                  ).documents[0]
 
 
 def test_draft_within_limits(tmp_path):
     path = make_draft(tmp_path / "p.docx", [("h", "Background"), ("p", "Short text."),
-                                            ("h", "Aims"), ("p", "Two aims.")])
-    req = Requirements.from_dict(FULL).documents[0]
-    msgs = messages(check_draft(path, req))
-    assert not [m for s, m in msgs if s != "info"]
+                                            ("h", "Aims"), ("p", "Two aims.")],
+                      pages=3, size=12, margin_cm=2.5)
+    req = doc_req(max_words=50, max_pages=5, min_font_size=11, min_margin_cm=2,
+                  sections=["Background", "Aims"])
+    found = outcomes(check_document(path, req))
+    assert not [t for o, t in found if o != PASS], found
+    assert (PASS, "3 of 5 pages (as last saved in Word).") in found
 
 
 def test_draft_over_word_limit_and_missing_section(tmp_path):
     path = make_draft(tmp_path / "p.docx",
                       [("h", "Background"), ("p", "word " * 60)])
-    req = Requirements.from_dict(FULL).documents[0]
-    msgs = messages(check_draft(path, req))
-    assert ("warning", "The Research proposal is 60 words, over the limit of "
-                       "50 by 10.") in msgs
-    assert any(s == "error" and '"Aims"' in m for s, m in msgs)
+    found = outcomes(check_document(path, doc_req(max_words=50,
+                                                  sections=["Background", "Aims"])))
+    assert (FAIL, "60 words, over the 50-word limit by 10.") in found
+    assert (FAIL, 'No "Aims" section was found.') in found
+    assert (PASS, 'Includes "Background".') in found
 
 
 def test_page_count_from_word(tmp_path):
-    req = Requirements.from_dict({"documents": [{"name": "Proposal",
-                                                 "max_pages": 5}]}).documents[0]
     over = make_draft(tmp_path / "over.docx", [("p", "x")], pages=7)
-    assert any("7 pages" in m and s == "warning" for s, m in messages(check_draft(over, req)))
+    found = outcomes(check_document(over, doc_req(max_pages=5)))
+    assert any(o == FAIL and "7 pages" in t for o, t in found)
     unknown = make_draft(tmp_path / "unknown.docx", [("p", "x")])
-    if _saved_page_count(unknown) is None:
-        assert any("can't count pages" in m for _, m in messages(check_draft(unknown, req)))
+    if _docx_saved_pages(unknown) is None:
+        found = outcomes(check_document(unknown, doc_req(max_pages=5)))
+        assert any(o == WARN and "can't count pages" in t for o, t in found)
+
+
+def test_small_text_fails(tmp_path):
+    path = make_draft(tmp_path / "p.docx", [("p", "word " * 40)], size=9)
+    found = outcomes(check_document(path, doc_req(min_font_size=11)))
+    assert any(o == FAIL and "smaller than the 11 pt minimum" in t and "9 pt" in t
+               for o, t in found)
+
+
+def test_narrow_margins_fail(tmp_path):
+    path = make_draft(tmp_path / "p.docx", [("p", "text")], margin_cm=1.27)
+    found = outcomes(check_document(path, doc_req(min_margin_cm=2)))
+    assert any(o == FAIL and "narrower than 2 cm" in t and "left 1.3 cm" in t
+               for o, t in found)
+
+
+def test_word_file_when_pdf_wanted(tmp_path):
+    path = make_draft(tmp_path / "p.docx", [("p", "text")])
+    found = outcomes(check_document(path, doc_req(file_format="pdf")))
+    assert any(o == WARN and "as a PDF" in t for o, t in found)
+
+
+def test_bad_file_format_rejected():
+    with pytest.raises(ValueError, match="file_format"):
+        doc_req(file_format="odt")
+
+
+def test_unsupported_file_type(tmp_path):
+    other = tmp_path / "p.txt"
+    other.write_text("hello")
+    with pytest.raises(ValueError, match="isn't a Word document or a PDF"):
+        check_document(str(other), doc_req())
+
+
+def test_whole_application(tmp_path):
+    f = fellowship(requirements={
+        "documents": [{"name": "Research proposal", "max_words": 50},
+                      {"name": "Career statement", "max_words": 20}],
+        "cv_format": "narrative", "host_letter": True})
+    proposal = make_draft(tmp_path / "p.docx", [("p", "Fine and short.")])
+    report = check_application(f, {"Research proposal": proposal})
+    by_name = {d.name: d for d in report.documents}
+    assert by_name["Research proposal"].problems == 0
+    assert outcomes(by_name["Career statement"].findings)[0] == (FAIL, "Not attached yet.")
+    assert not report.ready and report.problems == 1
+    assert any("narrative CV" in g.text for g in report.general)
+    assert any("letter of support" in g.text for g in report.general)
+
+    statement = make_draft(tmp_path / "s.docx", [("p", "Brief.")])
+    report = check_application(f, {"Research proposal": proposal,
+                                   "Career statement": statement})
+    assert report.ready
+
+
+def test_moved_file_is_reported(tmp_path):
+    f = fellowship(requirements={"documents": [{"name": "Proposal"}]})
+    report = check_application(f, {"Proposal": str(tmp_path / "gone.docx")})
+    assert "can no longer be found" in report.documents[0].findings[0].text
 
 
 # --- preparation plan --------------------------------------------------------
@@ -231,3 +307,43 @@ def test_report_link_names_the_entry_only():
 def test_no_report_link_for_your_own_entries():
     f = Fellowship.from_dict({"id": "custom-x", "name": "X", "custom": True})
     assert f.report_problem_url() is None
+
+
+def test_pdf_pages_text_size_and_margins(tmp_path):
+    pytest.importorskip("pdfplumber")
+    pytest.importorskip("PySide6")
+    from PySide6.QtCore import QMarginsF, QRectF, Qt
+    from PySide6.QtGui import QFont, QPageLayout, QPageSize, QPainter, QPdfWriter
+    from PySide6.QtWidgets import QApplication
+    if QApplication.instance() is None:
+        try:
+            QApplication([])
+        except Exception as e:
+            pytest.skip(f"Qt cannot start here: {e}")
+
+    def make(path, pt, margin_mm, pages):
+        w = QPdfWriter(str(path))
+        w.setPageSize(QPageSize(QPageSize.A4))
+        w.setResolution(72)
+        w.setPageMargins(QMarginsF(*[margin_mm] * 4), QPageLayout.Millimeter)
+        p = QPainter(w)
+        font = QFont()
+        font.setPointSizeF(pt)
+        p.setFont(font)
+        for i in range(pages):
+            if i:
+                w.newPage()
+            p.drawText(QRectF(0, 0, w.width(), 40), Qt.AlignLeft, "Background")
+            p.drawText(QRectF(0, 60, w.width(), 400), Qt.TextWordWrap,
+                       "Aims of the project. " + "word " * 120)
+        p.end()
+        return str(path)
+
+    req = doc_req(max_pages=3, min_font_size=11, min_margin_cm=2,
+                  sections=["Background", "Aims"], file_format="pdf")
+    good = outcomes(check_document(make(tmp_path / "ok.pdf", 12, 25, 2), req))
+    assert all(o == PASS for o, _ in good), good
+    bad = outcomes(check_document(make(tmp_path / "bad.pdf", 9, 10, 4), req))
+    assert (FAIL, "4 pages, over the 3-page limit.") in bad
+    assert any(o == FAIL and "9 pt" in t for o, t in bad)
+    assert any(o == FAIL and "Margins are narrower" in t for o, t in bad)

@@ -37,6 +37,7 @@ class Application:
     interview_date: str | None = None
     notes: str = ""
     snoozed_until: dict[str, str] = field(default_factory=dict)  # step -> date
+    files: dict[str, str] = field(default_factory=dict)  # document -> path
 
     def set_status(self, status: str, today: date) -> None:
         if status not in STATUSES:

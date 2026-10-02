@@ -124,3 +124,28 @@ def test_main_window_has_both_sections(app, settings):
     assert win.switcher.buttons[1].text().startswith("Fellowships")
     win.switcher.select(1)
     assert win.sections.currentWidget() is win.fellowships
+
+
+def test_attach_and_check_application(app, settings, tmp_path, monkeypatch):
+    import docx
+    proposal = tmp_path / "proposal.docx"
+    d = docx.Document()
+    for heading in ("Background", "Aims", "Approach", "Feasibility"):
+        d.add_heading(heading, level=1)
+        d.add_paragraph("Some text.")
+    d.save(proposal)
+
+    page = make_page(app)
+    page._add_application("example-international-postdoc")
+    assert "CHECK YOUR APPLICATION" in texts(page.detail)
+    monkeypatch.setattr(page, "_choose_file", lambda title: str(proposal))
+    page._attach("example-international-postdoc", "Research proposal")
+    saved = load_applications(settings / "applications.json")
+    assert saved["example-international-postdoc"].files == {
+        "Research proposal": str(proposal)}
+
+    page._check_application("example-international-postdoc")
+    report = texts(page.detail)
+    assert "to fix" in report                       # career statement missing
+    assert "Not attached yet." in report
+    assert 'Includes "Feasibility".' in report

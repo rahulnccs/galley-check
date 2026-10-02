@@ -37,7 +37,8 @@ Scope: life-science fellowships only.
 "requirements": {
   "documents": [
     {"name": "Research proposal", "max_pages": 5, "max_words": 3000,
-     "min_font_size": 11, "sections": ["Background", "Aims"],
+     "min_font_size": 11, "min_margin_cm": 2, "file_format": "pdf",
+     "sections": ["Background", "Aims"],
      "template_url": "https://...", "notes": "References don't count"}
   ],
   "cv_format": "narrative",
@@ -49,9 +50,10 @@ Scope: life-science fellowships only.
 ```
 
 Everything is optional. `cv_format` is `standard`, `narrative` or
-`funder_template`; `submission` is `portal`, `email` or `institution`. Galley
-checks a draft .docx against a document's `max_words`, `max_pages` and
-`sections`, and builds each applicant's preparation plan from the host letter
+`funder_template`; `submission` is `portal`, `email` or `institution`;
+`file_format` is `pdf` or `docx`. When a user attaches their documents, Galley
+checks each against `max_pages`, `max_words`, `sections`, `min_font_size`,
+`min_margin_cm` and `file_format`, and builds each applicant's preparation plan from the host letter
 and documents listed here.
 
 Countries are two-letter ISO codes: `IN`, `DE`, `GB`, `US`.
