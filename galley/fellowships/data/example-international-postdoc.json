@@ -6,17 +6,63 @@
   "url": "https://example.org/fellowships/international-postdoc",
   "verified": "2026-10-01",
   "notes": "Invented, to show the format. Not a real fellowship.",
-  "fields": ["any"],
+  "fields": [
+    "any"
+  ],
   "career_stage": {
     "max_years_since_phd": 3,
     "career_breaks_extend": true
   },
-  "mobility": {"max_months_in_host": 12, "window_years": 3},
+  "mobility": {
+    "max_months_in_host": 12,
+    "window_years": 3
+  },
   "deadlines": [
-    {"kind": "call_opens", "date": "2026-11-01"},
-    {"kind": "referees", "date": "2027-01-22", "label": "Reference letters due"},
-    {"kind": "final", "date": "2027-01-15", "time": "17:00", "timezone": "Europe/Berlin"}
+    {
+      "kind": "call_opens",
+      "date": "2026-11-01"
+    },
+    {
+      "kind": "referees",
+      "date": "2027-01-22",
+      "label": "Reference letters due"
+    },
+    {
+      "kind": "final",
+      "date": "2027-01-15",
+      "time": "17:00",
+      "timezone": "Europe/Berlin"
+    }
   ],
   "amount": "Salary and research costs",
-  "duration_months": 24
+  "duration_months": 24,
+  "requirements": {
+    "documents": [
+      {
+        "name": "Research proposal",
+        "max_pages": 5,
+        "min_font_size": 11,
+        "sections": [
+          "Background",
+          "Aims",
+          "Approach",
+          "Feasibility"
+        ],
+        "template_url": "https://example.org/fellowships/proposal-template.docx"
+      },
+      {
+        "name": "Career statement",
+        "max_words": 500
+      }
+    ],
+    "cv_format": "narrative",
+    "cv_notes": "Two pages at most, in the funder's narrative CV template.",
+    "referees": {
+      "count": 2,
+      "submitted_by": "referee"
+    },
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://example.org/apply"
+  }
 }

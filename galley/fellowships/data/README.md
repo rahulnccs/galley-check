@@ -27,8 +27,33 @@ Scope: life-science fellowships only.
 | `deadlines` | no | A list, each with `kind`, `date`, and optionally `time`, `timezone` (e.g. `Europe/Berlin`), `estimated` (true if guessed from previous years) and `label`. Kinds: `final`, `internal`, `pre_proposal`, `call_opens`, `referees`. |
 | `rolling` | no | true if applications are accepted at any time. |
 | `annual` | no | true (default) if the call runs every year. |
+| `requirements` | no | What the application needs; see below. |
 | `other_rules` | no | Eligibility rules the fields above can't express, in plain words, e.g. `"Must move to a new research field"`. Each one makes the result "possibly eligible" and is shown to the user to check. |
 | `amount`, `duration_months`, `notes` | no | Shown to users as written. `notes` is for information, not rules. |
+
+## Requirements
+
+```json
+"requirements": {
+  "documents": [
+    {"name": "Research proposal", "max_pages": 5, "max_words": 3000,
+     "min_font_size": 11, "sections": ["Background", "Aims"],
+     "template_url": "https://...", "notes": "References don't count"}
+  ],
+  "cv_format": "narrative",
+  "cv_notes": "Two pages, funder's template",
+  "referees": {"count": 2, "submitted_by": "referee"},
+  "host_letter": true,
+  "submission": "portal",
+  "submission_url": "https://..."
+}
+```
+
+Everything is optional. `cv_format` is `standard`, `narrative` or
+`funder_template`; `submission` is `portal`, `email` or `institution`. Galley
+checks a draft .docx against a document's `max_words`, `max_pages` and
+`sections`, and builds each applicant's preparation plan from the referees,
+host letter and documents listed here.
 
 Countries are two-letter ISO codes: `IN`, `DE`, `GB`, `US`.
 

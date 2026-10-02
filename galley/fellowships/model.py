@@ -15,8 +15,12 @@ from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
+from .requirements import Requirements
+
 DATA_DIR = Path(__file__).resolve().parent / "data"
 CUSTOM_PREFIX = "custom-"
+# Where users report an entry that is wrong or out of date.
+REPORT_URL = "https://github.com/rahulnccs/galley-check/issues/new"
 
 
 def user_fellowship_dir() -> Path:
@@ -110,6 +114,7 @@ class Fellowship:
     duration_months: int | None = None
     notes: str | None = None
     other_rules: list[str] = field(default_factory=list)  # checked by the user
+    requirements: Requirements | None = None
     template: bool = False
     custom: bool = False        # added by the user, not from the database
     path: Path | None = None
@@ -185,6 +190,8 @@ class Fellowship:
             duration_months=data.get("duration_months"),
             notes=data.get("notes"),
             other_rules=[str(x) for x in data.get("other_rules") or []],
+            requirements=(Requirements.from_dict(data["requirements"])
+                          if data.get("requirements") else None),
             template=bool(data.get("template")),
             custom=custom,
             path=path,
@@ -201,6 +208,21 @@ class Fellowship:
             if d.kind == kind and d.date >= today:
                 return d
         return None
+
+    def report_problem_url(self) -> str | None:
+        """A link that opens a pre-filled GitHub issue about this entry. It
+        names the entry only; nothing about the user is included. None for
+        the user's own entries, which the maintainer can't fix."""
+        if self.custom:
+            return None
+        from urllib.parse import urlencode
+        body = (f"Fellowship: {self.name} ({self.id})\n"
+                f"Official page: {self.url}\n"
+                f"Last verified: {self.verified or 'never'}\n\n"
+                f"What is wrong or out of date?\n\n")
+        return REPORT_URL + "?" + urlencode({
+            "title": f"Fellowship entry: {self.name}",
+            "body": body, "labels": "fellowship-data"})
 
     def months_since_verified(self, today: date) -> float | None:
         if self.verified is None:
