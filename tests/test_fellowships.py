@@ -27,13 +27,13 @@ def texts(m):
 # --- the database itself ---------------------------------------------------
 
 def test_every_shipped_entry_loads():
-    entries = load_fellowships(include_templates=True)
+    entries = load_fellowships(include_templates=True, include_custom=False)
     assert len(entries) >= 3
     assert all(f.url.startswith("https://") for f in entries)
 
 
 def test_templates_are_kept_out_of_real_results():
-    assert all(not f.template for f in load_fellowships())
+    assert all(not f.template for f in load_fellowships(include_custom=False))
 
 
 @pytest.mark.parametrize("bad, complaint", [
@@ -58,7 +58,7 @@ def test_duplicate_ids_rejected(tmp_path):
         (tmp_path / name).write_text(
             '{"id": "same", "name": "N", "funder": "F", "url": "https://x.org"}')
     with pytest.raises(ValueError, match="duplicate fellowship id"):
-        load_fellowships(tmp_path)
+        load_fellowships(tmp_path, include_custom=False)
 
 
 # --- career stage ----------------------------------------------------------
@@ -247,7 +247,8 @@ def test_researchers_own_field_ranks_first():
 
 
 def test_shipped_examples_match_sensibly():
-    entries = {f.id: f for f in load_fellowships(DATA_DIR, include_templates=True)}
+    entries = {f.id: f for f in load_fellowships(DATA_DIR, include_templates=True,
+                                                 include_custom=False)}
     indian_postdoc = Researcher(phd_date=date(2024, 8, 1), nationalities=["IN"],
                                 residence="IN", clinical=False,
                                 fields=["microbiology"], target_hosts=["IN", "DE"],
@@ -257,3 +258,83 @@ def test_shipped_examples_match_sensibly():
     assert results["example-national-fellowship"] == POSSIBLE   # other_rules
     assert results["example-clinical-rolling"] == NOT_ELIGIBLE  # clinical, GB
     assert results["example-international-postdoc"] == ELIGIBLE
+
+
+# --- the user's own entries --------------------------------------------------
+
+from galley.fellowships import (delete_custom_fellowship,  # noqa: E402
+                                save_custom_fellowship)
+
+
+def test_custom_entry_needs_only_a_name(tmp_path):
+    f = save_custom_fellowship({"name": "Institute Internal Fellowship"}, tmp_path)
+    assert f.id == "custom-institute-internal-fellowship"
+    assert f.custom and (tmp_path / f"{f.id}.json").exists()
+
+
+def test_custom_entry_without_a_name_is_refused(tmp_path):
+    with pytest.raises(ValueError, match="give the entry a name"):
+        save_custom_fellowship({"name": "  "}, tmp_path)
+    assert not list(tmp_path.iterdir())
+
+
+def test_custom_entry_is_validated_before_saving(tmp_path):
+    with pytest.raises(ValueError, match="YYYY-MM-DD"):
+        save_custom_fellowship({"name": "X", "deadlines": [
+            {"kind": "final", "date": "next March"}]}, tmp_path)
+    assert not list(tmp_path.iterdir())
+
+
+def test_custom_entries_load_with_the_database(tmp_path):
+    save_custom_fellowship({"name": "Society Travel Grant",
+                            "deadlines": [{"kind": "final", "date": "2026-11-30"}]},
+                           tmp_path)
+    entries = load_fellowships(custom_folder=tmp_path, include_templates=True)
+    custom = [f for f in entries if f.custom]
+    assert [f.name for f in custom] == ["Society Travel Grant"]
+    assert len(entries) == len(load_fellowships(custom_folder=tmp_path / "none",
+                                                include_templates=True)) + 1
+
+
+def test_same_name_twice_gets_its_own_id(tmp_path):
+    a = save_custom_fellowship({"name": "Seed Grant"}, tmp_path)
+    b = save_custom_fellowship({"name": "Seed Grant"}, tmp_path)
+    assert a.id != b.id and b.id == "custom-seed-grant-2"
+
+
+def test_saving_with_an_id_updates_the_entry(tmp_path):
+    f = save_custom_fellowship({"name": "Seed Grant"}, tmp_path)
+    save_custom_fellowship({"id": f.id, "name": "Seed Grant (renewal)"}, tmp_path)
+    names = [x.name for x in load_fellowships(tmp_path / "none", custom_folder=tmp_path)]
+    assert names == ["Seed Grant (renewal)"]
+
+
+def test_custom_ids_cannot_take_over_database_entries(tmp_path):
+    with pytest.raises(ValueError, match='start with "custom-"'):
+        save_custom_fellowship({"id": "example-clinical-rolling", "name": "X"},
+                               tmp_path)
+
+
+def test_delete_custom_entry(tmp_path):
+    f = save_custom_fellowship({"name": "Seed Grant"}, tmp_path)
+    assert delete_custom_fellowship(f.id, tmp_path)
+    assert not delete_custom_fellowship(f.id, tmp_path)
+    assert not delete_custom_fellowship("example-clinical-rolling", tmp_path)
+
+
+def test_hand_edited_broken_custom_file_is_skipped(tmp_path):
+    (tmp_path / "custom-broken.json").write_text("{ not json")
+    save_custom_fellowship({"name": "Fine"}, tmp_path)
+    names = [f.name for f in load_fellowships(tmp_path / "none", custom_folder=tmp_path)]
+    assert names == ["Fine"]
+
+
+def test_custom_entry_is_matched_like_any_other(tmp_path):
+    f = save_custom_fellowship({"name": "Institute Fellowship",
+                                "career_stage": {"max_years_since_phd": 2},
+                                "deadlines": [{"kind": "final", "date": DEADLINE}]},
+                               tmp_path)
+    m = match(f, Researcher(phd_date=date(2020, 1, 1)), TODAY)
+    assert m.status == NOT_ELIGIBLE
+    assert "You added this entry yourself" in texts(m)
+    assert "last checked" not in texts(m)       # no staleness nag on your own

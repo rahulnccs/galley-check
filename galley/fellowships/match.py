@@ -248,7 +248,9 @@ def match(f: Fellowship, r: Researcher, today: date) -> Match:
                   f"previous years and not yet announced."))
 
     age = f.months_since_verified(today)
-    if age is None or age > STALE_AFTER_MONTHS:
+    if f.custom:
+        result.reasons.append(Reason(INFO, "You added this entry yourself."))
+    elif age is None or age > STALE_AFTER_MONTHS:
         when = (f"last checked {f.verified:%b %Y}" if f.verified
                 else "never checked against the funder's page")
         result.reasons.append(Reason(

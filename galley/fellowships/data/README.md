@@ -36,6 +36,14 @@ Fields: `molecular_cell_biology`, `neuroscience`, `immunology_infection`,
 `genetics_genomics`, `ecology_evolution`, `plant_science`, `microbiology`,
 `structural_biology`, `bioinformatics`, `biomedical_clinical`.
 
+## Users' own entries
+
+Users can add fellowships that aren't here (an institute's internal scheme, a
+society grant) with `save_custom_fellowship`. Those are saved in their Galley
+settings folder, never in this one, so a refresh of the database leaves them
+alone. They use the same keys as above, but only `name` is required, and their
+ids always start with `custom-`.
+
 ## When a rule doesn't fit
 
 Put it in `other_rules` in plain words. The matcher only decides what it can

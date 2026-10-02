@@ -10,11 +10,20 @@ YYYY-MM-DD.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
+CUSTOM_PREFIX = "custom-"
+
+
+def user_fellowship_dir() -> Path:
+    """Where the user's own entries are kept: next to their journal profiles,
+    outside the bundled data, so a database refresh never touches them."""
+    from ..checks.offline.submission import user_profile_dir
+    return user_profile_dir().parent / "fellowships"
 
 # Life-science fields a fellowship can be restricted to, and a researcher can
 # work in. "any" on a fellowship means any life-science field.
@@ -102,6 +111,7 @@ class Fellowship:
     notes: str | None = None
     other_rules: list[str] = field(default_factory=list)  # checked by the user
     template: bool = False
+    custom: bool = False        # added by the user, not from the database
     path: Path | None = None
 
     @classmethod
@@ -115,6 +125,9 @@ class Fellowship:
 
     @classmethod
     def _from_dict(cls, data: dict, path: Path | None) -> "Fellowship":
+        custom = bool(data.get("custom"))
+        if custom and not str(data.get("name") or "").strip():
+            raise ValueError("give the entry a name")
         fields_ = list(data.get("fields") or ["any"])
         unknown = [f for f in fields_ if f not in FIELDS]
         if unknown:
@@ -144,8 +157,10 @@ class Fellowship:
         return cls(
             id=str(data["id"]),
             name=str(data["name"]),
-            funder=str(data["funder"]),
-            url=str(data["url"]),
+            # The user's own entries need only a name; the database's need
+            # a funder and an official page.
+            funder=str(data.get("funder") or "") if custom else str(data["funder"]),
+            url=str(data.get("url") or "") if custom else str(data["url"]),
             verified=_date(data.get("verified"), "verified"),
             fields=fields_,
             track=track,
@@ -171,6 +186,7 @@ class Fellowship:
             notes=data.get("notes"),
             other_rules=[str(x) for x in data.get("other_rules") or []],
             template=bool(data.get("template")),
+            custom=custom,
             path=path,
         )
 
@@ -215,20 +231,87 @@ class Researcher:
     target_hosts: list[str] = field(default_factory=list)  # where they'd go
 
 
-def load_fellowships(folder: Path | None = None,
-                     include_templates: bool = False) -> list[Fellowship]:
-    """Every fellowship in the folder. A file that doesn't parse raises, with
-    the file name in the message, so a broken entry is fixed rather than
-    silently skipped."""
-    folder = folder or DATA_DIR
+def _load_folder(folder: Path, include_templates: bool) -> list[Fellowship]:
     out = []
-    for path in sorted(folder.glob("*.json")):
+    try:
+        paths = sorted(folder.glob("*.json"))
+    except OSError:
+        return out
+    for path in paths:
         f = Fellowship.load(path)
         if f.template and not include_templates:
             continue
         out.append(f)
+    return out
+
+
+def load_fellowships(folder: Path | None = None,
+                     include_templates: bool = False,
+                     custom_folder: Path | None = None,
+                     include_custom: bool = True) -> list[Fellowship]:
+    """The database's fellowships plus the user's own entries.
+
+    A database file that doesn't parse raises, with the file name in the
+    message, so a broken entry is fixed rather than silently skipped. A
+    broken custom entry is skipped instead: the user may have edited it by
+    hand, and one bad file shouldn't hide the whole list.
+    """
+    out = _load_folder(folder or DATA_DIR, include_templates)
+    if include_custom:
+        custom_folder = custom_folder or user_fellowship_dir()
+        try:
+            paths = sorted(custom_folder.glob("*.json"))
+        except OSError:
+            paths = []
+        for path in paths:
+            try:
+                f = Fellowship.load(path)
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+            f.custom = True
+            out.append(f)
     ids = [f.id for f in out]
     dupes = {i for i in ids if ids.count(i) > 1}
     if dupes:
         raise ValueError(f"duplicate fellowship id(s): {', '.join(sorted(dupes))}")
     return out
+
+
+def save_custom_fellowship(data: dict, folder: Path | None = None) -> Fellowship:
+    """Save one of the user's own entries and return it.
+
+    Only a name is needed; everything else (deadlines, rules, a link) is
+    optional and uses the same keys as the database. A new entry gets an id
+    starting "custom-", so it can never clash with a database entry. Saving
+    with an existing custom id replaces that entry.
+    """
+    folder = folder or user_fellowship_dir()
+    data = dict(data, custom=True)
+    data.pop("template", None)
+    if not data.get("id"):
+        stem = re.sub(r"[^a-z0-9]+", "-",
+                      str(data.get("name", "")).lower()).strip("-") or "entry"
+        base, n = CUSTOM_PREFIX + stem, 2
+        data["id"] = base
+        while (folder / f"{data['id']}.json").exists():
+            data["id"], n = f"{base}-{n}", n + 1
+    elif not str(data["id"]).startswith(CUSTOM_PREFIX):
+        raise ValueError(f'custom entry ids start with "{CUSTOM_PREFIX}"')
+    fellowship = Fellowship.from_dict(data)     # validate before writing
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{data['id']}.json"
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    fellowship.path = path
+    return fellowship
+
+
+def delete_custom_fellowship(fellowship_id: str, folder: Path | None = None) -> bool:
+    """Remove one of the user's own entries. Database entries are left alone."""
+    if not fellowship_id.startswith(CUSTOM_PREFIX):
+        return False
+    path = (folder or user_fellowship_dir()) / f"{fellowship_id}.json"
+    try:
+        path.unlink()
+    except OSError:
+        return False
+    return True
