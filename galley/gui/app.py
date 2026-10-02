@@ -918,13 +918,81 @@ class MainWindow(QMainWindow):
         self.results = ResultsPage(paper_font)
         self.stack.addWidget(self.start)
         self.stack.addWidget(self.results)
-        self.setCentralWidget(self.stack)
+
+        # Manuscript checks and fellowships are two sections of one window.
+        from .fellowships_page import FellowshipsPage, Segmented
+        self.fellowships = FellowshipsPage()
+        self.sections = QStackedWidget()
+        self.sections.addWidget(self.stack)
+        self.sections.addWidget(self.fellowships)
+
+        bar = QWidget()
+        bar.setObjectName("page")
+        bar_lay = QHBoxLayout(bar)
+        bar_lay.setContentsMargins(12, 10, 12, 6)
+        self.switcher = Segmented(["Manuscript", "Fellowships"])
+        self.switcher.changed.connect(self.sections.setCurrentIndex)
+        bar_lay.addStretch(1)
+        bar_lay.addWidget(self.switcher)
+        bar_lay.addStretch(1)
+
+        # Reminders show when the app opens: a banner if anything needs
+        # attention now, which leads to the Applications tab.
+        self.banner = QFrame()
+        self.banner.setStyleSheet("background:#FFF4E5; border-radius:10px;")
+        banner_lay = QHBoxLayout(self.banner)
+        banner_lay.setContentsMargins(14, 8, 8, 8)
+        self.banner_text = QLabel()
+        self.banner_text.setStyleSheet("color:#7A4B00; background:transparent;")
+        view = QPushButton("View")
+        view.setCursor(Qt.PointingHandCursor)
+        view.setStyleSheet("color:#007AFF; background:transparent; border:none; "
+                           "font-weight:600; padding:4px 8px;")
+        view.clicked.connect(self._show_reminders)
+        close = QPushButton("\u2715")
+        close.setCursor(Qt.PointingHandCursor)
+        close.setStyleSheet("color:#8E8E93; background:transparent; border:none; "
+                            "padding:4px 8px;")
+        close.clicked.connect(self.banner.hide)
+        banner_lay.addWidget(self.banner_text, 1)
+        banner_lay.addWidget(view)
+        banner_lay.addWidget(close)
+        banner_holder = QWidget()
+        banner_holder.setObjectName("page")
+        bh = QHBoxLayout(banner_holder)
+        bh.setContentsMargins(16, 0, 16, 6)
+        bh.addWidget(self.banner)
+
+        central = QWidget()
+        central.setObjectName("page")
+        lay = QVBoxLayout(central)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(0)
+        lay.addWidget(bar)
+        lay.addWidget(banner_holder)
+        lay.addWidget(self.sections, 1)
+        self.setCentralWidget(central)
+        self._update_banner(self.fellowships.attention_count())
+        self.fellowships.attentionChanged.connect(self._update_banner)
 
         self.start.checkRequested.connect(self.check)
         self.results.recheck.connect(lambda: self.current_path and self.check(self.current_path))
         self.results.newFile.connect(lambda: self.stack.setCurrentWidget(self.start))
 
+    def _update_banner(self, count: int):
+        self.banner_text.setText(
+            f"{count} fellowship reminder{'s need' if count != 1 else ' needs'} "
+            f"your attention.")
+        self.banner.setVisible(count > 0)
+        self.banner.parentWidget().setVisible(count > 0)
+        self.switcher.set_title(1, f"Fellowships ({count})" if count else "Fellowships")
+
+    def _show_reminders(self):
+        self.switcher.select(1)
+        self.fellowships.show_tab(1)
+
     def check(self, path: str):
+        self.switcher.select(0)
         if self._thread is not None:
             return
         if not path.lower().endswith(".docx"):

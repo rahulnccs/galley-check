@@ -62,6 +62,20 @@ Galley ships a template rather than real journals, because a stale limit is
 worse than none, and there is no way for the app to know when a journal changed
 its rules. Profiles for journals you submit to are welcome as pull requests.
 
+**Fellowships**
+
+Switch to **Fellowships** at the top of the window. Fill in your profile (PhD
+date, nationality, field, places you've lived) and Galley lists the
+life-science fellowships you're eligible for, the ones worth checking, and the
+ones you can't apply for, with the reason for each. Add a fellowship to **My
+Applications** to get a preparation plan worked back from its deadline, and
+reminders whenever you open Galley. Fellowships Galley doesn't list, like an
+institute's internal scheme, can be added by hand. Your profile and
+applications are saved on your computer only.
+
+The fellowship list is still being built: Galley currently ships invented
+examples only, which are hidden from real results.
+
 **Comparing two versions**
 
 Choose **Document → Compare with an earlier version…**, or run
@@ -214,9 +228,9 @@ git push origin v1.5.0
 7. Code signing, so the first-launch warning goes away
 8. Fellowship matching for life-science researchers: ~~fellowship format,
    eligibility matching, users' own entries, application requirements and
-   draft checks, preparation plans, application tracking and reminders~~ (see
-   `galley/fellowships/data/README.md`); app screens and a monthly data
-   refresh still to come
+   draft checks, preparation plans, application tracking, reminders and the
+   Fellowships screen~~ (see `galley/fellowships/data/README.md`); real
+   fellowship entries and a monthly data refresh still to come
 
 ## Feedback
 

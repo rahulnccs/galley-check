@@ -23,11 +23,6 @@
       "date": "2026-11-01"
     },
     {
-      "kind": "referees",
-      "date": "2027-01-22",
-      "label": "Reference letters due"
-    },
-    {
       "kind": "final",
       "date": "2027-01-15",
       "time": "17:00",
@@ -57,10 +52,6 @@
     ],
     "cv_format": "narrative",
     "cv_notes": "Two pages at most, in the funder's narrative CV template.",
-    "referees": {
-      "count": 2,
-      "submitted_by": "referee"
-    },
     "host_letter": true,
     "submission": "portal",
     "submission_url": "https://example.org/apply"

@@ -25,7 +25,7 @@ def fellowship(**overrides) -> Fellowship:
 
 FULL = {"documents": [{"name": "Research proposal", "max_words": 50,
                        "sections": ["Background", "Aims"]}],
-        "referees": {"count": 2}, "host_letter": True}
+        "host_letter": True}
 
 
 # --- requirements ------------------------------------------------------------
@@ -33,7 +33,7 @@ FULL = {"documents": [{"name": "Research proposal", "max_words": 50,
 @pytest.mark.parametrize("bad, complaint", [
     ({"documents": [{"max_pages": 3}]}, "needs a name"),
     ({"cv_format": "fancy"}, "cv_format must be"),
-    ({"referees": {"count": 2, "submitted_by": "host"}}, "submitted_by"),
+    ({"documents": [{"name": "Proposal", "max_words": "lots"}]}, "invalid literal"),
     ({"submission": "fax"}, "submission must be"),
 ])
 def test_bad_requirements_rejected(bad, complaint):
@@ -43,7 +43,7 @@ def test_bad_requirements_rejected(bad, complaint):
 
 def test_requirements_parsed():
     f = fellowship(requirements=FULL)
-    assert f.requirements.referees.count == 2
+    assert f.requirements.host_letter
     assert f.requirements.document("research proposal").max_words == 50
 
 
@@ -103,7 +103,7 @@ def test_plan_works_back_from_the_deadline():
     f = fellowship(requirements=FULL)
     steps = {s.key: s for s in plan(f, TODAY)}
     assert steps["submit"].date == FINAL and steps["submit"].is_deadline
-    assert steps["ask_referees"].date == FINAL - timedelta(weeks=6)
+    assert steps["drafts_for_feedback"].date == FINAL - timedelta(weeks=4)
     assert steps["contact_hosts"].date == FINAL - timedelta(weeks=12)
     assert steps["final_check"].date == FINAL - timedelta(weeks=1)
     assert "Research proposal" in steps["start_writing"].task
@@ -120,18 +120,6 @@ def test_internal_deadline_pulls_drafting_earlier():
     assert steps["start_writing"].date == internal - timedelta(weeks=8)
 
 
-def test_referee_deadline_after_the_final_one():
-    # Letters are often due a week after the applicant submits.
-    refs = FINAL + timedelta(days=7)
-    f = fellowship(requirements={"referees": {"count": 1}},
-                   deadlines=[{"kind": "final", "date": FINAL.isoformat()},
-                              {"kind": "referees", "date": refs.isoformat()}])
-    steps = {s.key: s for s in plan(f, TODAY)}
-    assert steps["referees_due"].date == refs and steps["referees_due"].is_deadline
-    assert steps["ask_referees"].date == refs - timedelta(weeks=6)
-    assert steps["ask_referees"].task.startswith("Ask 1 referee ")
-
-
 def test_no_plan_without_a_deadline():
     assert plan(fellowship(deadlines=[], rolling=True), TODAY) == []
 
@@ -139,7 +127,7 @@ def test_no_plan_without_a_deadline():
 def test_late_start_keeps_steps_as_overdue():
     late = FINAL - timedelta(weeks=2)
     steps = {s.key: s for s in plan(fellowship(requirements=FULL), late)}
-    assert steps["ask_referees"].overdue(late)
+    assert steps["contact_hosts"].overdue(late)
     assert not steps["submit"].overdue(late)
 
 
@@ -187,7 +175,7 @@ def test_reminders_when_the_app_opens():
     day = FINAL - timedelta(weeks=5)
     found = reminders(apps, [f], day)
     texts = [r.text for r in found]
-    assert any("Ask 2 referees" in t for t in texts)
+    assert any("Contact potential host labs" in t for t in texts)
     assert found[0].urgency == "overdue"            # most urgent first
     assert all((r.date - day).days <= 42 for r in found)
 
@@ -197,10 +185,10 @@ def test_done_and_snoozed_steps_are_quiet():
     apps = {}
     app = start_application(apps, f, TODAY)
     day = FINAL - timedelta(weeks=5)
-    app.mark_done("ask_referees")
+    app.mark_done("contact_hosts")
     app.snooze("drafts_for_feedback", day + timedelta(days=7))
     keys = [r.step for r in reminders(apps, [f], day)]
-    assert "ask_referees" not in keys and "drafts_for_feedback" not in keys
+    assert "contact_hosts" not in keys and "drafts_for_feedback" not in keys
 
 
 def test_submitted_application_stops_preparation_reminders():

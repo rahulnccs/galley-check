@@ -45,7 +45,7 @@ FIELDS = {
     "biomedical_clinical",
 }
 TRACKS = {"any", "clinical", "non_clinical"}
-DEADLINE_KINDS = {"final", "internal", "pre_proposal", "call_opens", "referees"}
+DEADLINE_KINDS = {"final", "internal", "pre_proposal", "call_opens"}
 
 
 def _date(value, what: str) -> date | None:
@@ -337,3 +337,50 @@ def delete_custom_fellowship(fellowship_id: str, folder: Path | None = None) -> 
     except OSError:
         return False
     return True
+
+
+def researcher_path() -> Path:
+    from ..checks.offline.submission import user_profile_dir
+    return user_profile_dir().parent / "researcher.json"
+
+
+def researcher_to_dict(r: Researcher) -> dict:
+    iso = lambda d: d.isoformat() if d else None    # noqa: E731
+    return {"phd_date": iso(r.phd_date), "phd_expected": iso(r.phd_expected),
+            "career_break_months": r.career_break_months,
+            "nationalities": r.nationalities, "residence": r.residence,
+            "stays": [{"country": s.country, "start": iso(s.start), "end": iso(s.end)}
+                      for s in r.stays],
+            "fields": r.fields, "clinical": r.clinical,
+            "target_hosts": r.target_hosts}
+
+
+def researcher_from_dict(data: dict) -> Researcher:
+    return Researcher(
+        phd_date=_date(data.get("phd_date"), "phd_date"),
+        phd_expected=_date(data.get("phd_expected"), "phd_expected"),
+        career_break_months=float(data.get("career_break_months") or 0),
+        nationalities=_countries(data.get("nationalities") or [], "nationalities"),
+        residence=(data.get("residence") or "").upper() or None,
+        stays=[Stay(s["country"].upper(), _date(s["start"], "start"),
+                    _date(s.get("end"), "end"))
+               for s in data.get("stays") or []],
+        fields=[f for f in data.get("fields") or [] if f in FIELDS],
+        clinical=data.get("clinical"),
+        target_hosts=_countries(data.get("target_hosts") or [], "target_hosts"))
+
+
+def load_researcher(path: Path | None = None) -> Researcher:
+    """The saved profile, or an empty one. Never raises: a damaged file just
+    means starting the profile again."""
+    try:
+        data = json.loads((path or researcher_path()).read_text(encoding="utf-8"))
+        return researcher_from_dict(data)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return Researcher()
+
+
+def save_researcher(r: Researcher, path: Path | None = None) -> None:
+    path = path or researcher_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(researcher_to_dict(r), indent=2), encoding="utf-8")

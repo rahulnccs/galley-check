@@ -1,5 +1,5 @@
 """What an application needs: documents and their limits, CV format,
-referees and how to submit. Also checks a draft document against its limits.
+a host letter and how to submit. Also checks a draft document against its limits.
 
 In a fellowship's JSON this is the "requirements" section; see
 galley/fellowships/data/README.md.
@@ -13,7 +13,6 @@ from dataclasses import dataclass, field
 from ..model.document import Issue
 
 CV_FORMATS = {"standard", "narrative", "funder_template"}
-REFEREE_SUBMITTERS = {"referee", "applicant"}
 SUBMISSION_ROUTES = {"portal", "email", "institution"}
 CHECK = "application"
 WORD = re.compile(r"[\wÀ-ɏ][\wÀ-ɏ'’\-]*")
@@ -31,17 +30,10 @@ class DocumentRequirement:
 
 
 @dataclass
-class Referees:
-    count: int
-    submitted_by: str = "referee"           # who uploads the letters
-
-
-@dataclass
 class Requirements:
     documents: list[DocumentRequirement] = field(default_factory=list)
     cv_format: str | None = None
     cv_notes: str | None = None
-    referees: Referees | None = None
     host_letter: bool = False
     submission: str | None = None
     submission_url: str | None = None
@@ -64,18 +56,12 @@ class Requirements:
         cv = data.get("cv_format")
         if cv is not None and cv not in CV_FORMATS:
             raise ValueError(f"cv_format must be one of {', '.join(sorted(CV_FORMATS))}")
-        refs = data.get("referees")
-        if refs is not None:
-            by = refs.get("submitted_by", "referee")
-            if by not in REFEREE_SUBMITTERS:
-                raise ValueError("referees.submitted_by must be referee or applicant")
-            refs = Referees(int(refs["count"]), by)
         route = data.get("submission")
         if route is not None and route not in SUBMISSION_ROUTES:
             raise ValueError(f"submission must be one of "
                              f"{', '.join(sorted(SUBMISSION_ROUTES))}")
         return cls(documents=docs, cv_format=cv, cv_notes=data.get("cv_notes"),
-                   referees=refs, host_letter=bool(data.get("host_letter")),
+                   host_letter=bool(data.get("host_letter")),
                    submission=route, submission_url=data.get("submission_url"))
 
     def document(self, name: str) -> DocumentRequirement | None:

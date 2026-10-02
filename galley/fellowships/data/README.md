@@ -24,7 +24,7 @@ Scope: life-science fellowships only.
 | `host_countries` | no | Where the fellowship must be held. Leave out for anywhere. |
 | `excluded_host_countries` | no | Where it may not be held. |
 | `mobility` | no | `{"max_months_in_host": 12, "window_years": 3}`: no more than 12 months living in the host country in the 3 years before the deadline. |
-| `deadlines` | no | A list, each with `kind`, `date`, and optionally `time`, `timezone` (e.g. `Europe/Berlin`), `estimated` (true if guessed from previous years) and `label`. Kinds: `final`, `internal`, `pre_proposal`, `call_opens`, `referees`. |
+| `deadlines` | no | A list, each with `kind`, `date`, and optionally `time`, `timezone` (e.g. `Europe/Berlin`), `estimated` (true if guessed from previous years) and `label`. Kinds: `final`, `internal`, `pre_proposal`, `call_opens`. |
 | `rolling` | no | true if applications are accepted at any time. |
 | `annual` | no | true (default) if the call runs every year. |
 | `requirements` | no | What the application needs; see below. |
@@ -42,7 +42,6 @@ Scope: life-science fellowships only.
   ],
   "cv_format": "narrative",
   "cv_notes": "Two pages, funder's template",
-  "referees": {"count": 2, "submitted_by": "referee"},
   "host_letter": true,
   "submission": "portal",
   "submission_url": "https://..."
@@ -52,8 +51,8 @@ Scope: life-science fellowships only.
 Everything is optional. `cv_format` is `standard`, `narrative` or
 `funder_template`; `submission` is `portal`, `email` or `institution`. Galley
 checks a draft .docx against a document's `max_words`, `max_pages` and
-`sections`, and builds each applicant's preparation plan from the referees,
-host letter and documents listed here.
+`sections`, and builds each applicant's preparation plan from the host letter
+and documents listed here.
 
 Countries are two-letter ISO codes: `IN`, `DE`, `GB`, `US`.
 

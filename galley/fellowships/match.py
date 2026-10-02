@@ -75,7 +75,8 @@ def _career_stage(f: Fellowship, r: Researcher, on: date) -> list[Reason]:
         return []
     lo, hi = f.min_years_since_phd, f.max_years_since_phd
     window = ("" if lo is None and hi is None
-              else f"{_fmt_years(lo or 0)} to {_fmt_years(hi)}" if hi is not None
+              else f"up to {_fmt_years(hi)}" if lo is None
+              else f"{_fmt_years(lo)} to {_fmt_years(hi)}" if hi is not None
               else f"at least {_fmt_years(lo)}")
     if r.phd_date is None:
         if r.phd_expected is not None:
