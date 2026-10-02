@@ -212,6 +212,9 @@ git push origin v1.5.0
 5. ~~Desktop app~~ (done early); one-click installers for Windows and Mac
 6. Optional online checks (DOI verification, retractions)
 7. Code signing, so the first-launch warning goes away
+8. Fellowship matching for life-science researchers: ~~fellowship format and
+   eligibility matching~~ (see `galley/fellowships/data/README.md`); app
+   screens, deadline reminders and a monthly data refresh still to come
 
 ## Feedback
 

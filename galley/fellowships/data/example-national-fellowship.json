@@ -1,0 +1,45 @@
+{
+  "id": "example-national-fellowship",
+  "template": true,
+  "name": "Example National Early Career Fellowship",
+  "funder": "Example National Research Agency",
+  "url": "https://example.org/fellowships/national-early-career",
+  "verified": "2026-10-01",
+  "notes": "Invented, to show the format. Not a real fellowship.",
+  "fields": [
+    "molecular_cell_biology",
+    "genetics_genomics",
+    "microbiology"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "min_years_since_phd": 1,
+    "max_years_since_phd": 6
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "residence": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "internal",
+      "date": "2027-02-15",
+      "label": "Host institute endorsement"
+    },
+    {
+      "kind": "final",
+      "date": "2027-03-31",
+      "estimated": true
+    }
+  ],
+  "amount": "Fellowship stipend and contingency grant",
+  "duration_months": 60,
+  "other_rules": [
+    "A host institute must agree to administer the fellowship"
+  ]
+}

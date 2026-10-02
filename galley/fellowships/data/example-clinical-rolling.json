@@ -1,0 +1,16 @@
+{
+  "id": "example-clinical-rolling",
+  "template": true,
+  "name": "Example Clinical Research Fellowship",
+  "funder": "Example Medical Charity",
+  "url": "https://example.org/fellowships/clinical-research",
+  "verified": "2026-10-01",
+  "notes": "Invented, to show the format. Not a real fellowship.",
+  "fields": ["biomedical_clinical", "immunology_infection"],
+  "track": "clinical",
+  "career_stage": {"phd_required": false},
+  "host_countries": ["GB"],
+  "rolling": true,
+  "annual": false,
+  "duration_months": 36
+}

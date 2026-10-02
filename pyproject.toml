@@ -24,4 +24,4 @@ build-backend = "setuptools.build_meta"
 include = ["galley*"]
 
 [tool.setuptools.package-data]
-galley = ["profiles/*.json"]
+galley = ["profiles/*.json", "fellowships/data/*.json"]
