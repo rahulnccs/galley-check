@@ -58,9 +58,12 @@ CHECK_LABELS = {
     "references": "Citations and references",
     "abbreviations": "Abbreviations",
     "species": "Species names",
+    "consistency": "Consistency",
+    "statements": "Ethics and statements",
     "submission": "Journal requirements",
 }
-CHECK_ORDER = ["figures", "references", "abbreviations", "species", "submission"]
+CHECK_ORDER = ["figures", "references", "abbreviations", "species",
+               "consistency", "statements", "submission"]
 SEVERITY = {
     "error":   {"color": "#B4463D", "tint": "#F8DFDC", "name": "error"},
     "warning": {"color": "#9A6416", "tint": "#FAEBD6", "name": "warning"},
@@ -260,7 +263,8 @@ class StartPage(QWidget):
         title = QLabel("Galley")
         title.setObjectName("title")
         sub = QLabel("Checks figures, tables, citations, references, "
-                     "abbreviations and species names before reviewers do. "
+                     "abbreviations, species names, consistency and ethics "
+                     "statements before reviewers do. "
                      "Your manuscript stays on this computer.")
         sub.setObjectName("subtitle")
         sub.setWordWrap(True)
@@ -770,8 +774,8 @@ class ResultsPage(QWidget):
                 f"\u2713</p>"
                 f"<h3 style='margin:4px 0 2px 0'>Nothing to fix</h3>"
                 f"<p style='color:{INK_SOFT}'>Figures, tables, citations, "
-                f"references, abbreviations and species names all check "
-                f"out.</p></div>")
+                f"references, abbreviations, species names, consistency "
+                f"and statements all check out.</p></div>")
         return (f"<p style='color:{INK_SOFT}'>No findings at this filter. "
                 f"Choose another tile.</p>")
 

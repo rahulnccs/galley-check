@@ -10,8 +10,8 @@ mechanical part of that check for you.
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Status:** v1.4. Checks figures, tables, abbreviations, species names,
-citations, references and submission readiness in `.docx` files. PDF support is
-experimental and not yet reliable.
+citations, references, consistency, ethics statements and submission readiness
+in `.docx` files. PDF support is experimental and not yet reliable.
 
 ## What it checks so far
 
@@ -87,6 +87,31 @@ and are rejoined before checking.
 A phrase is only treated as a species when the manuscript gives evidence it is
 one — italics somewhere, an abbreviated form, or a "sp." usage — so ordinary
 prose like "Alpha diversity" is never mistaken for a binomial.
+
+**Consistency**
+
+Each of these only fires when the manuscript does the same thing two ways —
+"37 °C" and "37°C" are both acceptable styles, but not in the same paper.
+
+- A unit written with a space after the number in some places and not others
+  ("5 mg" and "5mg")
+- The same unit capitalized two ways ("ml" and "mL")
+- Two different micro signs (µ and μ look alike but aren't), or "u" used in place
+  of one ("uL")
+- British and American spelling mixed ("colour" and "color"); names such as
+  "Cancer Center" and the reference list are left alone
+- A sentence that starts with a numeral ("15 mice were...")
+
+**Ethics and statements**
+
+- Data availability, competing interests, funding and author contributions
+  statements, which almost every journal asks for
+- Ethics approval and informed consent, when the methods or results describe
+  research with people ("patients", "participants")
+- Animal ethics approval, when they describe work with animals ("mice", "rats");
+  antibodies like "mouse anti-GFP" don't count
+- A code availability statement, when the manuscript mentions custom code or
+  scripts
 
 **Citations and references**
 
