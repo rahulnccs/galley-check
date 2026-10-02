@@ -9,8 +9,9 @@ mechanical part of that check for you.
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Status:** early development (v0.2). Checks figures, tables, citations, and
-references in `.docx` files. PDF support is experimental and not yet reliable.
+**Status:** v1.4. Checks figures, tables, abbreviations, species names,
+citations, references and submission readiness in `.docx` files. PDF support is
+experimental and not yet reliable.
 
 ## What it checks so far
 
@@ -48,10 +49,9 @@ Anything left blank isn't checked.
 
 The profile is saved under your user folder and appears in the dropdown next
 time, so you fill it in once per journal. Galley remembers the last journal you
-used, and profiles you made can be edited or removed from the same row. They are
-small JSON files, so one can also be shared with a labmate. Profiles are small JSON files, so you
-can also share one with your lab, or pass it on the command line with
-`--profile myjournal.json`.
+used, and profiles you made can be edited or removed from the same row.
+Profiles are small JSON files, so you can share one with your lab, or pass it on
+the command line with `--profile myjournal.json`.
 
 Every profile records the date its rules were checked and a link to the
 journal's own guidelines, and Galley reports both. A profile with no date, or
@@ -174,8 +174,8 @@ Builds run automatically. Pushing a version tag publishes the Mac and Windows
 apps to a GitHub release:
 
 ```bash
-git tag v0.2.0
-git push origin v0.2.0
+git tag v1.5.0
+git push origin v1.5.0
 ```
 
 ## Roadmap
