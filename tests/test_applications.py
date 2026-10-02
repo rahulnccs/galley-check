@@ -132,7 +132,9 @@ def test_narrow_margins_fail(tmp_path):
 def test_word_file_when_pdf_wanted(tmp_path):
     path = make_draft(tmp_path / "p.docx", [("p", "text")])
     found = outcomes(check_document(path, doc_req(file_format="pdf")))
-    assert any(o == WARN and "as a PDF" in t for o, t in found)
+    assert [(o, t) for o, t in found if "as a PDF" in t] == [
+        ("info", "Submit the Research proposal as a PDF: export it from Word "
+                 "when it's final, and check the PDF's page count.")]
 
 
 def test_bad_file_format_rejected():

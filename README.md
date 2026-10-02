@@ -74,8 +74,9 @@ reminders whenever you open Galley.
 Before you submit, attach your documents to the application and choose
 **Check Application**. Galley checks each one against that fellowship's
 format: page and word limits, required sections, smallest text size, margins
-and file type. It then lists what passes and what to fix. Word files are
-always supported; PDFs too if you install with `pip install -e ".[pdf]"`.
+and file type. It then lists what passes and what to fix. Attach the Word
+files you're writing; if the funder wants PDFs, Galley reminds you to export
+them at the end.
 
 Fellowships Galley doesn't list, like an
 institute's internal scheme, can be added by hand. Your profile and

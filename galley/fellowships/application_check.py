@@ -245,10 +245,10 @@ def check_document(path: str, req: DocumentRequirement) -> list[Finding]:
     if req.file_format and req.file_format != m.kind:
         wanted = "PDF" if req.file_format == "pdf" else "Word document"
         if req.file_format == "pdf":
-            out.append(Finding(WARN, f"The funder wants the {name} as a PDF; "
-                                     f"you attached the Word file.",
-                               "Export it as PDF before submitting, and check "
-                               "the PDF's page count."))
+            # Expected: people write in Word and export at the end.
+            out.append(Finding(INFO, f"Submit the {name} as a PDF: export it "
+                                     f"from Word when it's final, and check "
+                                     f"the PDF's page count."))
         else:
             out.append(Finding(FAIL, f"The funder wants the {name} as a {wanted}.",
                                "Attach and submit the Word file."))
