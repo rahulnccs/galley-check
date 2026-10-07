@@ -35,7 +35,7 @@ def settings(tmp_path, monkeypatch):
     real = model.load_fellowships
 
     def with_examples(*a, **k):
-        k.setdefault("include_templates", True)
+        k["include_templates"] = True
         return real(*a, **k)
     import galley.gui.fellowships_page as page_mod
     monkeypatch.setattr(page_mod, "load_fellowships", with_examples)
@@ -161,3 +161,16 @@ def test_category_filter_and_career_stage(app, settings):
     page.p_level.setCurrentIndex(2)              # PhD student
     page.save_profile()
     assert load_researcher(settings / "researcher.json").career_level == "phd_student"
+
+
+def test_examples_can_be_shown_to_try_galley(app, tmp_path, monkeypatch):
+    # The real loader: examples are hidden until the user asks for them.
+    monkeypatch.setattr(submission, "user_profile_dir", lambda: tmp_path / "profiles")
+    from galley.gui.fellowships_page import FellowshipsPage
+    page = FellowshipsPage(today=TODAY)
+    assert "Example International" not in texts(page.tab_stack.widget(0))
+    assert "Show invented example entries" in texts(page.tab_stack.widget(0))
+    page._toggle_examples(True)
+    shown = texts(page.tab_stack.widget(0))
+    assert "Example International Postdoctoral Fellowship" in shown
+    assert "Postdoc fellowship (example)" in shown

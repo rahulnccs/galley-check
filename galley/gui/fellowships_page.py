@@ -536,6 +536,7 @@ class FellowshipsPage(QWidget):
         self.today = today or date.today()
         self.load_error: str | None = None
         self.category_filter: str | None = None     # None = all categories
+        self.show_examples = False      # the invented entries, for trying Galley
         self.reload_data()
 
         self.stack = QStackedWidget()
@@ -576,7 +577,7 @@ class FellowshipsPage(QWidget):
     # -- data ----------------------------------------------------------------
     def reload_data(self):
         try:
-            self.fellowships = load_fellowships()
+            self.fellowships = load_fellowships(include_templates=self.show_examples)
             self.load_error = None
         except ValueError as e:
             self.fellowships, self.load_error = [], str(e)
@@ -687,7 +688,7 @@ class FellowshipsPage(QWidget):
                     when = "Open all year"
                 else:
                     when = "No deadline announced"
-                kind = CATEGORY_LABEL[f.category]
+                kind = CATEGORY_LABEL[f.category] + (" (example)" if f.template else "")
                 sub = " · ".join(x for x in (kind, f.funder, when) if x)
                 trailing = QWidget()
                 tl = QHBoxLayout(trailing)
@@ -697,15 +698,29 @@ class FellowshipsPage(QWidget):
                 tl.addWidget(pill(STATUS_LABEL[status], STATUS_COLOR[status]))
                 row = card.add(Row(f.name, sub, trailing=trailing, tappable=True))
                 row.clicked.connect(lambda f=f: self.open_fellowship(f.id))
+        real = [f for f in self.fellowships if not f.template]
         if not matches and not self.load_error:
             page.header("Fellowships")
             card = page.add(Card())
             card.add(Row("No fellowships yet",
                          "Add your own from the Applications tab."))
+        if not real or self.show_examples:
+            page.header("Try Galley")
+            card = page.add(Card())
+            sw = Switch(self.show_examples)
+            sw.toggled.connect(self._toggle_examples)
+            card.add(field_row("Show invented example entries", sw))
+            page.footnote("The examples aren't real fellowships; they show how "
+                          "matching, plans and the application check work.")
         page.footnote("Results are guidance. The funder's official rules decide "
                       "eligibility; each entry links to them.")
         page.finish()
         return page
+
+    def _toggle_examples(self, on: bool):
+        self.show_examples = on
+        self.reload_data()
+        self.refresh(0)
 
     def _filter_category(self, index: int):
         self.category_filter = CATEGORY_FILTERS[index]
