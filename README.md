@@ -1,7 +1,15 @@
 # Galley
 
-Offline checks for academic manuscript drafts — figures, tables, citations and
-references. Your paper never leaves your computer.
+A desktop app for life-science researchers, in two parts:
+
+- **Manuscript checks**: offline checks for manuscript drafts (figures, tables,
+  citations, references, abbreviations, species names, consistency and ethics
+  statements) before reviewers see them.
+- **Fellowships**: which postdoc fellowships, PhD fellowships and travel
+  grants you can apply for and why, a preparation plan and reminders for each
+  application, and a check of your documents against the funder's format.
+
+Your manuscript, documents and profile never leave your computer.
 
 A galley proof is the draft an author checks before publication. Galley does the
 mechanical part of that check for you.
@@ -9,11 +17,11 @@ mechanical part of that check for you.
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Status:** v1.5. Checks figures, tables, abbreviations, species names,
-citations, references, consistency, ethics statements and submission readiness
-in `.docx` files. PDF support is experimental and not yet reliable.
+**Status:** v1.5. Manuscript checks work on `.docx` files; PDF support is
+experimental and not yet reliable. The Fellowships section is new in v1.5 and
+its fellowship list is still being built (see [Fellowships](#fellowships)).
 
-## What it checks so far
+## Manuscript checks
 
 **Figures and tables**
 
@@ -61,30 +69,6 @@ numbers are current.
 Galley ships a template rather than real journals, because a stale limit is
 worse than none, and there is no way for the app to know when a journal changed
 its rules. Profiles for journals you submit to are welcome as pull requests.
-
-**Fellowships**
-
-Switch to **Fellowships** at the top of the window. Fill in your profile (PhD
-date, nationality, field, places you've lived) and Galley lists the
-life-science funding you're eligible for, the ones worth checking, and the
-ones you can't apply for, with the reason for each: postdoc fellowships, PhD
-fellowships and travel grants, filtered at the top of the list. Add a fellowship to **My
-Applications** to get a preparation plan worked back from its deadline, and
-reminders whenever you open Galley.
-
-Before you submit, attach your documents to the application and choose
-**Check Application**. Galley checks each one against that fellowship's
-format: page and word limits, required sections, smallest text size, margins
-and file type. It then lists what passes and what to fix. Attach the Word
-files you're writing; if the funder wants PDFs, Galley reminds you to export
-them at the end.
-
-Fellowships Galley doesn't list, like an
-institute's internal scheme, can be added by hand. Your profile and
-applications are saved on your computer only.
-
-The fellowship list is still being built: Galley currently ships invented
-examples only, which are hidden from real results.
 
 **Comparing two versions**
 
@@ -158,6 +142,47 @@ of false errors, and everything else is still checked.
 
 The parser reads text as it appears with tracked changes accepted, and detects
 citations inserted by Zotero, Mendeley, and EndNote.
+
+## Fellowships
+
+Switch to **Fellowships** at the top of the window. It covers three kinds of
+life-science funding: postdoc fellowships, PhD fellowships and travel grants.
+
+**Matches.** Fill in your profile (career stage, PhD date, career breaks,
+nationality, where you live and would like to go, places you've lived, field)
+and Galley sorts the funding into what you're eligible for, what's worth
+checking, and what you can't apply for, with the reason for each rule: career
+stage, years since PhD, nationality, residence, host country, mobility rules,
+clinical track and society membership. Filter the list by Postdoc, PhD or
+Travel. When a rule can't be checked automatically, Galley says "worth
+checking" rather than guessing, and every entry links to the funder's own page.
+
+**Applications.** Add a fellowship to **My Applications** to get a preparation
+plan worked back from its deadline (contact host labs, start drafting, get
+feedback, final check), track its stage from preparing to awarded, and keep
+notes. Whenever you open Galley, a banner lists steps that are overdue or
+coming up, and deadlines that have moved.
+
+**Check Application.** Before you submit, attach your Word documents to the
+application and choose **Check Application**. Galley checks each one against
+the fellowship's format (page and word limits, required sections, smallest
+text size and margins) and lists what passes and what to fix. If the funder
+wants PDFs, Galley reminds you to export them at the end.
+
+**Your own entries.** Funding Galley doesn't list, like an institute's
+internal scheme, can be added by hand.
+
+**The fellowship list.** It is maintained in
+[`galley/fellowships/data/`](galley/fellowships/data/README.md), one small
+file per scheme, each with the date it was last checked against the funder's
+page; entries older than a year are flagged. The list is still being built:
+Galley currently ships invented examples only, which you can switch on under
+Matches to try the features. To suggest a scheme, fill in
+[`templates/fellowship-database-template.xlsx`](templates/fellowship-database-template.xlsx)
+or open an issue. Each entry in the app has a **Report Outdated Information**
+link for corrections.
+
+Your profile and applications are saved on your computer only.
 
 ## Download
 
@@ -236,11 +261,10 @@ git push origin v1.6.0
 5. ~~Desktop app~~ (done early); one-click installers for Windows and Mac
 6. Optional online checks (DOI verification, retractions)
 7. Code signing, so the first-launch warning goes away
-8. Fellowship matching for life-science researchers: ~~fellowship format,
-   eligibility matching, users' own entries, application requirements and
-   draft checks, preparation plans, application tracking, reminders and the
-   Fellowships screen~~ (see `galley/fellowships/data/README.md`); real
-   fellowship entries and a monthly data refresh still to come
+8. ~~Fellowships for life-science researchers: postdoc and PhD fellowships
+   and travel grants, matching, application tracking, reminders and document
+   checks~~ (v1.5); real fellowship entries and a monthly data refresh still
+   to come
 
 ## Feedback
 
