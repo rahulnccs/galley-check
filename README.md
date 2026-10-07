@@ -9,7 +9,7 @@ mechanical part of that check for you.
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**Status:** v1.4. Checks figures, tables, abbreviations, species names,
+**Status:** v1.5. Checks figures, tables, abbreviations, species names,
 citations, references, consistency, ethics statements and submission readiness
 in `.docx` files. PDF support is experimental and not yet reliable.
 
@@ -223,8 +223,8 @@ Builds run automatically. Pushing a version tag publishes the Mac and Windows
 apps to a GitHub release:
 
 ```bash
-git tag v1.5.0
-git push origin v1.5.0
+git tag v1.6.0
+git push origin v1.6.0
 ```
 
 ## Roadmap
