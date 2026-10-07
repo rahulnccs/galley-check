@@ -1,0 +1,19 @@
+{
+  "id": "example-travel-grant",
+  "template": true,
+  "category": "travel",
+  "purpose": "conference",
+  "name": "Example Conference Travel Grant",
+  "funder": "Example Society for Cell Biology",
+  "url": "https://example.org/grants/travel",
+  "verified": "2026-10-01",
+  "notes": "Invented, to show the format. Not a real grant.",
+  "career_levels": ["phd_student", "postdoc"],
+  "membership": "the Example Society for Cell Biology",
+  "membership_min_months": 12,
+  "deadlines": [{"kind": "final", "date": "2027-03-15"}],
+  "amount": "Up to 1,000 EUR",
+  "requirements": {
+    "documents": [{"name": "Motivation letter", "max_words": 500}]
+  }
+}

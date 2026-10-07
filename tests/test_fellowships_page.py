@@ -149,3 +149,15 @@ def test_attach_and_check_application(app, settings, tmp_path, monkeypatch):
     assert "to fix" in report                       # career statement missing
     assert "Not attached yet." in report
     assert 'Includes "Feasibility".' in report
+
+
+def test_category_filter_and_career_stage(app, settings):
+    page = make_page(app)
+    page._filter_category(3)                     # Travel
+    assert "Example International Postdoctoral" not in texts(page.tab_stack.widget(0))
+    page._filter_category(0)                     # All
+    assert "Example International Postdoctoral" in texts(page.tab_stack.widget(0))
+    page.show_tab(2)
+    page.p_level.setCurrentIndex(2)              # PhD student
+    page.save_profile()
+    assert load_researcher(settings / "researcher.json").career_level == "phd_student"

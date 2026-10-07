@@ -1,0 +1,16 @@
+{
+  "id": "example-phd-fellowship",
+  "template": true,
+  "category": "phd",
+  "name": "Example PhD Fellowship in the Life Sciences",
+  "funder": "Example Life Science Foundation",
+  "url": "https://example.org/fellowships/phd",
+  "verified": "2026-10-01",
+  "notes": "Invented, to show the format. Not a real fellowship.",
+  "fields": ["molecular_cell_biology", "neuroscience", "genetics_genomics"],
+  "excluded_host_countries": [],
+  "deadlines": [{"kind": "final", "date": "2027-02-01"}],
+  "amount": "Monthly stipend and tuition",
+  "duration_months": 36,
+  "other_rules": ["Must be in the first year of a PhD, or about to start one"]
+}

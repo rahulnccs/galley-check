@@ -53,8 +53,11 @@ def plan(f: Fellowship, today: date) -> list[Step]:
 
     documents = [d.name for d in req.documents] if req else []
     what = ", ".join(documents) if documents else "the application"
-    steps.append(Step("start_writing", first_gate - 8 * WEEK, f"Start drafting: {what}"))
-    steps.append(Step("drafts_for_feedback", first_gate - 4 * WEEK,
+    # A travel grant is a short application; a fellowship takes months.
+    start, feedback = (3, 1) if f.category == "travel" else (8, 4)
+    steps.append(Step("start_writing", first_gate - start * WEEK,
+                      f"Start drafting: {what}"))
+    steps.append(Step("drafts_for_feedback", first_gate - feedback * WEEK,
                       "Send drafts to a mentor or colleague for feedback"))
 
     for g in gates:

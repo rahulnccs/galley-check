@@ -75,6 +75,15 @@ FIELD_LABEL = {
 }
 DEADLINE_LABEL = {"final": "Deadline", "internal": "Internal deadline",
                   "pre_proposal": "Pre-proposal", "call_opens": "Call opens"}
+CATEGORY_LABEL = {"postdoc": "Postdoc fellowship", "phd": "PhD fellowship",
+                  "travel": "Travel grant"}
+CATEGORY_FILTERS = [None, "postdoc", "phd", "travel"]
+PURPOSE_LABEL = {"conference": "Conference", "lab_visit": "Lab visit",
+                 "course": "Course or workshop", "fieldwork": "Fieldwork",
+                 "other": "Other"}
+LEVEL_CHOICES = [(None, "Not set"), ("masters_student", "Master's student"),
+                 ("phd_student", "PhD student"), ("postdoc", "Postdoc"),
+                 ("faculty", "Faculty or independent researcher")]
 CV_LABEL = {"standard": "Standard CV", "narrative": "Narrative CV",
             "funder_template": "Funder's CV template"}
 ROUTE_LABEL = {"portal": "Funder's online portal", "email": "By email",
@@ -526,6 +535,7 @@ class FellowshipsPage(QWidget):
         self.setStyleSheet(apple_stylesheet(apple_font()))
         self.today = today or date.today()
         self.load_error: str | None = None
+        self.category_filter: str | None = None     # None = all categories
         self.reload_data()
 
         self.stack = QStackedWidget()
@@ -587,7 +597,8 @@ class FellowshipsPage(QWidget):
 
     def profile_is_empty(self) -> bool:
         r = self.researcher
-        return not (r.phd_date or r.phd_expected or r.nationalities or r.fields)
+        return not (r.career_level or r.phd_date or r.phd_expected
+                    or r.nationalities or r.fields)
 
     # -- navigation ----------------------------------------------------------
     def refresh(self, tab: int | None = None):
@@ -641,12 +652,24 @@ class FellowshipsPage(QWidget):
             page.header("Get started")
             card = page.add(Card())
             row = card.add(Row("Fill in your profile",
-                               "Add your PhD date, nationality and field to see "
-                               "which fellowships you can apply for.",
+                               "Add your career stage, PhD date, nationality and "
+                               "field to see what you can apply for.",
                                leading=mark(INFO), tappable=True))
             row.clicked.connect(lambda: self.show_tab(2))
 
-        matches = match_all(self.fellowships, self.researcher, self.today)
+        filt = Segmented(["All", "Postdoc", "PhD", "Travel"])
+        filt.select(CATEGORY_FILTERS.index(self.category_filter), emit=False)
+        filt.changed.connect(self._filter_category)
+        holder = QWidget()
+        hl = QHBoxLayout(holder)
+        hl.setContentsMargins(0, 4, 0, 0)
+        hl.addWidget(filt)
+        hl.addStretch(1)
+        page.add(holder)
+
+        shown = [f for f in self.fellowships
+                 if self.category_filter in (None, f.category)]
+        matches = match_all(shown, self.researcher, self.today)
         groups = [(ELIGIBLE, "You're eligible"), (POSSIBLE, "Worth checking"),
                   (NOT_ELIGIBLE, "Not eligible")]
         for status, title in groups:
@@ -664,7 +687,8 @@ class FellowshipsPage(QWidget):
                     when = "Open all year"
                 else:
                     when = "No deadline announced"
-                sub = " · ".join(x for x in (f.funder, when) if x)
+                kind = CATEGORY_LABEL[f.category]
+                sub = " · ".join(x for x in (kind, f.funder, when) if x)
                 trailing = QWidget()
                 tl = QHBoxLayout(trailing)
                 tl.setContentsMargins(0, 0, 0, 0)
@@ -682,6 +706,10 @@ class FellowshipsPage(QWidget):
                       "eligibility; each entry links to them.")
         page.finish()
         return page
+
+    def _filter_category(self, index: int):
+        self.category_filter = CATEGORY_FILTERS[index]
+        self.refresh(0)
 
     def open_fellowship(self, fid: str):
         f = self.by_id[fid]
@@ -747,6 +775,8 @@ class FellowshipsPage(QWidget):
                 card.add(Row("How to submit", ROUTE_LABEL[req.submission]))
 
         details = [(k, v) for k, v in (
+            ("Type", CATEGORY_LABEL[f.category]),
+            ("Pays for", PURPOSE_LABEL.get(f.purpose) if f.purpose else None),
             ("Funding", f.amount),
             ("Length", f"{f.duration_months} months" if f.duration_months else None),
             ("Notes", f.notes)) if v]
@@ -1104,6 +1134,11 @@ class FellowshipsPage(QWidget):
 
         page.header("Career stage")
         card = page.add(Card())
+        self.p_level = QComboBox()
+        for key, text in LEVEL_CHOICES:
+            self.p_level.addItem(text, key)
+        self.p_level.setCurrentIndex([k for k, _ in LEVEL_CHOICES].index(r.career_level))
+        card.add(field_row("I am a", self.p_level))
         self.p_phd_state = QComboBox()
         self.p_phd_state.addItems(["Awarded", "In progress", "Not set"])
         self.p_phd_state.setCurrentIndex(0 if r.phd_date else 1 if r.phd_expected else 2)
@@ -1214,7 +1249,8 @@ class FellowshipsPage(QWidget):
             stays=self.p_stays,
             fields=[k for k, sw in self.p_fields.items() if sw.isChecked()],
             clinical=self.p_clinical.isChecked(),
-            target_hosts=hosts)
+            target_hosts=hosts,
+            career_level=self.p_level.currentData())
 
     def save_profile(self):
         try:

@@ -66,8 +66,9 @@ its rules. Profiles for journals you submit to are welcome as pull requests.
 
 Switch to **Fellowships** at the top of the window. Fill in your profile (PhD
 date, nationality, field, places you've lived) and Galley lists the
-life-science fellowships you're eligible for, the ones worth checking, and the
-ones you can't apply for, with the reason for each. Add a fellowship to **My
+life-science funding you're eligible for, the ones worth checking, and the
+ones you can't apply for, with the reason for each: postdoc fellowships, PhD
+fellowships and travel grants, filtered at the top of the list. Add a fellowship to **My
 Applications** to get a preparation plan worked back from its deadline, and
 reminders whenever you open Galley.
 

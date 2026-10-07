@@ -214,6 +214,29 @@ def _track(f: Fellowship, r: Researcher) -> list[Reason]:
     return [Reason(NOT_MET, f"For {label} only.")]
 
 
+LEVEL_LABEL = {"masters_student": "Master's students", "phd_student": "PhD students",
+               "postdoc": "postdocs", "faculty": "faculty"}
+
+
+def _career_level(f: Fellowship, r: Researcher) -> list[Reason]:
+    if not f.career_levels:
+        return []
+    who = ", ".join(LEVEL_LABEL[x] for x in f.career_levels)
+    if r.career_level is None:
+        return [Reason(UNSURE, f"For {who}; add your career stage to check this.")]
+    if r.career_level in f.career_levels:
+        return [Reason(MET, f"Open to {who}, which includes you.")]
+    return [Reason(NOT_MET, f"Only for {who}.")]
+
+
+def _membership(f: Fellowship) -> list[Reason]:
+    if not f.membership:
+        return []
+    time = (f" for at least {f.membership_min_months} months"
+            if f.membership_min_months else "")
+    return [Reason(UNSURE, f"Requires membership of {f.membership}{time}.")]
+
+
 def _field_fit(f: Fellowship, r: Researcher) -> int:
     if r.fields and set(r.fields) & set(f.fields):
         return 2
@@ -232,6 +255,8 @@ def match(f: Fellowship, r: Researcher, today: date) -> Match:
     result.reasons += host_reasons
     result.reasons += _mobility(f, r, hosts, on)
     result.reasons += _track(f, r)
+    result.reasons += _career_level(f, r)
+    result.reasons += _membership(f)
     result.reasons += [Reason(UNSURE, f"Also requires: {rule}")
                        for rule in f.other_rules]
 

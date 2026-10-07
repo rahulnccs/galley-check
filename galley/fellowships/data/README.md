@@ -6,7 +6,8 @@ refresh them from this folder on GitHub, so a fix here reaches every user.
 The three `example-*.json` files are invented and marked `"template": true`,
 which keeps them out of real results. Copy one to start a new entry.
 
-Scope: life-science fellowships only.
+Scope: life-science funding only, of three kinds (`category`): postdoc
+fellowships, PhD fellowships and travel grants.
 
 ## Fields
 
@@ -28,6 +29,10 @@ Scope: life-science fellowships only.
 | `rolling` | no | true if applications are accepted at any time. |
 | `annual` | no | true (default) if the call runs every year. |
 | `requirements` | no | What the application needs; see below. |
+| `category` | no | `postdoc` (default), `phd` or `travel`. |
+| `career_levels` | no | Who may apply: any of `masters_student`, `phd_student`, `postdoc`, `faculty`. PhD fellowships default to Master's and PhD students; leave it out otherwise if the career-stage rules already say enough. |
+| `purpose` | no | Travel grants: `conference`, `lab_visit`, `course`, `fieldwork` or `other`. |
+| `membership`, `membership_min_months` | no | A society membership the applicant must hold, e.g. `"the British Society for Immunology"`, and for how long. Shown to users to check. |
 | `other_rules` | no | Eligibility rules the fields above can't express, in plain words, e.g. `"Must move to a new research field"`. Each one makes the result "possibly eligible" and is shown to the user to check. |
 | `amount`, `duration_months`, `notes` | no | Shown to users as written. `notes` is for information, not rules. |
 

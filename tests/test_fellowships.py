@@ -338,3 +338,65 @@ def test_custom_entry_is_matched_like_any_other(tmp_path):
     assert m.status == NOT_ELIGIBLE
     assert "You added this entry yourself" in texts(m)
     assert "last checked" not in texts(m)       # no staleness nag on your own
+
+
+# --- PhD fellowships and travel grants ---------------------------------------
+
+def test_category_defaults_to_postdoc():
+    assert fellowship().category == "postdoc"
+
+
+@pytest.mark.parametrize("bad, complaint", [
+    ({"category": "scholarship"}, "category must be"),
+    ({"career_levels": ["undergraduate"]}, "unknown career level"),
+    ({"category": "travel", "purpose": "holiday"}, "purpose must be"),
+])
+def test_bad_categories_rejected(bad, complaint):
+    with pytest.raises(ValueError, match=complaint):
+        fellowship(**bad)
+
+
+def test_phd_fellowship_is_for_students_by_default():
+    f = fellowship(category="phd")
+    assert f.career_levels == ["masters_student", "phd_student"]
+    assert match(f, Researcher(career_level="phd_student"), TODAY).status == ELIGIBLE
+    assert match(f, Researcher(career_level="masters_student"), TODAY).status == ELIGIBLE
+    m = match(f, Researcher(career_level="postdoc"), TODAY)
+    assert m.status == NOT_ELIGIBLE and "Only for Master's students, PhD students" in texts(m)
+    assert match(f, Researcher(), TODAY).status == POSSIBLE
+
+
+def test_explicit_career_levels_override_the_default():
+    f = fellowship(category="phd", career_levels=["phd_student"])
+    assert match(f, Researcher(career_level="masters_student"), TODAY).status == NOT_ELIGIBLE
+
+
+def test_travel_grant_open_to_all_levels_unless_listed():
+    f = fellowship(category="travel", purpose="conference")
+    assert f.career_levels == []
+    assert match(f, Researcher(career_level="faculty"), TODAY).status == ELIGIBLE
+    limited = fellowship(category="travel", career_levels=["phd_student", "postdoc"])
+    assert match(limited, Researcher(career_level="faculty"), TODAY).status == NOT_ELIGIBLE
+
+
+def test_membership_is_always_for_the_user_to_check():
+    f = fellowship(category="travel", membership="the British Society for Immunology",
+                   membership_min_months=12)
+    m = match(f, Researcher(career_level="postdoc"), TODAY)
+    assert m.status == POSSIBLE
+    assert "membership of the British Society for Immunology for at least 12 months" in texts(m)
+
+
+def test_travel_grant_plan_is_shorter():
+    from datetime import timedelta
+    from galley.fellowships import plan
+    steps = {s.key: s for s in plan(fellowship(category="travel"), TODAY)}
+    assert steps["start_writing"].date == date(2027, 1, 15) - timedelta(weeks=3)
+    post = {s.key: s for s in plan(fellowship(), TODAY)}
+    assert post["start_writing"].date == date(2027, 1, 15) - timedelta(weeks=8)
+
+
+def test_career_level_saved_with_profile(tmp_path):
+    from galley.fellowships.model import load_researcher, save_researcher
+    save_researcher(Researcher(career_level="phd_student"), tmp_path / "r.json")
+    assert load_researcher(tmp_path / "r.json").career_level == "phd_student"

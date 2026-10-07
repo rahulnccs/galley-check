@@ -45,6 +45,14 @@ FIELDS = {
     "biomedical_clinical",
 }
 TRACKS = {"any", "clinical", "non_clinical"}
+# What kind of funding an entry is. All are life-science only.
+CATEGORIES = {"postdoc", "phd", "travel"}
+# Career levels an entry can be open to, and a researcher can be at.
+CAREER_LEVELS = {"masters_student", "phd_student", "postdoc", "faculty"}
+# Who a category is for when an entry doesn't say. Postdoc fellowships are
+# decided by the PhD rules instead, and travel grants vary too much to assume.
+DEFAULT_LEVELS = {"phd": ["masters_student", "phd_student"]}
+TRAVEL_PURPOSES = {"conference", "lab_visit", "course", "fieldwork", "other"}
 DEADLINE_KINDS = {"final", "internal", "pre_proposal", "call_opens"}
 
 
@@ -115,6 +123,11 @@ class Fellowship:
     notes: str | None = None
     other_rules: list[str] = field(default_factory=list)  # checked by the user
     requirements: Requirements | None = None
+    category: str = "postdoc"
+    career_levels: list[str] = field(default_factory=list)  # empty = not checked
+    purpose: str | None = None              # travel grants: what it pays for
+    membership: str | None = None           # society membership required
+    membership_min_months: int | None = None
     template: bool = False
     custom: bool = False        # added by the user, not from the database
     path: Path | None = None
@@ -138,6 +151,18 @@ class Fellowship:
         if unknown:
             raise ValueError(f"unknown field(s) {', '.join(unknown)}; "
                              f"use {', '.join(sorted(FIELDS))}")
+        category = data.get("category", "postdoc")
+        if category not in CATEGORIES:
+            raise ValueError(f"category must be one of {', '.join(sorted(CATEGORIES))}")
+        levels = data.get("career_levels")
+        levels = list(DEFAULT_LEVELS.get(category, [])) if levels is None else list(levels)
+        bad = [x for x in levels if x not in CAREER_LEVELS]
+        if bad:
+            raise ValueError(f"unknown career level(s) {', '.join(bad)}; "
+                             f"use {', '.join(sorted(CAREER_LEVELS))}")
+        purpose = data.get("purpose")
+        if purpose is not None and purpose not in TRAVEL_PURPOSES:
+            raise ValueError(f"purpose must be one of {', '.join(sorted(TRAVEL_PURPOSES))}")
         track = data.get("track", "any")
         if track not in TRACKS:
             raise ValueError(f'track must be one of {", ".join(sorted(TRACKS))}')
@@ -190,6 +215,12 @@ class Fellowship:
             duration_months=data.get("duration_months"),
             notes=data.get("notes"),
             other_rules=[str(x) for x in data.get("other_rules") or []],
+            category=category,
+            career_levels=levels,
+            purpose=purpose,
+            membership=data.get("membership") or None,
+            membership_min_months=(int(data["membership_min_months"])
+                                   if data.get("membership_min_months") else None),
             requirements=(Requirements.from_dict(data["requirements"])
                           if data.get("requirements") else None),
             template=bool(data.get("template")),
@@ -251,6 +282,7 @@ class Researcher:
     fields: list[str] = field(default_factory=list)
     clinical: bool | None = None
     target_hosts: list[str] = field(default_factory=list)  # where they'd go
+    career_level: str | None = None     # see CAREER_LEVELS
 
 
 def _load_folder(folder: Path, include_templates: bool) -> list[Fellowship]:
@@ -352,7 +384,7 @@ def researcher_to_dict(r: Researcher) -> dict:
             "stays": [{"country": s.country, "start": iso(s.start), "end": iso(s.end)}
                       for s in r.stays],
             "fields": r.fields, "clinical": r.clinical,
-            "target_hosts": r.target_hosts}
+            "target_hosts": r.target_hosts, "career_level": r.career_level}
 
 
 def researcher_from_dict(data: dict) -> Researcher:
@@ -367,7 +399,9 @@ def researcher_from_dict(data: dict) -> Researcher:
                for s in data.get("stays") or []],
         fields=[f for f in data.get("fields") or [] if f in FIELDS],
         clinical=data.get("clinical"),
-        target_hosts=_countries(data.get("target_hosts") or [], "target_hosts"))
+        target_hosts=_countries(data.get("target_hosts") or [], "target_hosts"),
+        career_level=(data.get("career_level")
+                      if data.get("career_level") in CAREER_LEVELS else None))
 
 
 def load_researcher(path: Path | None = None) -> Researcher:
