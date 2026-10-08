@@ -1,0 +1,19 @@
+{
+  "id": "belgian-american-educational-foundation-baef",
+  "name": "Belgian American Educational Foundation (BAEF) Fellowships for Study or Research in Belgium",
+  "url": "http://www.baef.be/documents/fellowships-for-us-citizens/study-res-fellow.-for-us-citizen-.xml?lang=en",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "Master's & PhD: $27,000, Postdoc: $31,000",
+  "notes": "Typical deadline: October. Also open to: Master's/PhD/Postdoc. The Belgian American Educational Foundation (BAEF) encourages applications for fellowships for advanced study or research at a Belgian university or institution of higher learning. The fellowship period must be at least 6 months. In addition to the stipend, the Foundation will provide health insurance. Applicants must be citizens of the United States and either have a Masters degree or equivalent degree, or be working towards a Ph.D. or equivalent degree. Preference is given to applicants under the age of 30 with a reading and speaking knowledge of Dutch, French, or German. BAEF Fellows must reside in Belgium during the tenure of their fellowship. Not yet checked against the funder's page; details may have changed.",
+  "career_levels": [
+    "masters_student",
+    "phd_student",
+    "postdoc"
+  ],
+  "other_rules": [
+    "Citizenship: U.S. Citizen/U.S. National/Permanent Resident"
+  ],
+  "verified": null,
+  "funder": ""
+}

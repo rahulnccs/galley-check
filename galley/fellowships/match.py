@@ -276,11 +276,16 @@ def match(f: Fellowship, r: Researcher, today: date) -> Match:
     age = f.months_since_verified(today)
     if f.custom:
         result.reasons.append(Reason(INFO, "You added this entry yourself."))
-    elif age is None or age > STALE_AFTER_MONTHS:
-        when = (f"last checked {f.verified:%b %Y}" if f.verified
-                else "never checked against the funder's page")
+    elif age is None:
+        # Nobody has confirmed these details against the funder's page, so
+        # Galley can't say "eligible" on the strength of them.
         result.reasons.append(Reason(
-            INFO, f"These rules were {when}; confirm them at {f.url}."))
+            UNSURE, f"These details haven't been checked against the funder's "
+                    f"page yet; confirm them at {f.url}."))
+    elif age > STALE_AFTER_MONTHS:
+        result.reasons.append(Reason(
+            INFO, f"These rules were last checked {f.verified:%b %Y}; confirm "
+                  f"them at {f.url}."))
     return result
 
 

@@ -1,0 +1,17 @@
+{
+  "id": "small-business-postdoctoral-research",
+  "name": "Small Business Postdoctoral Research Diversity Fellowship",
+  "url": "https://nsfsbir.asee.org/",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "$75,000 plus health insurance benefits",
+  "notes": "The Small Business Postdoctoral Research Diversity Fellowship program aims to encourage creative and highly-trained recipients of doctoral degrees in NSF-supported science, technology, engineering and mathematical disciplines to engage in hands-on research projects in their areas of expertise at the kind of small innovative businesses that historically have fueled the nation’s economic regime. Not yet checked against the funder's page; details may have changed.",
+  "career_stage": {
+    "phd_required": true
+  },
+  "other_rules": [
+    "Citizenship: U.S. Citizen/U.S. National/Permanent Resident"
+  ],
+  "verified": null,
+  "funder": ""
+}

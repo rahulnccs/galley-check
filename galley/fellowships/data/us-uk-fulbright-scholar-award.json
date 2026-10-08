@@ -1,0 +1,18 @@
+{
+  "id": "us-uk-fulbright-scholar-award",
+  "name": "US-UK Fulbright Scholar Award",
+  "funder": "Cancer Research UK",
+  "url": "http://www.fulbright.org.uk/going-to-the-usa/academic-and-professional/fulbright-scholar-awards/awards-available/cancer-research-uk",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "$5000 per month",
+  "other_rules": [
+    "Eligibility: Applicant must be based in the UK"
+  ],
+  "notes": "Deadline as listed: 2018-11-06 00:00:00. Purpose: Collaboration between UK and US. This grant covers any appropriate project for 3 to 12 months Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

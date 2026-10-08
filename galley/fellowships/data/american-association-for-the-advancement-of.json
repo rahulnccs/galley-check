@@ -1,0 +1,17 @@
+{
+  "id": "american-association-for-the-advancement-of",
+  "name": "American Association for the Advancement of Science (AAAS) Science & Technology Policy Fellowships",
+  "url": "https://fellowshipapp.aaas.org/applications/subsectionid.1,pageid.21/default.asp",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "12-month fellowship, stipend varies",
+  "notes": "Typical deadline: November. AAAS administers fellowships to provide the opportunity for accomplished scientists and engineers to participate in and contribute to the public policymaking process of the federal government. Following selection, Fellows come to Washington, DC, in September of each year and participate in a comprehensive eight-day orientation program before beginning their fellowships in the various sectors of government. AAAS also conducts a professional development program throughout the year. Applicants must have a Ph.D. or an equivalent doctoral-level degree at the time of application. Individuals with a master's degree in engineering and at least three years of post-degree professional experience also may apply. Not yet checked against the funder's page; details may have changed.",
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "US"
+  ],
+  "verified": null,
+  "funder": ""
+}

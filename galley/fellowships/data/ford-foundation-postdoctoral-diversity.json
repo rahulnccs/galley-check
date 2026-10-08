@@ -1,0 +1,17 @@
+{
+  "id": "ford-foundation-postdoctoral-diversity",
+  "name": "Ford Foundation Postdoctoral Diversity Fellowships",
+  "url": "http://sites.nationalacademies.org/PGA/FordFellowships/PGA_047960",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "$45,000 stipend, plus conference fee for Conference of Ford fellows",
+  "notes": "Typical deadline: November. For individuals engaged in postdoctoral study after the attainment of the Ph.D. or Sc.D. degree Not yet checked against the funder's page; details may have changed.",
+  "career_stage": {
+    "phd_required": true
+  },
+  "other_rules": [
+    "Citizenship: U.S. Citizen/U.S. National/Permanent Resident"
+  ],
+  "verified": null,
+  "funder": ""
+}

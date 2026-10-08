@@ -1,0 +1,17 @@
+{
+  "id": "society-for-applied-microbiology-scientific",
+  "name": "Scientific Meeting Grant",
+  "funder": "Society for Applied Microbiology",
+  "url": "http://www.sfam.org.uk/en/grants--awards/supporting-microbiology/scientific-meeting-attend-grant/index.cfm",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "microbiology"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "£300 (UK)",
+  "membership": "Society for Applied Microbiology",
+  "membership_min_months": 12,
+  "notes": "Deadline as listed: 4 weeks prior to start of event. Purpose: Conference. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

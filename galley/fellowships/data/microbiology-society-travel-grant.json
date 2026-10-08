@@ -1,0 +1,17 @@
+{
+  "id": "microbiology-society-travel-grant",
+  "name": "Travel grant",
+  "funder": "Microbiology Society",
+  "url": "https://microbiologysociety.org/grants/all-grants-prizes/travel-grants.html",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "microbiology"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "up to £750 (UK)",
+  "membership": "Microbiology Society",
+  "membership_min_months": 24,
+  "notes": "Deadline as listed: 1 March, 1 June, 1 Sept, 1 Dec. Purpose: Conference, short course or training event. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

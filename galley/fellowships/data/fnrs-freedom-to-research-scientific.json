@@ -1,0 +1,17 @@
+{
+  "id": "fnrs-freedom-to-research-scientific",
+  "name": "Scientific Congresses",
+  "funder": "FNRS Freedom to Research",
+  "url": "http://www.fnrs.be/en/index.php/funding/scientific-congresses",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "other_rules": [
+    "Eligibility: Anyone, but for congress organization the organising committee should include professors from at least two universities from the Wallonia-Brussels Federation"
+  ],
+  "notes": "Deadline as listed: Congress attendance: 2 (European) or 3 (non-European) months before; Congress organization: 6 months before. Purpose: Scientific meeting attendance or organization. Regulations are only provided in French Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

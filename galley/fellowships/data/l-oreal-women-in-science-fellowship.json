@@ -1,0 +1,17 @@
+{
+  "id": "l-oreal-women-in-science-fellowship",
+  "name": "L'Oreal Women in Science Fellowship",
+  "url": "http://www.lorealusa.com/csr-commitments/the-l%E2%80%99or%C3%A9al-corporate-foundation/science/l%E2%80%99or%C3%A9al-usa-for-women-in-science-program",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "$60,000",
+  "notes": "Typical deadline: February. The L’Oréal USA For Women in Science fellowship program awards five women postdoctoral scientists annually with grants of $60,000 each for their contributions in Science, Technology, Engineering and Math (STEM) fields and commitment to serving as role models for younger generations. The program is the U.S. component of the L'Oréal-UNESCO For Women in Science International Fellowships program. Celebrating its thirteenth year in the U.S., the For Women in Science program has awarded 65 postdoctoral women scientists over $3 million in grants. Not yet checked against the funder's page; details may have changed.",
+  "career_stage": {
+    "phd_required": true
+  },
+  "other_rules": [
+    "Citizenship: U.S. Citizen/U.S. National/Permanent Resident"
+  ],
+  "verified": null,
+  "funder": ""
+}

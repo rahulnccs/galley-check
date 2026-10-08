@@ -1,0 +1,24 @@
+{
+  "id": "biolegend-travel-awards",
+  "name": "Biolegend Travel Awards",
+  "funder": "Biolegend",
+  "url": "https://www.biolegend.com/travel_awards/",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "immunology_infection",
+    "molecular_cell_biology"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "$500",
+  "career_levels": [
+    "faculty",
+    "phd_student",
+    "postdoc"
+  ],
+  "other_rules": [
+    "Eligibility: Legal resident of USA, Canada or UK"
+  ],
+  "notes": "Deadline as listed: One drawing every month. Purpose: Conference. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

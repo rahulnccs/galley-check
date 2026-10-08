@@ -1,0 +1,17 @@
+{
+  "id": "microbiology-society-research-visit-grant",
+  "name": "Research visit grant",
+  "funder": "Microbiology Society",
+  "url": "https://microbiologysociety.org/grants/all-grants-prizes/research-visit-grant.html",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "microbiology"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "up to £3000 (UK)",
+  "membership": "Microbiology Society",
+  "membership_min_months": 24,
+  "notes": "Deadline as listed: 1 April, 1 October. Purpose: Develop collaborations. short visits from 1-3 months Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

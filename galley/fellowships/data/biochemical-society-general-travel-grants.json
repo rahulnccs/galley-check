@@ -1,0 +1,17 @@
+{
+  "id": "biochemical-society-general-travel-grants",
+  "name": "General Travel Grants",
+  "funder": "Biochemical Society",
+  "url": "http://www.biochemistry.org/Grants/GeneralTravelGrants.aspx",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "molecular_cell_biology"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "£300-£750",
+  "membership": "Biochemical Society",
+  "membership_min_months": 12,
+  "notes": "Deadline as listed: 7 times a year. Purpose: Scientific conferences, training courses, lab visit to learn a new technique. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

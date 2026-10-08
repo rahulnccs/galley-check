@@ -1,0 +1,19 @@
+{
+  "id": "fritz-thyssen-stiftung-f-r-wissenschafts",
+  "name": "Travel Subsidies",
+  "funder": "Fritz Thyssen Stiftung für Wissenschaftsörderung",
+  "url": "http://www.fritz-thyssen-stiftung.de/foerderung/foerderarten/reisebeihilfen/",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "other_rules": [
+    "Eligibility: Anyone, but has to be German or work at a German research institute"
+  ],
+  "rolling": true,
+  "annual": false,
+  "notes": "Deadline as listed: any time; decisions reached in 8 weeks. Purpose: Visit another lab. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

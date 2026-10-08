@@ -1,0 +1,14 @@
+{
+  "id": "argonne-national-laboratory-fellowships",
+  "name": "Argonne National Laboratory Fellowships",
+  "url": "https://www.anl.gov/careers/apply-job/argonne-fellowships",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "N/A",
+  "notes": "Typical deadline: March. Candidates for the fellowships must display superb ability in scientific or engineering research and must show definite promise of becoming outstanding leaders in the research they pursue. Fellows work closely with an Argonne sponsor to pursue their research interests. Fellows are hired as an Argonne Scholar with full benefits, a highly competitive salary and a stipend for research support. Fellows may renew their appointments on an annual basis for up to 3 years, with the possibility of retention. Not yet checked against the funder's page; details may have changed.",
+  "career_stage": {
+    "phd_required": true
+  },
+  "verified": null,
+  "funder": ""
+}

@@ -1,0 +1,17 @@
+{
+  "id": "british-council-newton-mobility-grants",
+  "name": "Newton Mobility Grants",
+  "funder": "British Council",
+  "url": "https://www.britac.ac.uk/newton-mobility-grants",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "other_rules": [
+    "Eligibility: Must be in eligible country, coming to the UK to establish collaboration (Brazil, Malaysia, Mexico, South Africa, Turkey, Thailand, Vietnam)"
+  ],
+  "notes": "Deadline as listed: 2018-09-05 00:00:00. Purpose: Develop collaborations. Duration: 12 months Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

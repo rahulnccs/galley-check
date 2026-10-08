@@ -1,0 +1,22 @@
+{
+  "id": "go-everywhere-travel-grants",
+  "name": "Go Everywhere Travel Grants",
+  "funder": "Bio-Techne (R&D systems)",
+  "url": "https://www.rndsystems.com/grants-scholarships/apply-now-receive-travel-grants-bio-techne",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "$1000",
+  "career_levels": [
+    "faculty",
+    "phd_student",
+    "postdoc"
+  ],
+  "rolling": true,
+  "annual": false,
+  "notes": "Deadline as listed: Monthly travel grant; apply till 31 December 2019. Purpose: Conference. One winner announced each month (within first 10 days of each month) Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

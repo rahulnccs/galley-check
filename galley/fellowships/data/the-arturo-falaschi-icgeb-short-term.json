@@ -1,0 +1,18 @@
+{
+  "id": "the-arturo-falaschi-icgeb-short-term",
+  "name": "The Arturo Falaschi ICGEB Short-Term Fellowship",
+  "funder": "International Centre for Genetic Engineering and Biotechnology (ICGEB)",
+  "url": "https://www.icgeb.org/short-term-postdoc-application.html",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "Trieste: €2,000; New Delhi: US$1,590; Cape Town: ZAR18,750.",
+  "other_rules": [
+    "Eligibility: From ICGEB Member States (http://www.icgeb.org/member-states.html)"
+  ],
+  "notes": "Deadline as listed: 31 March, 30 June, 30 September, 31 December. Purpose: Short-term fellowships for ongoing collaborative research at ICGEB laboratories in Trieste, New Delhi and Cape Town. Duration: 1-6 months. Includes travel, insurance and visa fees. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

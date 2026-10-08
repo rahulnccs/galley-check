@@ -1,0 +1,18 @@
+{
+  "id": "trans-antarctic-association-travel-grant",
+  "name": "Trans-antarctic Association Travel grant",
+  "funder": "Trans-antarctic Association",
+  "url": "http://www.transantarctic.org.uk/grant-application-procedure/",
+  "category": "travel",
+  "purpose": "fieldwork",
+  "fields": [
+    "ecology_evolution"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "up to £1500",
+  "other_rules": [
+    "Eligibility: Australia, New Zealand, South Africa, United Kingdom"
+  ],
+  "notes": "Deadline as listed: 31 January in the UK, and 12 March in NZ. Purpose: Field work or travel to Antarctica, equipment and other research activities directly related to Antarctica. Annual travel grant Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

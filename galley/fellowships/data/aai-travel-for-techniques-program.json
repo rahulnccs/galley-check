@@ -1,0 +1,16 @@
+{
+  "id": "aai-travel-for-techniques-program",
+  "name": "AAI Travel for Techniques Program",
+  "funder": "American Association of Immunologists (AAI)",
+  "url": "http://www.aai.org/Careers/TfT",
+  "category": "travel",
+  "purpose": "course",
+  "fields": [
+    "immunology_infection"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "$1500",
+  "membership": "American Association of Immunologists (AAI)",
+  "notes": "Deadline as listed: 15 Aug - 15 Oct 2018, 15 Dec 2018 - 15 Feb 2019. Purpose: Learn a new technique in other lab. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

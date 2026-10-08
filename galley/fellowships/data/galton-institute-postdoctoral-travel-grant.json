@@ -1,0 +1,17 @@
+{
+  "id": "galton-institute-postdoctoral-travel-grant",
+  "name": "Galton Institute Postdoctoral Travel Grant",
+  "funder": "The Galton Institute",
+  "url": "http://www.galtoninstitute.org.uk/grants/galton-institute-postdoctoral-travel-grant/",
+  "category": "travel",
+  "purpose": "course",
+  "fields": [
+    "genetics_genomics"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "up to £6000 (UK)",
+  "rolling": true,
+  "annual": false,
+  "notes": "Deadline as listed: Any time. Purpose: Develop collaborations, learn new technique. visit of minimum 6 months Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

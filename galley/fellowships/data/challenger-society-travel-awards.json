@@ -1,0 +1,23 @@
+{
+  "id": "challenger-society-travel-awards",
+  "name": "Challenger Society Travel Awards",
+  "funder": "Challenger Society for Marine Science",
+  "url": "https://www.challenger-society.org.uk/Travel_awards",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "ecology_evolution"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "£250 for UK travel or £500 for international travel",
+  "career_levels": [
+    "masters_student",
+    "phd_student"
+  ],
+  "membership": "Challenger Society for Marine Science",
+  "other_rules": [
+    "Eligibility: Based at UK research institution"
+  ],
+  "notes": "Deadline as listed: February 15th, May 15th, August 15th and November 15th. Purpose: Conference, participate in cruises and field work. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

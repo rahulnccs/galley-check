@@ -1,0 +1,19 @@
+{
+  "id": "isscr-travel-award",
+  "name": "ISSCR Travel Award",
+  "funder": "ISSCR",
+  "url": "http://www.isscr.org/meetings-events/annual-meetings/isscr-annual-meeting-2018/present/abstracts/awards-for-travel-merit-posters",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "molecular_cell_biology"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "membership": "ISSCR",
+  "membership_min_months": 12,
+  "other_rules": [
+    "Eligibility: Anyone"
+  ],
+  "notes": "Deadline as listed: currently closed for applications. Purpose: Conference. Annual Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

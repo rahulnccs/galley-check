@@ -1,0 +1,19 @@
+{
+  "id": "the-paul-daisy-soros-fellowships",
+  "name": "The Paul & Daisy Soros Fellowships",
+  "url": "http://www.pdsoros.org/",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "Stipend up to $25,000, Up to $20,000 tuition",
+  "notes": "Typical deadline: November. Also open to: Master’s/PhD/Postdoc. Not yet checked against the funder's page; details may have changed.",
+  "career_levels": [
+    "masters_student",
+    "phd_student",
+    "postdoc"
+  ],
+  "other_rules": [
+    "Citizenship: U.S. Citizen/U.S. Permanent Resident"
+  ],
+  "verified": null,
+  "funder": ""
+}

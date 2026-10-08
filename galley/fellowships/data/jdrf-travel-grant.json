@@ -1,0 +1,18 @@
+{
+  "id": "jdrf-travel-grant",
+  "name": "JDRF Travel Grant",
+  "funder": "JDRF",
+  "url": "https://www.jdrf.org.au/research/travel-grants",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "$2000 or $4000",
+  "other_rules": [
+    "Eligibility: Australian"
+  ],
+  "notes": "Deadline as listed: 19 Sept 2018. Purpose: Conference. Two funding rounds per year Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

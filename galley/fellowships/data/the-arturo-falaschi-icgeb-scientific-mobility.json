@@ -1,0 +1,19 @@
+{
+  "id": "the-arturo-falaschi-icgeb-scientific-mobility",
+  "name": "The Arturo Falaschi ICGEB Scientific Mobility for Advanced Research Training (SMART)",
+  "funder": "International Centre for Genetic Engineering and Biotechnology (ICGEB)",
+  "url": "https://www.icgeb.org/fellowships.html",
+  "category": "travel",
+  "purpose": "other",
+  "fields": [
+    "biomedical_clinical",
+    "plant_science"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "US$800-US$1,500 (+US$500/month to host)",
+  "other_rules": [
+    "Eligibility: From ICGEB Member States (http://www.icgeb.org/member-states.html)"
+  ],
+  "notes": "Deadline as listed: 31 March, 30 June, 30 September, 31 December. Purpose: Mobility of researchers between ICGEB Member States. Duration: 3-9 months. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

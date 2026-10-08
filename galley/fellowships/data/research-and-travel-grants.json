@@ -1,0 +1,18 @@
+{
+  "id": "research-and-travel-grants",
+  "name": "Research and Travel Grants",
+  "funder": "Central European University",
+  "url": "https://www.ceu.edu/funding-fees/finaid-enrolled/research-travel-grants",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "career_levels": [
+    "masters_student",
+    "phd_student"
+  ],
+  "notes": "Deadline as listed: 7 March 2019, 6 June 2019. Purpose: Conference. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

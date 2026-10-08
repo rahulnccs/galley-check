@@ -1,0 +1,17 @@
+{
+  "id": "laboratory-animal-science-association-lasa",
+  "name": "LASA Bursaries",
+  "funder": "Laboratory Animal Science Association (LASA)",
+  "url": "http://www.lasa.co.uk/bursaries/",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "up to £1000 (UK)",
+  "rolling": true,
+  "annual": false,
+  "notes": "Deadline as listed: Any time. Purpose: laboratory animal science events. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

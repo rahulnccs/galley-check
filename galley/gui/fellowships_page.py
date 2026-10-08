@@ -50,25 +50,38 @@ APPLE = {
 APPLE_FONTS = [".AppleSystemUIFont", "SF Pro Text", "SF Pro", "Helvetica Neue",
                "Segoe UI", "Inter", "Cantarell", "DejaVu Sans"]
 
-STATUS_COLOR = {ELIGIBLE: APPLE["green"], POSSIBLE: APPLE["orange"],
-                NOT_ELIGIBLE: APPLE["gray"]}
+# The soft palette of the manuscript results tiles, shared by both sections:
+# dark slate, red, amber and blue, with green, indigo and purple in the
+# same tone for what fellowships need beyond errors, warnings and notes.
+SOFT = {"all": "#4A4E54", "red": "#DE837C", "amber": "#E7B279",
+        "blue": "#7BA7E0", "grey": "#93A0A8", "green": "#7CC39B",
+        "indigo": "#9A96E0", "purple": "#C09BD8"}
+STATUS_COLOR = {ELIGIBLE: SOFT["green"], POSSIBLE: SOFT["amber"],
+                NOT_ELIGIBLE: SOFT["red"]}
 STATUS_LABEL = {ELIGIBLE: "Eligible", POSSIBLE: "Check", NOT_ELIGIBLE: "Not eligible"}
-REASON_MARK = {MET: ("✓", APPLE["green"]), NOT_MET: ("✕", APPLE["red"]),
-               UNSURE: ("?", APPLE["orange"]), INFO: ("i", APPLE["blue"])}
+REASON_MARK = {MET: ("✓", SOFT["green"]), NOT_MET: ("✕", SOFT["red"]),
+               UNSURE: ("?", SOFT["amber"]), INFO: ("i", SOFT["blue"])}
 FINDING_MARK = {PASS: MET, FAIL: NOT_MET, WARN: UNSURE, NOTE: INFO}
-URGENCY_COLOR = {"overdue": APPLE["red"], "changed": APPLE["orange"],
-                 "soon": APPLE["orange"], "upcoming": APPLE["blue"]}
+URGENCY_COLOR = {"overdue": SOFT["red"], "changed": SOFT["amber"],
+                 "soon": SOFT["amber"], "upcoming": SOFT["blue"]}
 # The three tabs, in order.
 PROFILE, MATCHES, APPLICATIONS = 0, 1, 2
 
-# A colour per application stage, from Apple's system palette.
-STAGE_COLOR = {"planning": "#007AFF",      # blue: in progress
-               "submitted": "#5856D6",     # indigo
-               "shortlisted": "#FF9500",   # orange
-               "interview": "#AF52DE",     # purple
-               "awarded": "#34C759",       # green
-               "not_funded": "#FF3B30",    # red
-               "withdrawn": "#8E8E93"}     # grey
+# A colour per application stage, in the same soft palette.
+STAGE_COLOR = {"planning": SOFT["blue"], "submitted": SOFT["indigo"],
+               "shortlisted": SOFT["amber"], "interview": SOFT["purple"],
+               "awarded": SOFT["green"], "not_funded": SOFT["red"],
+               "withdrawn": SOFT["grey"]}
+# The Applications tiles group the stages.
+STAGE_GROUPS = [("all", "All", SOFT["all"], None),
+                ("preparing", "Preparing", SOFT["blue"], {"planning"}),
+                ("review", "Under review", SOFT["indigo"],
+                 {"submitted", "shortlisted", "interview"}),
+                ("awarded", "Awarded", SOFT["green"], {"awarded"}),
+                ("closed", "Closed", SOFT["grey"], {"not_funded", "withdrawn"})]
+MATCH_TILES = [("all", "All", SOFT["all"]), (ELIGIBLE, "Eligible", SOFT["green"]),
+               (POSSIBLE, "Worth checking", SOFT["amber"]),
+               (NOT_ELIGIBLE, "Not eligible", SOFT["red"])]
 APP_STATUS_LABEL = {"planning": "Preparing", "submitted": "Submitted",
                     "shortlisted": "Shortlisted", "interview": "Interview",
                     "awarded": "Awarded", "not_funded": "Not funded",
@@ -461,6 +474,23 @@ class Row(QFrame):
         super().leaveEvent(e)
 
 
+def tile_row(tiles, counts: dict, current: str, on_click) -> QWidget:
+    """A row of coloured count tiles, as on the manuscript results screen.
+    Clicking one filters the list below it."""
+    from .app import Tile
+    holder = QWidget()
+    lay = QHBoxLayout(holder)
+    lay.setContentsMargins(0, 8, 0, 4)
+    lay.setSpacing(10)
+    for key, text, color in tiles:
+        t = Tile(key, text, color)
+        t.set_count(counts.get(key, 0))
+        t.setChecked(key == current)
+        t.clicked.connect(lambda _=False, key=key: on_click(key))
+        lay.addWidget(t)
+    return holder
+
+
 def field_row(title: str, editor: QWidget) -> QWidget:
     if isinstance(editor, (QLineEdit, QComboBox, QDateEdit, QSpinBox)):
         editor.setObjectName("valueEditor")
@@ -691,6 +721,8 @@ class FellowshipsPage(QWidget):
         self.load_error: str | None = None
         self.category_filter: str | None = None     # None = all categories
         self.show_examples = False      # the invented entries, for trying Galley
+        self.status_filter = "all"      # Matches tile selected
+        self.stage_filter = "all"       # Applications tile selected
         self._update_thread: QThread | None = None
         self.update_note = ""           # result of the last "Check for Updates"
         self.reload_data()
@@ -848,9 +880,15 @@ class FellowshipsPage(QWidget):
         shown = [f for f in self.fellowships
                  if self.category_filter in (None, f.category)]
         matches = match_all(shown, self.researcher, self.today)
+        counts = {"all": len(matches)}
+        for m in matches:
+            counts[m.status] = counts.get(m.status, 0) + 1
+        page.add(tile_row(MATCH_TILES, counts, self.status_filter, self._filter_status))
         groups = [(ELIGIBLE, "You're eligible"), (POSSIBLE, "Worth checking"),
                   (NOT_ELIGIBLE, "Not eligible")]
         for status, title in groups:
+            if self.status_filter not in ("all", status):
+                continue
             items = [m for m in matches if m.status == status]
             if not items:
                 continue
@@ -929,6 +967,14 @@ class FellowshipsPage(QWidget):
         self.show_examples = on
         self.reload_data()
         self.refresh(MATCHES)
+
+    def _filter_status(self, key: str):
+        self.status_filter = key
+        self.refresh(MATCHES)
+
+    def _filter_stage(self, key: str):
+        self.stage_filter = key
+        self.refresh(APPLICATIONS)
 
     def _filter_category(self, index: int):
         self.category_filter = CATEGORY_FILTERS[index]
@@ -1135,13 +1181,22 @@ class FellowshipsPage(QWidget):
                 else:
                     row.clicked.connect(lambda r=r: self.open_application(r.fellowship_id))
 
+        apps_all = [a for a in self.apps.values() if a.fellowship_id in self.by_id]
+        if apps_all:
+            counts = {key: sum(1 for a in apps_all if stages is None or a.status in stages)
+                      for key, _, _, stages in STAGE_GROUPS}
+            page.add(tile_row([(k, t, c) for k, t, c, _ in STAGE_GROUPS], counts,
+                              self.stage_filter, self._filter_stage))
         page.header("My applications")
         card = page.add(Card())
-        apps = [a for a in self.apps.values() if a.fellowship_id in self.by_id]
-        if not apps:
+        wanted = dict((k, st) for k, _, _, st in STAGE_GROUPS)[self.stage_filter]
+        apps = [a for a in apps_all if wanted is None or a.status in wanted]
+        if not apps_all:
             card.add(Row("No applications yet",
                          "Open a fellowship in Matches and choose Add to My "
                          "Applications."))
+        elif not apps:
+            card.add(Row("None at this stage", "Choose All to see every application."))
         order = {s: i for i, s in enumerate(STATUSES)}
         for a in sorted(apps, key=lambda a: (order[a.status],
                                              self.by_id[a.fellowship_id].name)):

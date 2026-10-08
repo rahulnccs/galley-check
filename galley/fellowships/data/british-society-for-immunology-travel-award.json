@@ -1,0 +1,17 @@
+{
+  "id": "british-society-for-immunology-travel-award",
+  "name": "Travel Award",
+  "funder": "British Society for Immunology",
+  "url": "https://www.immunology.org/grants-and-prizes/travel-awards",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "immunology_infection"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "£500 for travel within the UK; £700 for European travel; and £1000 for rest of the World",
+  "membership": "British Society for Immunology",
+  "membership_min_months": 12,
+  "notes": "Deadline as listed: 1 February, 1 March, 1 August, 1 November. Purpose: Meetings, congresses, visit lab, learn new technique. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

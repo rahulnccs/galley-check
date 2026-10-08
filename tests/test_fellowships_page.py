@@ -168,6 +168,14 @@ def test_category_filter_and_career_stage(app, settings):
 def test_examples_can_be_shown_to_try_galley(app, tmp_path, monkeypatch):
     # The real loader: examples are hidden until the user asks for them.
     monkeypatch.setattr(submission, "user_profile_dir", lambda: tmp_path / "profiles")
+    # A database with only the invented examples, as before real entries.
+    import shutil
+    import galley.fellowships.model as model
+    only_examples = tmp_path / "data"
+    only_examples.mkdir()
+    for p in model.DATA_DIR.glob("example-*.json"):
+        shutil.copy(p, only_examples)
+    monkeypatch.setattr(model, "DATA_DIR", only_examples)
     from galley.gui.fellowships_page import FellowshipsPage
     page = FellowshipsPage(today=TODAY)
     assert "Example International" not in texts(page.tab_stack.widget(MATCHES))
@@ -251,3 +259,47 @@ def test_postdoc_profile_saves_an_awarded_phd(app, settings):
     r = load_researcher(settings / "researcher.json")
     assert r.career_level == "postdoc" and r.phd_date is not None
     assert r.phd_expected is None
+
+
+def test_real_entries_are_listed(app, tmp_path, monkeypatch):
+    monkeypatch.setattr(submission, "user_profile_dir", lambda: tmp_path / "profiles")
+    from galley.gui.fellowships_page import FellowshipsPage
+    page = FellowshipsPage(today=TODAY)
+    shown = texts(page.tab_stack.widget(MATCHES))
+    assert "Howard Hughes Medical Institute" in shown
+    assert "Show invented example entries" not in shown     # real list: no demo switch
+    assert "never checked against the funder's page" not in shown  # only in details
+
+
+def test_match_tiles_count_and_filter(app, settings):
+    from galley.gui.app import Tile
+    page = make_page(app)
+    page.show_tab(MATCHES)
+    tiles = {t.key: t for t in page.tab_stack.widget(MATCHES).findChildren(Tile)}
+    assert set(tiles) == {"all", "eligible", "possibly eligible", "not eligible"}
+    total = int(tiles["all"].text().split()[0])
+    parts = sum(int(tiles[k].text().split()[0]) for k in tiles if k != "all")
+    assert total == parts and tiles["all"].isChecked()
+    key = next(k for k in ("not eligible", "possibly eligible", "eligible")
+               if int(tiles[k].text().split()[0]))
+    heading = {"not eligible": "NOT ELIGIBLE", "possibly eligible": "WORTH CHECKING",
+               "eligible": "YOU'RE ELIGIBLE"}
+    page._filter_status(key)
+    shown = texts(page.tab_stack.widget(MATCHES))
+    assert heading[key] in shown
+    assert not [h for k, h in heading.items() if k != key and h in shown]
+
+
+def test_application_tiles_group_the_stages(app, settings):
+    from galley.gui.app import Tile
+    page = make_page(app)
+    page._add_application("example-international-postdoc")
+    page.apps["example-international-postdoc"].set_status("interview", TODAY)
+    page._add_application("example-travel-grant")
+    page.refresh(APPLICATIONS)
+    tiles = {t.key: t.text().split()[0]
+             for t in page.tab_stack.widget(APPLICATIONS).findChildren(Tile)}
+    assert tiles == {"all": "2", "preparing": "1", "review": "1",
+                     "awarded": "0", "closed": "0"}
+    page._filter_stage("awarded")
+    assert "None at this stage" in texts(page.tab_stack.widget(APPLICATIONS))

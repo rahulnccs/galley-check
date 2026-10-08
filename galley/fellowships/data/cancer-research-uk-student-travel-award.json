@@ -1,0 +1,23 @@
+{
+  "id": "cancer-research-uk-student-travel-award",
+  "name": "Student Travel Award",
+  "funder": "Cancer Research UK",
+  "url": "https://www.cancerresearchuk.org/funding-for-researchers/our-funding-schemes/bacrcruk-student-travel-awards",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "£500 for UK meetings, £1000 for overseas meetings",
+  "career_levels": [
+    "phd_student"
+  ],
+  "membership": "the British Association for Cancer Research",
+  "membership_min_months": 12,
+  "other_rules": [
+    "Eligibility: Applicant must be based in the UK"
+  ],
+  "notes": "Deadline as listed: currently closed for applications. Purpose: Conference. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

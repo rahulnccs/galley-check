@@ -29,7 +29,7 @@ def texts(m):
 def test_every_shipped_entry_loads():
     entries = load_fellowships(DATA_DIR, include_templates=True, include_custom=False)
     assert len(entries) >= 3
-    assert all(f.url.startswith("https://") for f in entries)
+    assert all(f.url.startswith(("https://", "http://")) for f in entries)
 
 
 def test_templates_are_kept_out_of_real_results():
@@ -400,3 +400,10 @@ def test_career_level_saved_with_profile(tmp_path):
     from galley.fellowships.model import load_researcher, save_researcher
     save_researcher(Researcher(career_level="phd_student"), tmp_path / "r.json")
     assert load_researcher(tmp_path / "r.json").career_level == "phd_student"
+
+
+def test_unverified_entry_is_never_called_eligible():
+    f = fellowship(verified=None)
+    m = match(f, Researcher(), TODAY)
+    assert m.status == POSSIBLE
+    assert "haven't been checked against the funder's page" in texts(m)

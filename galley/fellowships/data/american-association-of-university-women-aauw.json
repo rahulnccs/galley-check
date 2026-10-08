@@ -1,0 +1,17 @@
+{
+  "id": "american-association-of-university-women-aauw",
+  "name": "American Association of University Women (AAUW) American Postdoctoral Fellowships",
+  "url": "http://www.aauw.org/what-we-do/educational-funding-and-awards/american-fellowships/",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "$30,000",
+  "notes": "Typical deadline: November. American Fellowships support women scholars seeking funds for postdoctoral research leave from accredited institutions. Candidates are evaluated on the basis of scholarly excellence, teaching experience, and active commitment to helping women and girls through service in their communities, professions, or fields of research. Not yet checked against the funder's page; details may have changed.",
+  "career_stage": {
+    "phd_required": true
+  },
+  "other_rules": [
+    "Citizenship: U.S. Citizen/U.S. National/Permanent Resident"
+  ],
+  "verified": null,
+  "funder": ""
+}

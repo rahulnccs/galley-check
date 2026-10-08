@@ -1,0 +1,17 @@
+{
+  "id": "plos-early-career-travel-award-program",
+  "name": "PLOS Early Career Travel Award Program",
+  "funder": "PLOS journal",
+  "url": "https://www.plos.org/ecr-travel-awards",
+  "category": "travel",
+  "purpose": "conference",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "other_rules": [
+    "Eligibility: (co)-author of PLOS publication"
+  ],
+  "notes": "Deadline as listed: currently closed for applications. Purpose: Conference. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

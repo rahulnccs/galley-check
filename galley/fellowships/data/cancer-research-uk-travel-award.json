@@ -1,0 +1,21 @@
+{
+  "id": "cancer-research-uk-travel-award",
+  "name": "Research Travel Award",
+  "funder": "Cancer Research UK",
+  "url": "https://www.cancerresearchuk.org/funding-for-researchers/our-funding-schemes/research-travel-award",
+  "category": "travel",
+  "purpose": "course",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "Typically under £10000",
+  "career_levels": [
+    "postdoc"
+  ],
+  "other_rules": [
+    "Eligibility: Applicant must be based in the UK"
+  ],
+  "notes": "Deadline as listed: currently closed for applications. Purpose: Visit collaborating research group (UK or overseas), attend skills-based training. Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}

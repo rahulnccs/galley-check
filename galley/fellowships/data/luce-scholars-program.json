@@ -1,0 +1,19 @@
+{
+  "id": "luce-scholars-program",
+  "name": "Luce Scholars Program",
+  "url": "http://www.hluce.org/lsprogram.aspx",
+  "category": "postdoc",
+  "source": "Fellowships_Spreadsheet.xlsx (supplied by the maintainer)",
+  "amount": "In addition to the basic stipend, a cost of living allowance and a housing allowance may be provided to Scholars living in areas where such costs are high.",
+  "notes": "Typical deadline: October. Also open to: Master's/PhD/Postdoc. The Luce Scholars Program provides stipends and internships for fifteen young Americans to live and work in Asia each year. Dating from 1974, the program's purpose is to increase awareness of Asia among future leaders in American society. Students must be nominated by College. Not yet checked against the funder's page; details may have changed.",
+  "career_levels": [
+    "masters_student",
+    "phd_student",
+    "postdoc"
+  ],
+  "nationalities": [
+    "US"
+  ],
+  "verified": null,
+  "funder": ""
+}

@@ -15,7 +15,7 @@ fellowships, PhD fellowships and travel grants.
 | --- | --- | --- |
 | `id` | yes | Unique, lower case with hyphens, e.g. `embo-postdoctoral`. Never change it once published: users' shortlists refer to it. |
 | `name`, `funder`, `url` | yes | `url` is the funder's official call page. |
-| `verified` | yes | The date you last read the official page (YYYY-MM-DD). Entries older than 12 months are flagged to users. |
+| `verified` | yes | The date you last read the official page (YYYY-MM-DD), or `null` if nobody has yet. An unverified entry is never shown as "eligible", only "worth checking"; one older than 12 months is flagged. |
 | `fields` | no | Life-science fields, or `["any"]` (the default). See the list below. |
 | `track` | no | `any` (default), `clinical` or `non_clinical`. |
 | `career_stage` | no | `min_years_since_phd`, `max_years_since_phd`, `phd_required` (default true when `career_stage` is given; leave the whole section out if career stage doesn't matter), `career_breaks_extend` (true if parental leave, illness etc. extend the window). |
@@ -34,6 +34,7 @@ fellowships, PhD fellowships and travel grants.
 | `purpose` | no | Travel grants: `conference`, `lab_visit`, `course`, `fieldwork` or `other`. |
 | `membership`, `membership_min_months` | no | A society membership the applicant must hold, e.g. `"the British Society for Immunology"`, and for how long. Shown to users to check. |
 | `other_rules` | no | Eligibility rules the fields above can't express, in plain words, e.g. `"Must move to a new research field"`. Each one makes the result "possibly eligible" and is shown to the user to check. |
+| `source` | no | Where the entry came from, for the maintainer. Not shown to users. |
 | `amount`, `duration_months`, `notes` | no | Shown to users as written. `notes` is for information, not rules. |
 
 ## Requirements

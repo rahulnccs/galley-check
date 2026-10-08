@@ -1,0 +1,18 @@
+{
+  "id": "sulsa-postdoctoral-and-early-career",
+  "name": "SULSA Postdoctoral and Early Career Researcher Exchange Scheme",
+  "funder": "Scottish Universities Life Science Alliance (SULSA)",
+  "url": "http://www.sulsa.ac.uk/postdoc-exchanges/",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "fields": [
+    "any"
+  ],
+  "source": "Terra Viva Grants travel grant list (supplied by the maintainer)",
+  "amount": "up to £5000",
+  "other_rules": [
+    "Eligibility: ECR must be employed with a SULSA department"
+  ],
+  "notes": "Deadline as listed: currently closed for applications. Purpose: Existing or new collaborations. Visit must take place in Europe (not UK), North America, China or India only Not yet checked against the funder's page; details may have changed.",
+  "verified": null
+}
