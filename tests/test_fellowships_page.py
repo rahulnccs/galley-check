@@ -219,3 +219,35 @@ def test_update_note_shown_after_download(app, settings, monkeypatch):
     assert "12 entries downloaded, 1 skipped" in texts(page.tab_stack.widget(MATCHES))
     assert "Check for Updates" in [b.text() for b in
                                    page.tab_stack.widget(MATCHES).findChildren(QPushButton)]
+
+
+@pytest.mark.parametrize("level, state, date_label, phd_shown", [
+    (1, 2, None, False),                         # Master's student: no PhD yet
+    (2, 1, "PhD expected", False),        # PhD student: in progress
+    (3, 0, "PhD awarded", False),               # Postdoc: awarded
+    (4, 0, "PhD awarded", False),               # Faculty: awarded
+    (0, None, None, True),                       # Not set: the user chooses
+])
+def test_career_stage_decides_the_phd_question(app, settings, level, state,
+                                               date_label, phd_shown):
+    page = make_page(app)
+    page.show_tab(PROFILE)
+    page.p_level.setCurrentIndex(level)
+    if state is not None:
+        assert page.p_phd_state.currentIndex() == state
+    assert page.p_phd_state.parentWidget().isVisibleTo(page) == phd_shown
+    if date_label:
+        assert page.p_phd_label.text() == date_label
+        assert page.p_phd_date.parentWidget().isVisibleTo(page)
+    elif state == 2:
+        assert not page.p_phd_date.parentWidget().isVisibleTo(page)
+
+
+def test_postdoc_profile_saves_an_awarded_phd(app, settings):
+    page = make_page(app)
+    page.show_tab(PROFILE)
+    page.p_level.setCurrentIndex(3)              # Postdoc
+    page.save_profile()
+    r = load_researcher(settings / "researcher.json")
+    assert r.career_level == "postdoc" and r.phd_date is not None
+    assert r.phd_expected is None

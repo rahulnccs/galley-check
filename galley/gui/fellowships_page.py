@@ -93,6 +93,10 @@ CATEGORY_FILTERS = [None, "postdoc", "phd", "travel"]
 PURPOSE_LABEL = {"conference": "Conference", "lab_visit": "Lab visit",
                  "course": "Course or workshop", "fieldwork": "Fieldwork",
                  "other": "Other"}
+# What each career stage means for the PhD row: 0 awarded, 1 in progress,
+# 2 none. Not set (None) leaves the choice to the user.
+PHD_STATE_FOR_LEVEL = {"masters_student": 2, "phd_student": 1,
+                       "postdoc": 0, "faculty": 0}
 LEVEL_CHOICES = [(None, "Not set"), ("masters_student", "Master's student"),
                  ("phd_student", "PhD student"), ("postdoc", "Postdoc"),
                  ("faculty", "Faculty or independent researcher")]
@@ -1359,7 +1363,7 @@ class FellowshipsPage(QWidget):
         self.p_phd_state = Picker()
         self.p_phd_state.addItems(["Awarded", "In progress", "Not set"])
         self.p_phd_state.setCurrentIndex(0 if r.phd_date else 1 if r.phd_expected else 2)
-        card.add(field_row("PhD", self.p_phd_state))
+        phd_row = card.add(field_row("PhD", self.p_phd_state))
         self.p_phd_date = QDateEdit()
         self.p_phd_date.setCalendarPopup(True)
         self.p_phd_date.setDisplayFormat("d MMM yyyy")
@@ -1376,10 +1380,21 @@ class FellowshipsPage(QWidget):
         card.add(date_row)
 
         def phd_state(i):
-            date_row.setVisible(i != 2)
-            self.p_phd_label.setText("Date awarded" if i == 0 else "Expected")
+            Card.show_row(date_row, i != 2)
+            self.p_phd_label.setText("PhD awarded" if i == 0 else "PhD expected")
         self.p_phd_state.currentIndexChanged.connect(phd_state)
-        phd_state(self.p_phd_state.currentIndex())
+
+        def level_changed(_=None):
+            # The career stage answers the PhD question: a postdoc's PhD is
+            # awarded, a PhD student's is in progress, a Master's student
+            # has none yet. Only ask when the stage isn't set.
+            state = PHD_STATE_FOR_LEVEL.get(self.p_level.currentData())
+            if state is not None:
+                self.p_phd_state.setCurrentIndex(state)
+            Card.show_row(phd_row, state is None)
+            phd_state(self.p_phd_state.currentIndex())
+        self.p_level.currentIndexChanged.connect(level_changed)
+        level_changed()
 
         self.p_breaks = QSpinBox()
         self.p_breaks.setRange(0, 240)
