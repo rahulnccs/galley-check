@@ -5,12 +5,14 @@ import pytest
 
 pytest.importorskip("PySide6")
 
-from PySide6.QtWidgets import QApplication, QLabel  # noqa: E402
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton  # noqa: E402
 
 from galley.checks.offline import submission  # noqa: E402
 from galley.fellowships import load_applications  # noqa: E402
 from galley.fellowships.model import (Researcher, Stay,  # noqa: E402
                                       load_researcher, save_researcher)
+
+from galley.gui.fellowships_page import APPLICATIONS, MATCHES, PROFILE  # noqa: E402
 
 TODAY = date(2026, 10, 1)
 
@@ -53,7 +55,7 @@ def make_page(app):
 
 def test_empty_profile_prompts_to_fill_it_in(app, settings):
     page = make_page(app)
-    assert "Fill in your profile" in texts(page.tab_stack.widget(0))
+    assert "Fill in your profile" in texts(page.tab_stack.widget(MATCHES))
 
 
 def test_matches_grouped_by_eligibility(app, settings):
@@ -62,7 +64,7 @@ def test_matches_grouped_by_eligibility(app, settings):
                                target_hosts=["DE"],
                                stays=[Stay("IN", date(2015, 1, 1))]))
     page = make_page(app)
-    shown = texts(page.tab_stack.widget(0))
+    shown = texts(page.tab_stack.widget(MATCHES))
     assert "YOU'RE ELIGIBLE" in shown
     assert "Example International Postdoctoral Fellowship" in shown
     assert "Fill in your profile" not in shown
@@ -90,13 +92,13 @@ def test_reminders_counted_for_the_banner(app, settings):
     page._add_application("example-international-postdoc")
     page.today = date(2026, 12, 20)      # a few weeks before the deadline
     assert page.attention_count() > 0
-    page.refresh(1)
-    assert "COMING UP" in texts(page.tab_stack.widget(1))
+    page.refresh(APPLICATIONS)
+    assert "COMING UP" in texts(page.tab_stack.widget(APPLICATIONS))
 
 
 def test_profile_form_saves(app, settings):
     page = make_page(app)
-    page.show_tab(2)
+    page.show_tab(PROFILE)
     page.p_phd_state.setCurrentIndex(0)
     page.p_nationality.setText("in, gb")
     page.p_residence.setText("in")
@@ -154,10 +156,10 @@ def test_attach_and_check_application(app, settings, tmp_path, monkeypatch):
 def test_category_filter_and_career_stage(app, settings):
     page = make_page(app)
     page._filter_category(3)                     # Travel
-    assert "Example International Postdoctoral" not in texts(page.tab_stack.widget(0))
+    assert "Example International Postdoctoral" not in texts(page.tab_stack.widget(MATCHES))
     page._filter_category(0)                     # All
-    assert "Example International Postdoctoral" in texts(page.tab_stack.widget(0))
-    page.show_tab(2)
+    assert "Example International Postdoctoral" in texts(page.tab_stack.widget(MATCHES))
+    page.show_tab(PROFILE)
     page.p_level.setCurrentIndex(2)              # PhD student
     page.save_profile()
     assert load_researcher(settings / "researcher.json").career_level == "phd_student"
@@ -168,9 +170,52 @@ def test_examples_can_be_shown_to_try_galley(app, tmp_path, monkeypatch):
     monkeypatch.setattr(submission, "user_profile_dir", lambda: tmp_path / "profiles")
     from galley.gui.fellowships_page import FellowshipsPage
     page = FellowshipsPage(today=TODAY)
-    assert "Example International" not in texts(page.tab_stack.widget(0))
-    assert "Show invented example entries" in texts(page.tab_stack.widget(0))
+    assert "Example International" not in texts(page.tab_stack.widget(MATCHES))
+    assert "Show invented example entries" in texts(page.tab_stack.widget(MATCHES))
     page._toggle_examples(True)
-    shown = texts(page.tab_stack.widget(0))
+    shown = texts(page.tab_stack.widget(MATCHES))
     assert "Example International Postdoctoral Fellowship" in shown
     assert "Postdoc fellowship (example)" in shown
+
+
+def test_tabs_are_profile_matches_applications(app, settings):
+    page = make_page(app)
+    assert [b.text() for b in page.tabs.buttons][:2] == ["Profile", "Matches"]
+    assert page.tabs.index == PROFILE                # empty profile: start there
+    save_researcher(Researcher(career_level="postdoc"))
+    assert make_page(app).tabs.index == MATCHES      # then open on Matches
+
+
+def test_stage_picker_has_a_colour_per_stage(app, settings):
+    from galley.gui.fellowships_page import STAGE_COLOR, Picker
+    page = make_page(app)
+    page._add_application("example-international-postdoc")
+    picker = [p for p in page.detail.findChildren(Picker)][0]
+    assert picker.count() == 7
+    assert len({c for _, _, c in picker.items}) == 7  # all different
+    picker.setCurrentIndex(1)                         # Submitted
+    assert page.apps["example-international-postdoc"].status == "submitted"
+    assert STAGE_COLOR["submitted"] in picker.styleSheet()
+
+
+def test_picker_menu_opens_with_big_rows(app, settings):
+    from PySide6.QtWidgets import QPushButton
+    from galley.gui.fellowships_page import _PickerMenu
+    menu = _PickerMenu([("Awarded", 0, None), ("In progress", 1, None)], 1)
+    rows = [b for b in menu.findChildren(QPushButton)]
+    assert len(rows) == 2 and all(r.minimumHeight() >= 44 for r in rows)
+    chosen = []
+    menu.chosen.connect(chosen.append)
+    rows[0].click()
+    assert chosen == [0]
+
+
+def test_update_note_shown_after_download(app, settings, monkeypatch):
+    from galley.fellowships.update import UpdateResult
+    from datetime import datetime, timezone
+    page = make_page(app)
+    page._update_done(UpdateResult(12, datetime.now(timezone.utc), ["x.json"]))
+    page.refresh(MATCHES)
+    assert "12 entries downloaded, 1 skipped" in texts(page.tab_stack.widget(MATCHES))
+    assert "Check for Updates" in [b.text() for b in
+                                   page.tab_stack.widget(MATCHES).findChildren(QPushButton)]

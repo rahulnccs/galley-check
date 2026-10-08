@@ -302,8 +302,12 @@ def _load_folder(folder: Path, include_templates: bool) -> list[Fellowship]:
 def load_fellowships(folder: Path | None = None,
                      include_templates: bool = False,
                      custom_folder: Path | None = None,
-                     include_custom: bool = True) -> list[Fellowship]:
+                     include_custom: bool = True,
+                     downloaded_folder: Path | None = None) -> list[Fellowship]:
     """The database's fellowships plus the user's own entries.
+
+    The database is the copy bundled with Galley, updated by any list the
+    user downloaded with "Check for Updates".
 
     A database file that doesn't parse raises, with the file name in the
     message, so a broken entry is fixed rather than silently skipped. A
@@ -311,6 +315,24 @@ def load_fellowships(folder: Path | None = None,
     hand, and one bad file shouldn't hide the whole list.
     """
     out = _load_folder(folder or DATA_DIR, include_templates)
+    if folder is None:
+        # Entries from "Check for Updates" replace bundled ones with the same
+        # id and add new ones. A damaged download is skipped, not fatal.
+        from .update import downloaded_dir
+        newer: dict[str, Fellowship] = {}
+        try:
+            paths = sorted((downloaded_folder or downloaded_dir()).glob("*.json"))
+        except OSError:
+            paths = []
+        for path in paths:
+            try:
+                f = Fellowship.load(path)
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+            if f.template and not include_templates:
+                continue
+            newer[f.id] = f
+        out = [newer.pop(f.id, f) for f in out] + list(newer.values())
     if include_custom:
         custom_folder = custom_folder or user_fellowship_dir()
         try:

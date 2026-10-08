@@ -148,6 +148,9 @@ citations inserted by Zotero, Mendeley, and EndNote.
 Switch to **Fellowships** at the top of the window. It covers three kinds of
 life-science funding: postdoc fellowships, PhD fellowships and travel grants.
 
+The tabs run in the order you use them: **Profile**, then **Matches**, then
+**Applications**.
+
 **Matches.** Fill in your profile (career stage, PhD date, career breaks,
 nationality, where you live and would like to go, places you've lived, field)
 and Galley sorts the funding into what you're eligible for, what's worth
@@ -177,7 +180,10 @@ internal scheme, can be added by hand.
 file per scheme, each with the date it was last checked against the funder's
 page; entries older than a year are flagged. The list is still being built:
 Galley currently ships invented examples only, which you can switch on under
-Matches to try the features. To suggest a scheme, fill in
+Matches to try the features. **Check for Updates**, at the top of Matches,
+downloads the latest list from this repository, so new and corrected entries
+reach the app without a new release; only the list is downloaded, nothing
+about you is sent. To suggest a scheme, fill in
 [`templates/fellowship-database-template.xlsx`](templates/fellowship-database-template.xlsx)
 or open an issue. Each entry in the app has a **Report Outdated Information**
 link for corrections.

@@ -989,7 +989,8 @@ class MainWindow(QMainWindow):
 
     def _show_reminders(self):
         self.switcher.select(1)
-        self.fellowships.show_tab(1)
+        from .fellowships_page import APPLICATIONS
+        self.fellowships.show_tab(APPLICATIONS)
 
     def check(self, path: str):
         self.switcher.select(0)

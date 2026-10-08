@@ -27,13 +27,13 @@ def texts(m):
 # --- the database itself ---------------------------------------------------
 
 def test_every_shipped_entry_loads():
-    entries = load_fellowships(include_templates=True, include_custom=False)
+    entries = load_fellowships(DATA_DIR, include_templates=True, include_custom=False)
     assert len(entries) >= 3
     assert all(f.url.startswith("https://") for f in entries)
 
 
 def test_templates_are_kept_out_of_real_results():
-    assert all(not f.template for f in load_fellowships(include_custom=False))
+    assert all(not f.template for f in load_fellowships(DATA_DIR, include_custom=False))
 
 
 @pytest.mark.parametrize("bad, complaint", [

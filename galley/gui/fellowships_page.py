@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from datetime import date
 
-from PySide6.QtCore import QDate, QRectF, QSize, Qt, QUrl, Signal
+from PySide6.QtCore import QDate, QObject, QRectF, QSize, Qt, QThread, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QFontDatabase, QPainter
 from PySide6.QtWidgets import (
-    QAbstractButton, QComboBox, QDateEdit, QDialog, QDialogButtonBox,
+    QAbstractButton, QComboBox, QDateEdit, QGraphicsDropShadowEffect, QDialog, QDialogButtonBox,
     QFileDialog, QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit,
     QMessageBox, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy,
     QSpinBox, QStackedWidget, QVBoxLayout, QWidget,
@@ -27,6 +27,7 @@ from ..fellowships import (ELIGIBLE, NOT_ELIGIBLE, POSSIBLE, STATUSES,
 from ..fellowships.application_check import FAIL, PASS, WARN
 from ..fellowships.application_check import INFO as NOTE
 from ..fellowships.match import INFO, MET, NOT_MET, UNSURE
+from ..fellowships.update import fetch_updates, last_updated
 from ..fellowships.model import (FIELDS, Researcher, Stay,
                                  delete_custom_fellowship, load_researcher,
                                  save_custom_fellowship, save_researcher)
@@ -57,6 +58,17 @@ REASON_MARK = {MET: ("✓", APPLE["green"]), NOT_MET: ("✕", APPLE["red"]),
 FINDING_MARK = {PASS: MET, FAIL: NOT_MET, WARN: UNSURE, NOTE: INFO}
 URGENCY_COLOR = {"overdue": APPLE["red"], "changed": APPLE["orange"],
                  "soon": APPLE["orange"], "upcoming": APPLE["blue"]}
+# The three tabs, in order.
+PROFILE, MATCHES, APPLICATIONS = 0, 1, 2
+
+# A colour per application stage, from Apple's system palette.
+STAGE_COLOR = {"planning": "#007AFF",      # blue: in progress
+               "submitted": "#5856D6",     # indigo
+               "shortlisted": "#FF9500",   # orange
+               "interview": "#AF52DE",     # purple
+               "awarded": "#34C759",       # green
+               "not_funded": "#FF3B30",    # red
+               "withdrawn": "#8E8E93"}     # grey
 APP_STATUS_LABEL = {"planning": "Preparing", "submitted": "Submitted",
                     "shortlisted": "Shortlisted", "interview": "Interview",
                     "awarded": "Awarded", "not_funded": "Not funded",
@@ -133,6 +145,13 @@ def apple_stylesheet(font: str) -> str:
         border: none; width: 0px; }}
     QSpinBox#valueEditor::up-button, QSpinBox#valueEditor::down-button {{
         border: none; width: 14px; }}
+    QCalendarWidget {{ min-width: 340px; min-height: 300px; background: white; }}
+    QCalendarWidget QWidget#qt_calendar_navigationbar {{ background: white; }}
+    QCalendarWidget QToolButton {{ color: {a['blue']}; font-size: 16px; font-weight: 600;
+        background: transparent; border: none; padding: 6px 10px; }}
+    QCalendarWidget QAbstractItemView {{ font-size: 15px; background: white;
+        selection-background-color: {a['blue']}; selection-color: white;
+        outline: none; }}
     QComboBox QAbstractItemView {{ background: {a['card']}; border: 1px solid {a['fill']};
         selection-background-color: {a['blue']}; selection-color: white; }}
     """
@@ -239,6 +258,122 @@ class Switch(QAbstractButton):
         p.setBrush(QColor("white"))
         x = 20 if self.isChecked() else 2
         p.drawEllipse(QRectF(x, 2, 24, 24))
+
+
+class _PickerMenu(QFrame):
+    """The menu a Picker opens: a rounded card with large rows, a blue
+    checkmark on the current choice and an optional colour dot per option,
+    like a menu on iOS."""
+    chosen = Signal(int)
+
+    def __init__(self, items, current: int, parent=None):
+        super().__init__(parent, Qt.Popup | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(14, 10, 14, 18)        # room for the shadow
+        card = QFrame()
+        card.setObjectName("pickerCard")
+        card.setStyleSheet(f"""
+            #pickerCard {{ background: white; border-radius: 14px;
+                           border: 1px solid {APPLE['fill']}; }}
+            #pickerRow {{ background: transparent; border: none; border-radius: 9px;
+                          text-align: left; padding: 0 14px; font-size: 16px;
+                          color: {APPLE['label']}; }}
+            #pickerRow:hover {{ background: #E8F1FF; }}""")
+        shadow = QGraphicsDropShadowEffect(card)
+        shadow.setBlurRadius(28)
+        shadow.setOffset(0, 6)
+        shadow.setColor(QColor(0, 0, 0, 60))
+        card.setGraphicsEffect(shadow)
+        lay = QVBoxLayout(card)
+        lay.setContentsMargins(6, 6, 6, 6)
+        lay.setSpacing(2)
+        for i, (text, _, color) in enumerate(items):
+            row = QPushButton()
+            row.setObjectName("pickerRow")
+            row.setCursor(Qt.PointingHandCursor)
+            row.setMinimumHeight(44)                    # Apple's minimum tap target
+            row.setMinimumWidth(260)
+            rl = QHBoxLayout(row)
+            rl.setContentsMargins(12, 0, 14, 0)
+            rl.setSpacing(10)
+            check = QLabel("\u2713" if i == current else "")
+            check.setFixedWidth(16)
+            check.setStyleSheet(f"color:{APPLE['blue']}; font-size:16px; "
+                                f"font-weight:700; background:transparent;")
+            rl.addWidget(check)
+            if color:
+                rl.addWidget(dot(color))
+            name = QLabel(text)
+            name.setStyleSheet("background:transparent; font-size:16px;"
+                               + (" font-weight:600;" if i == current else ""))
+            rl.addWidget(name, 1)
+            for w in (check, name):
+                w.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+            row.clicked.connect(lambda _=False, i=i: self._choose(i))
+            lay.addWidget(row)
+        outer.addWidget(card)
+
+    def _choose(self, i: int):
+        self.chosen.emit(i)
+        self.close()
+
+
+class Picker(QPushButton):
+    """A value that opens an iOS-style menu when clicked. It has the parts of
+    QComboBox's interface that the screens use."""
+    currentIndexChanged = Signal(int)
+
+    def __init__(self):
+        super().__init__()
+        self.setObjectName("picker")
+        self.setCursor(Qt.PointingHandCursor)
+        self.items: list[tuple[str, object, str | None]] = []
+        self.index = -1
+        self.clicked.connect(self._open)
+
+    def addItem(self, text: str, data=None, color: str | None = None):
+        self.items.append((text, data, color))
+        if self.index < 0:
+            self.setCurrentIndex(0)
+
+    def addItems(self, texts):
+        for t in texts:
+            self.addItem(t)
+
+    def count(self) -> int:
+        return len(self.items)
+
+    def currentIndex(self) -> int:
+        return self.index
+
+    def currentData(self):
+        return self.items[self.index][1] if self.index >= 0 else None
+
+    def currentText(self) -> str:
+        return self.items[self.index][0] if self.index >= 0 else ""
+
+    def setCurrentIndex(self, i: int):
+        changed = i != self.index
+        self.index = i
+        text, _, color = self.items[i]
+        self.setText(f"{text}  \u25BE")
+        tint = color or APPLE["blue"]
+        self.setStyleSheet(f"#picker {{ color:{tint}; background:transparent; "
+                           f"border:none; font-size:15px; font-weight:500; "
+                           f"padding:6px 2px; text-align:right; }}"
+                           f"#picker:hover {{ color:{APPLE['label'] if not color else tint}; }}")
+        if changed:
+            self.currentIndexChanged.emit(i)
+
+    def _open(self):
+        menu = _PickerMenu(self.items, self.index, self)
+        menu.chosen.connect(self.setCurrentIndex)
+        menu.adjustSize()
+        pos = self.mapToGlobal(self.rect().bottomRight())
+        menu.move(pos.x() - menu.width() + 14, pos.y() - 4)
+        menu.show()
+        self._menu = menu                               # keep it alive while open
 
 
 class Card(QFrame):
@@ -523,6 +658,21 @@ def parse_codes(text: str) -> list[str]:
     return codes
 
 
+class UpdateWorker(QObject):
+    """Downloads the fellowship list off the main thread."""
+    finished = Signal(object)
+    failed = Signal(str)
+
+    def run(self):
+        try:
+            self.finished.emit(fetch_updates())
+        except OSError:
+            self.failed.emit("Galley couldn't reach GitHub. Check your internet "
+                             "connection and try again.")
+        except ValueError as e:
+            self.failed.emit(str(e))
+
+
 # ---- the page --------------------------------------------------------------
 
 class FellowshipsPage(QWidget):
@@ -537,6 +687,8 @@ class FellowshipsPage(QWidget):
         self.load_error: str | None = None
         self.category_filter: str | None = None     # None = all categories
         self.show_examples = False      # the invented entries, for trying Galley
+        self._update_thread: QThread | None = None
+        self.update_note = ""           # result of the last "Check for Updates"
         self.reload_data()
 
         self.stack = QStackedWidget()
@@ -559,7 +711,7 @@ class FellowshipsPage(QWidget):
         self.title = label("Fellowships", "largeTitle")
         col.addWidget(self.title)
         seg_row = QHBoxLayout()
-        self.tabs = Segmented(["Matches", "Applications", "Profile"])
+        self.tabs = Segmented(["Profile", "Matches", "Applications"])
         self.tabs.changed.connect(self._tab_changed)
         seg_row.addWidget(self.tabs)
         seg_row.addStretch(1)
@@ -572,6 +724,8 @@ class FellowshipsPage(QWidget):
         home.addWidget(self.tab_stack, 1)
         self.stack.addWidget(self.home)
         self.detail: QWidget | None = None
+        # New users start by telling Galley about themselves.
+        self.tabs.select(PROFILE if self.profile_is_empty() else MATCHES, emit=False)
         self.refresh()
 
     # -- data ----------------------------------------------------------------
@@ -608,13 +762,13 @@ class FellowshipsPage(QWidget):
             w = self.tab_stack.widget(0)
             self.tab_stack.removeWidget(w)
             w.deleteLater()
-        self.tab_stack.addWidget(self._matches_tab())
-        self.tab_stack.addWidget(self._applications_tab())
-        self.tab_stack.addWidget(self._profile_tab())
+        self.tab_stack.addWidget(self._profile_tab())       # PROFILE
+        self.tab_stack.addWidget(self._matches_tab())       # MATCHES
+        self.tab_stack.addWidget(self._applications_tab())  # APPLICATIONS
         self.tabs.select(tab, emit=False)
         self.tab_stack.setCurrentIndex(tab)
         n = self.attention_count()
-        self.tabs.set_title(1, f"Applications ({n})" if n else "Applications")
+        self.tabs.set_title(APPLICATIONS, f"Applications ({n})" if n else "Applications")
         self.attentionChanged.emit(n)
 
     def _tab_changed(self, index: int):
@@ -656,7 +810,26 @@ class FellowshipsPage(QWidget):
                                "Add your career stage, PhD date, nationality and "
                                "field to see what you can apply for.",
                                leading=mark(INFO), tappable=True))
-            row.clicked.connect(lambda: self.show_tab(2))
+            row.clicked.connect(lambda: self.show_tab(PROFILE))
+
+        page.header("Fellowship list")
+        card = page.add(Card())
+        when = last_updated()
+        sub = (f"Updated {day(when.astimezone().date())}" if when
+               else "The list included with Galley")
+        if self.update_note:
+            sub += f" \u00b7 {self.update_note}"
+        self.update_button = plain_button("Check for Updates")
+        self.update_button.clicked.connect(self.check_for_updates)
+        if self._update_thread is not None:
+            self.update_button.setText("Checking\u2026")
+            self.update_button.setEnabled(False)
+        count = sum(1 for f in self.fellowships if not f.template)
+        title = f"{count} fellowship{'s' if count != 1 else ''}"
+        examples = sum(1 for f in self.fellowships if f.template)
+        if examples:
+            title += f" (+{examples} examples shown)"
+        card.add(Row(title, sub, trailing=self.update_button))
 
         filt = Segmented(["All", "Postdoc", "PhD", "Travel"])
         filt.select(CATEGORY_FILTERS.index(self.category_filter), emit=False)
@@ -717,20 +890,51 @@ class FellowshipsPage(QWidget):
         page.finish()
         return page
 
+    def check_for_updates(self):
+        """Download the latest list from GitHub in the background."""
+        if self._update_thread is not None:
+            return
+        self.update_button.setText("Checking\u2026")
+        self.update_button.setEnabled(False)
+        self._update_thread = QThread()
+        self._update_worker = UpdateWorker()
+        self._update_worker.moveToThread(self._update_thread)
+        self._update_thread.started.connect(self._update_worker.run)
+        self._update_worker.finished.connect(self._update_done)
+        self._update_worker.failed.connect(self._update_failed)
+        self._update_worker.finished.connect(self._update_thread.quit)
+        self._update_worker.failed.connect(self._update_thread.quit)
+        self._update_thread.finished.connect(self._update_cleanup)
+        self._update_thread.start()
+
+    def _update_done(self, result):
+        skipped = (f", {len(result.skipped)} skipped" if result.skipped else "")
+        self.update_note = f"{result.count} entries downloaded{skipped}"
+        self.reload_data()
+
+    def _update_failed(self, message: str):
+        self.update_note = ""
+        QMessageBox.warning(self, "Couldn't update the list", message)
+
+    def _update_cleanup(self):
+        self._update_thread.deleteLater()
+        self._update_thread = None
+        self.refresh(MATCHES)
+
     def _toggle_examples(self, on: bool):
         self.show_examples = on
         self.reload_data()
-        self.refresh(0)
+        self.refresh(MATCHES)
 
     def _filter_category(self, index: int):
         self.category_filter = CATEGORY_FILTERS[index]
-        self.refresh(0)
+        self.refresh(MATCHES)
 
     def open_fellowship(self, fid: str):
         f = self.by_id[fid]
         m = match(f, self.researcher, self.today)
         page = ScrollPage()
-        page.add(nav_bar("Matches", lambda: self._back(0)))
+        page.add(nav_bar("Matches", lambda: self._back(MATCHES)))
         page.add(label(f.name, "detailTitle", wrap=True))
         if f.funder:
             page.add(label(f.funder, "secondary", wrap=True))
@@ -905,7 +1109,7 @@ class FellowshipsPage(QWidget):
         self.apps.pop(fid, None)
         save_applications(self.apps)
         self.reload_data()
-        self._back(0)
+        self._back(MATCHES)
 
     # -- Applications --------------------------------------------------------
     def _applications_tab(self) -> QWidget:
@@ -941,9 +1145,7 @@ class FellowshipsPage(QWidget):
             nxt = f.next_deadline(self.today)
             sub = (f"Deadline {day(nxt.date)} · {countdown(nxt.date, self.today)}"
                    if nxt else "No upcoming deadline")
-            color = (APPLE["green"] if a.status == "awarded" else
-                     APPLE["gray"] if a.status in ("not_funded", "withdrawn") else
-                     APPLE["blue"])
+            color = STAGE_COLOR[a.status]
             row = card.add(Row(f.name, sub,
                                trailing=pill(APP_STATUS_LABEL[a.status], color),
                                tappable=True))
@@ -965,7 +1167,7 @@ class FellowshipsPage(QWidget):
         nxt = f.next_deadline(self.today)
         app.deadline_seen = nxt.date.isoformat() if nxt else None
         self.save_apps()
-        self.refresh(1)
+        self.refresh(APPLICATIONS)
 
     def _add_custom(self):
         dlg = CustomEntryDialog(self)
@@ -979,21 +1181,21 @@ class FellowshipsPage(QWidget):
         self.reload_data()
         start_application(self.apps, self.by_id[f.id], self.today)
         self.save_apps()
-        self.refresh(1)
+        self.refresh(APPLICATIONS)
 
     def open_application(self, fid: str):
         f, app = self.by_id[fid], self.apps[fid]
         page = ScrollPage()
-        page.add(nav_bar("Applications", lambda: self._back(1)))
+        page.add(nav_bar("Applications", lambda: self._back(APPLICATIONS)))
         page.add(label(f.name, "detailTitle", wrap=True))
         if f.funder:
             page.add(label(f.funder, "secondary", wrap=True))
 
         page.header("Status")
         card = page.add(Card())
-        status = QComboBox()
+        status = Picker()
         for s in STATUSES:
-            status.addItem(APP_STATUS_LABEL[s], s)
+            status.addItem(APP_STATUS_LABEL[s], s, STAGE_COLOR[s])
         status.setCurrentIndex(STATUSES.index(app.status))
         card.add(field_row("Stage", status))
         interview = QDateEdit()
@@ -1140,7 +1342,7 @@ class FellowshipsPage(QWidget):
             return
         self.apps.pop(fid, None)
         self.save_apps()
-        self._back(1)
+        self._back(APPLICATIONS)
 
     # -- Profile -------------------------------------------------------------
     def _profile_tab(self) -> QWidget:
@@ -1149,12 +1351,12 @@ class FellowshipsPage(QWidget):
 
         page.header("Career stage")
         card = page.add(Card())
-        self.p_level = QComboBox()
+        self.p_level = Picker()
         for key, text in LEVEL_CHOICES:
             self.p_level.addItem(text, key)
         self.p_level.setCurrentIndex([k for k, _ in LEVEL_CHOICES].index(r.career_level))
         card.add(field_row("I am a", self.p_level))
-        self.p_phd_state = QComboBox()
+        self.p_phd_state = Picker()
         self.p_phd_state.addItems(["Awarded", "In progress", "Not set"])
         self.p_phd_state.setCurrentIndex(0 if r.phd_date else 1 if r.phd_expected else 2)
         card.add(field_row("PhD", self.p_phd_state))
@@ -1275,7 +1477,7 @@ class FellowshipsPage(QWidget):
             return
         save_researcher(r)
         self.researcher = r
-        self.refresh(2)
+        self.refresh(PROFILE)
         self.p_saved.setText("Saved")
 
     def _save_stays(self, stays: list[Stay]):
@@ -1287,7 +1489,7 @@ class FellowshipsPage(QWidget):
         r.stays = stays
         save_researcher(r)
         self.researcher = r
-        self.refresh(2)
+        self.refresh(PROFILE)
 
     def _add_stay(self):
         dlg = StayDialog(self)
