@@ -921,16 +921,19 @@ class MainWindow(QMainWindow):
 
         # Manuscript checks and fellowships are two sections of one window.
         from .fellowships_page import FellowshipsPage, Segmented
+        from .projects_page import ProjectsPage
         self.fellowships = FellowshipsPage()
+        self.projects = ProjectsPage()
         self.sections = QStackedWidget()
         self.sections.addWidget(self.stack)
         self.sections.addWidget(self.fellowships)
+        self.sections.addWidget(self.projects)
 
         bar = QWidget()
         bar.setObjectName("page")
         bar_lay = QHBoxLayout(bar)
         bar_lay.setContentsMargins(12, 10, 12, 6)
-        self.switcher = Segmented(["Manuscript", "Fellowships"])
+        self.switcher = Segmented(["Manuscript", "Fellowships", "Projects"])
         self.switcher.changed.connect(self.sections.setCurrentIndex)
         bar_lay.addStretch(1)
         bar_lay.addWidget(self.switcher)

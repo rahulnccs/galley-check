@@ -1,6 +1,6 @@
 # Galley
 
-A desktop app for life-science researchers, in two parts:
+A desktop app for life-science researchers, in three parts:
 
 - **Manuscript checks**: offline checks for manuscript drafts (figures, tables,
   citations, references, abbreviations, species names, consistency and ethics
@@ -8,6 +8,8 @@ A desktop app for life-science researchers, in two parts:
 - **Fellowships**: which postdoc fellowships, PhD fellowships and travel
   grants you can apply for and why, a preparation plan and reminders for each
   application, and a check of your documents against the funder's format.
+- **Projects**: a README, a sample tracker that opens each sample's
+  sequencing or other data folders, and a lab notebook, per project.
 
 Your manuscript, documents and profile never leave your computer.
 
@@ -191,6 +193,30 @@ or open an issue. Each entry in the app has a **Report Outdated Information**
 link for corrections.
 
 Your profile and applications are saved on your computer only.
+
+## Projects
+
+Switch to **Projects** at the top of the window to keep each research project
+in one place. Galley never copies or moves your data; it records where it is.
+
+**README.** A few lines about the project: the question, the system, the
+design, where things stand, and the analyses it uses (RNA-seq, DNA-seq,
+metabolomics, or your own).
+
+**Samples.** A sample tracker. Coloured tiles count the samples per analysis
+and filter the list; each sample shows which analyses it went through, coloured
+by status (done, in progress, planned, failed). Click a sample ID and Galley
+offers its data, for example *DNA-seq · raw data* or *RNA-seq · analysis*;
+choose one and the folder opens in Finder or Explorer. A folder that has been
+moved or deleted is flagged instead of failing silently. Import a sample sheet
+(CSV with a `sample_id` column and columns such as `RNA-seq data` and
+`RNA-seq analysis` holding folder paths) rather than typing samples in, and
+export it again.
+
+**Notebook.** Dated lab-notebook entries, searchable, each linked to the
+samples it concerns; a sample's page shows the entries that mention it.
+
+Projects are saved on your computer only.
 
 ## Download
 
