@@ -214,3 +214,13 @@ def test_status_is_worked_out_from_dates_when_missing(tmp_path):
     status = {o.item: o.status for o in import_orders(path).orders}
     assert status == {"A": "ordered", "B": "received", "C": "requested"}
     json.dumps([o.__dict__ for o in import_orders(path).orders])   # stays serialisable
+
+
+def test_example_orders_show_each_stage():
+    from galley.lab import example_orders
+    rows = example_orders(TODAY, "Rahul")
+    assert all(o.example for o in rows)
+    assert [o.status for o in rows][:4] == ["requested", "approved", "ordered", "received"]
+    received = [o for o in rows if o.status == "received"]
+    assert all(o.location and o.received for o in received)
+    assert all(o.requested <= o.ordered <= o.received for o in received)

@@ -151,8 +151,8 @@ citations inserted by Zotero, Mendeley, and EndNote.
 Switch to **Fellowships** at the top of the window. It covers three kinds of
 life-science funding: postdoc fellowships, PhD fellowships and travel grants.
 
-The tabs run in the order you use them: **Profile**, then **Matches**, then
-**Applications**.
+The tabs run in the order you use them: **Profile**, **Matches**,
+**Applications** and **Calendar**.
 
 **Matches.** Fill in your profile (career stage, PhD date, career breaks,
 nationality, where you live and would like to go, places you've lived, field)
@@ -160,14 +160,24 @@ and Galley sorts the funding into what you're eligible for, what's worth
 checking, and what you can't apply for, with the reason for each rule: career
 stage, years since PhD, nationality, residence, host country, mobility rules,
 clinical track and society membership. Filter the list by Postdoc, PhD or
-Travel. When a rule can't be checked automatically, Galley says "worth
-checking" rather than guessing, and every entry links to the funder's own page.
+Travel. When your profile leaves something out, Galley says "worth checking"
+rather than guessing. Rules written in words that no profile can answer (an
+age limit, "a lead-author paper") are listed under **Also confirm** on each
+fellowship, and the list shows how many there are, so they are never
+silently assumed. Every entry links to the funder's own page.
 
 **Applications.** Add a fellowship to **My Applications** to get a preparation
 plan worked back from its deadline (contact host labs, start drafting, get
 feedback, final check), track its stage from preparing to awarded, and keep
 notes. Whenever you open Galley, a banner lists steps that are overdue or
 coming up, and deadlines that have moved.
+
+**Calendar.** A month calendar with your applications' deadlines and
+interviews in blue, and, if you choose *Everything I can apply for*, the
+deadlines of fellowships you're eligible for in green. Click a day or move
+between months to list what's due. **Add to My Calendar** saves the upcoming
+deadlines as an .ics file for Apple Calendar, Google Calendar or Outlook,
+each with a reminder a week before.
 
 **Check Application.** Before you submit, attach your Word documents to the
 application and choose **Check Application**. Galley checks each one against
@@ -206,12 +216,13 @@ in one place. Galley never copies or moves your data; it records where it is.
 design, where things stand, and the analyses it uses (RNA-seq, DNA-seq,
 metabolomics, or your own).
 
-**Samples.** A sample tracker. Coloured tiles count the samples per analysis
-and filter the list; each sample shows which analyses it went through, coloured
-by status (done, in progress, planned, failed). Click a sample ID and Galley
-offers its data, for example *DNA-seq · raw data* or *RNA-seq · analysis*;
-choose one and the folder opens in Finder or Explorer. A folder that has been
-moved or deleted is flagged instead of failing silently. Import a sample sheet
+**Samples.** A searchable list of the project's samples. Click one to open
+its page of coloured boxes, one for each thing worth recording (RNA
+extraction, sequencing, QC, results). Each box has a title, notes and a
+linked data folder that opens in Finder or Explorer; choose its colour, and
+press **+ Add a Box** for more. Everything saves as you type. A folder that
+has been moved or deleted is flagged instead of failing silently. The page
+also lists the sample's analyses and notebook entries. Import a sample sheet
 (CSV with a `sample_id` column and columns such as `RNA-seq data` and
 `RNA-seq analysis` holding folder paths) rather than typing samples in, and
 export it again.
@@ -225,18 +236,26 @@ Projects are saved on your computer only.
 
 Switch to **My Lab** to track the lab's orders.
 
-**Orders.** Each order goes Requested → Approved → Ordered → Received (or
-Back-ordered or Cancelled), coloured as on most lab order sheets: red,
-indigo, amber, purple, green. Tiles count and filter them. Click an order to
-move it on. **Mark as Received** records who took the delivery and asks
-where it was put. **Order Again** repeats an earlier order in one click, and
+**Orders.** A spreadsheet with the usual order-sheet columns (Status, Date
+Requested, Date Approved, Approved By, Date Ordered, Account, Item Name,
+Requested By, Vendor, Catalog #, Qty, Unit Price, Total Price, Received By,
+Date Received, Location, SubLocation, Unit Size, URL, Notes). The header
+stays in place while the rows scroll; double-click a column name to rename
+it for the whole lab. **+ New Row** adds a row at the top to type into.
+Double-click a cell to edit it: Status offers a menu, dates a calendar, and
+names suggest what the lab has used before. A new tracker starts with a few
+example reagent rows, removed with one click. Each order goes Requested →
+Approved → Ordered → Received (or Back-ordered or Cancelled), coloured as on
+most lab order sheets: red, indigo, amber, purple, green; the Requested,
+Approved and Ordered tiles filter the sheet. Click a row number to move an
+order on. **Mark as Received** records who took the delivery and asks where
+it was put. **Order Again** repeats an earlier order in one click, and
 **Copy Order Details** puts the item, vendor, catalogue number, quantity,
 price and link on the clipboard for an email or purchasing form. Typing an
 item the lab has ordered before fills in its vendor, catalogue number and
-last price, and items ordered more than once are listed under *Order again*.
-**Needs attention** flags requests not ordered after a week and orders not
-received after two weeks (both adjustable), and the count shows on the My
-Lab tab.
+last price. A banner flags requests not ordered after a week and orders not
+received after two weeks (both adjustable) and shows just those orders; the
+count shows on the My Lab tab.
 
 **Inventory.** Everything received, grouped by where it was put (bench,
 freezer, cold room), with a "Where is it?" search.

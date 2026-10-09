@@ -14,32 +14,32 @@ from pathlib import Path
 from PySide6.QtCore import QDate, Qt, QUrl, Signal
 from PySide6.QtGui import QDesktopServices, QGuiApplication
 from PySide6.QtWidgets import (
-    QComboBox, QCompleter, QDateEdit, QDialog, QDialogButtonBox, QFileDialog,
-    QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit, QMessageBox,
-    QPlainTextEdit, QSpinBox, QStackedWidget, QVBoxLayout, QWidget,
+    QComboBox, QDateEdit, QDialog, QDialogButtonBox, QFileDialog, QFormLayout,
+    QFrame, QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QSpinBox,
+    QStackedWidget, QVBoxLayout, QWidget,
 )
 
-from ..lab import (OPEN_STATUSES, STATUS_LABEL, Lab, Order, advance, attention,
-                   catalogue, delete_order, export_orders, frequent_items,
-                   import_orders, load_lab, load_me, load_orders, new_order,
-                   order_again, request_text, save_lab, save_me, save_order,
-                   spend, total)
+from ..lab import (STATUS_LABEL, Lab, Order, advance, attention, delete_order,
+                   example_orders, export_orders, import_orders, load_lab,
+                   load_me, load_orders, order_again, request_text, save_lab,
+                   save_me, save_order, spend, total)
 from ..lab.model import month_start, months_back
 from .fellowships_page import (APPLE, SOFT, Card, Row, ScrollPage, Segmented,
                                apple_font, apple_stylesheet, day, dot,
                                field_row, filled_button, label, pill,
                                plain_button, tile_row)
+from .lab_sheet import OrderSheet
 from .projects_page import ActionMenu
 
 ORDERS, INVENTORY, SPENDING, LAB = 0, 1, 2, 3
 STATUS_COLOR = {"requested": SOFT["red"], "approved": SOFT["indigo"],
                 "ordered": SOFT["amber"], "backordered": SOFT["purple"],
                 "received": SOFT["green"], "cancelled": SOFT["grey"]}
-# The tiles above the order list; "ordered" includes back-ordered.
-ORDER_TILES = [("open", "Open", SOFT["all"]), ("requested", "Requested", SOFT["red"]),
+# The tiles above the spreadsheet; "ordered" includes back-ordered. Clicking
+# a tile shows only those orders; clicking it again shows them all.
+ORDER_TILES = [("requested", "Requested", SOFT["red"]),
                ("approved", "Approved", SOFT["indigo"]),
-               ("ordered", "Ordered", SOFT["amber"]),
-               ("received", "Received", SOFT["green"])]
+               ("ordered", "Ordered", SOFT["amber"])]
 PERIODS = [("month", "This month", SOFT["blue"]), ("year", "This year", SOFT["indigo"]),
            ("last12", "Last 12 months", SOFT["purple"])]
 SHOW_AT_MOST = 200
@@ -49,23 +49,6 @@ SEARCH_STYLE = (f"background:white; border:1px solid {APPLE['fill']}; "
 
 def _split(text: str) -> list[str]:
     return list(dict.fromkeys(x.strip() for x in text.split(",") if x.strip()))
-
-
-def _number(text: str, what: str, allow_blank: bool = True) -> float | None:
-    s = text.strip().replace(",", "")
-    for sign in "$€£₹¥":
-        s = s.replace(sign, "")
-    if not s:
-        if allow_blank:
-            return None
-        raise ValueError(f"Enter the {what}.")
-    try:
-        v = float(s)
-    except ValueError:
-        raise ValueError(f"The {what} should be a number, not “{text.strip()}”.") from None
-    if v < 0:
-        raise ValueError(f"The {what} can't be negative.")
-    return v
 
 
 def _combo(values: list[str], current: str = "", placeholder: str = "") -> QComboBox:
@@ -93,100 +76,6 @@ def bar(fraction: float, color: str, width: int = 150) -> QWidget:
 
 
 # ---- dialogs ----------------------------------------------------------------
-
-class OrderDialog(QDialog):
-    """A new order or an edit. Typing an item the lab has ordered before
-    offers it, and choosing it fills in the vendor, catalogue number and
-    last price."""
-
-    def __init__(self, lab: Lab, known: dict[str, Order], me: str,
-                 current: Order | None = None, parent=None):
-        super().__init__(parent)
-        self.known = known
-        self.setWindowTitle("Edit Order" if current else "New Order")
-        self.setMinimumWidth(540)
-        c = current
-        form = QFormLayout()
-        self.item = QLineEdit(c.item if c else "")
-        self.item.setPlaceholderText("e.g. TipOne 200 µl filter tips, sterile")
-        names = sorted({o.item for o in known.values()}, key=str.lower)
-        completer = QCompleter(names, self)
-        completer.setCaseSensitivity(Qt.CaseInsensitive)
-        completer.setFilterMode(Qt.MatchContains)
-        completer.activated.connect(self.fill_from)
-        self.item.setCompleter(completer)
-        self.vendor = _combo(sorted({o.vendor for o in known.values()}, key=str.lower),
-                             c.vendor if c else "", "e.g. Fisher Scientific")
-        self.catalog = QLineEdit(c.catalog if c else "")
-        self.qty = QLineEdit(f"{c.qty:g}" if c else "1")
-        self.price = QLineEdit("" if not c or c.unit_price is None else f"{c.unit_price:g}")
-        self.price.setPlaceholderText(f"in {lab.currency}, optional")
-        self.size = QLineEdit(c.unit_size if c else "")
-        self.size.setPlaceholderText("e.g. 500/pack, 1 L")
-        self.url = QLineEdit(c.url if c else "")
-        self.url.setPlaceholderText("Product page, optional")
-        self.account = _combo(lab.accounts, c.account if c else
-                              (lab.accounts[0] if len(lab.accounts) == 1 else ""),
-                              "Grant or cost centre")
-        self.by = _combo(sorted(set(lab.members) | ({me} if me else set())),
-                         c.requested_by if c else me, "Who needs it")
-        self.project = QLineEdit(c.project if c else "")
-        self.project.setPlaceholderText("What it's for, optional")
-        self.notes = QPlainTextEdit(c.notes if c else "")
-        self.notes.setFixedHeight(60)
-        for title, w in (("Item", self.item), ("Vendor", self.vendor),
-                         ("Catalog #", self.catalog), ("Quantity", self.qty),
-                         ("Unit price", self.price), ("Unit size", self.size),
-                         ("Link", self.url), ("Account", self.account),
-                         ("Requested by", self.by), ("Project", self.project),
-                         ("Notes", self.notes)):
-            form.addRow(title, w)
-        buttons = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        buttons.accepted.connect(self._accept)
-        buttons.rejected.connect(self.reject)
-        lay = QVBoxLayout(self)
-        lay.addLayout(form)
-        lay.addWidget(buttons)
-
-    def fill_from(self, name: str):
-        """Fill in what the lab knows about an item it ordered before."""
-        o = self.known.get(name.strip().lower())
-        if o is None:
-            return
-        self.vendor.setCurrentText(o.vendor)
-        self.catalog.setText(o.catalog)
-        self.price.setText("" if o.unit_price is None else f"{o.unit_price:g}")
-        self.size.setText(o.unit_size)
-        self.url.setText(o.url)
-        if o.account and not self.account.currentText():
-            self.account.setCurrentText(o.account)
-
-    def details(self) -> dict:
-        """The fields as Order keyword arguments; raises ValueError."""
-        if not self.item.text().strip():
-            raise ValueError("Say what to order.")
-        qty = _number(self.qty.text(), "quantity", allow_blank=False)
-        if qty == 0:
-            raise ValueError("The quantity should be at least 1.")
-        return dict(item=self.item.text().strip(),
-                    vendor=self.vendor.currentText().strip(),
-                    catalog=self.catalog.text().strip(),
-                    qty=int(qty) if qty.is_integer() else qty,
-                    unit_price=_number(self.price.text(), "unit price"),
-                    unit_size=self.size.text().strip(), url=self.url.text().strip(),
-                    account=self.account.currentText().strip(),
-                    requested_by=self.by.currentText().strip(),
-                    project=self.project.text().strip(),
-                    notes=self.notes.toPlainText().strip())
-
-    def _accept(self):
-        try:
-            self.details()
-        except ValueError as e:
-            QMessageBox.warning(self, "Order", str(e))
-            return
-        self.accept()
-
 
 class ReceiveDialog(QDialog):
     """Who took the delivery, when, and where it was put."""
@@ -233,7 +122,7 @@ class LabPage(QWidget):
         self.me_path = me_path
         self.today = today or date.today()
         self.tab = ORDERS
-        self.filter = "open"
+        self.filter = "all"
         self.search = ""
         self.inv_search = ""
         self.period = "year"
@@ -250,6 +139,24 @@ class LabPage(QWidget):
         self.folder = self.me.lab_folder()
         self.lab = load_lab(self.folder)
         self.orders = load_orders(self.folder)
+        if not self.orders and not self.lab.examples_added:
+            self.add_examples()
+
+    def add_examples(self):
+        """Fill a new tracker with example reagent orders, once."""
+        try:
+            for o in example_orders(self.today, self.me.name):
+                save_order(o, self.folder)
+            self.lab.examples_added = True
+            save_lab(self.lab, self.folder)
+        except OSError:
+            return                      # a read-only folder: start empty
+        self.orders = load_orders(self.folder)
+
+    def remove_examples(self):
+        for o in [o for o in self.orders if o.example]:
+            delete_order(o.id, self.folder)
+        self.refresh()
 
     def _save(self, o: Order):
         try:
@@ -283,8 +190,7 @@ class LabPage(QWidget):
         self.tab = i
         self.render()
 
-    def render(self):
-        page = ScrollPage()
+    def _title_bar(self) -> QWidget:
         title = QWidget()
         tl = QHBoxLayout(title)
         tl.setContentsMargins(0, 0, 0, 0)
@@ -293,7 +199,9 @@ class LabPage(QWidget):
         refresh.setToolTip("Load changes others made in the shared lab folder")
         refresh.clicked.connect(self.refresh)
         tl.addWidget(refresh, 0, Qt.AlignBottom)
-        page.add(title)
+        return title
+
+    def _tab_bar(self) -> QWidget:
         tabs = Segmented(["Orders", "Inventory", "Spending", "Lab"])
         tabs.select(self.tab, emit=False)
         tabs.changed.connect(self.show_tab)
@@ -302,10 +210,19 @@ class LabPage(QWidget):
         hl.setContentsMargins(0, 6, 0, 2)
         hl.addWidget(tabs)
         hl.addStretch(1)
-        page.add(holder)
-        {ORDERS: self._orders_tab, INVENTORY: self._inventory_tab,
-         SPENDING: self._spending_tab, LAB: self._lab_tab}[self.tab](page)
-        page.finish()
+        return holder
+
+    def render(self):
+        self.sheet = None
+        if self.tab == ORDERS:
+            page = self._orders_page()      # full width, the sheet scrolls itself
+        else:
+            page = ScrollPage()
+            page.add(self._title_bar())
+            page.add(self._tab_bar())
+            {INVENTORY: self._inventory_tab, SPENDING: self._spending_tab,
+             LAB: self._lab_tab}[self.tab](page)
+            page.finish()
         self._show(page)
         self.attentionChanged.emit(self.attention_count())
 
@@ -340,90 +257,86 @@ class LabPage(QWidget):
         return row
 
     # -- orders ---------------------------------------------------------------------
-    def _matches(self, o: Order) -> bool:
+    def _matches(self, o: Order, stuck: set[str]) -> bool:
         f = self.filter
-        in_tile = (o.is_open if f == "open" else
+        in_tile = (True if f == "all" else o.id in stuck if f == "attention" else
                    o.status in ("ordered", "backordered") if f == "ordered" else
-                   True if f == "all" else o.status == f)
+                   o.status == f)
         q = self.search.lower()
         return in_tile and (not q or q in " ".join(
             (o.item, o.vendor, o.catalog, o.requested_by, o.account, o.project,
-             o.notes)).lower())
+             o.location, o.notes)).lower())
 
-    def _orders_tab(self, page: ScrollPage):
+    def _orders_page(self) -> QWidget:
+        page = QWidget()
+        lay = QVBoxLayout(page)
+        lay.setContentsMargins(24, 12, 24, 12)
+        lay.setSpacing(8)
+        lay.addWidget(self._title_bar())
+        lay.addWidget(self._tab_bar())
+
         stuck = attention(self.orders, self.lab, self.today)
         if stuck:
-            page.header("Needs attention")
-            card = page.add(Card())
-            for a in stuck[:8]:
-                row = Row(a.order.item, a.text + (f" · {a.order.vendor}" if a.order.vendor
-                                                  else ""),
-                          leading=dot(SOFT["red"] if a.urgent else SOFT["amber"]),
-                          tappable=True)
-                row.clicked.connect(lambda o=a.order, row=row: self.order_menu(o, row))
-                card.add(row)
-            if len(stuck) > 8:
-                card.add(Row(f"{len(stuck) - 8} more", "Choose Open to see them all."))
+            first = stuck[0]
+            n = len(stuck)
+            more = f" and {n - 1} more" if n > 1 else ""
+            action = "Show all orders" if self.filter == "attention" else "Show them"
+            banner = QPushButton(
+                f"\u26A0  {n} order{'s need' if n != 1 else ' needs'} attention: "
+                f"{first.order.item[:50]} ({first.text.lower()}){more}.   {action}")
+            banner.setObjectName("labBanner")
+            banner.setCursor(Qt.PointingHandCursor)
+            banner.setStyleSheet("#labBanner { background:#FFF4E5; color:#7A4B00; "
+                                 "border:none; border-radius:10px; padding:9px 14px; "
+                                 "text-align:left; font-size:14px; }")
+            banner.clicked.connect(lambda: self._set_filter("attention"))
+            lay.addWidget(banner)
 
-        counts = {"open": sum(o.is_open for o in self.orders),
-                  "requested": sum(o.status == "requested" for o in self.orders),
+        counts = {"requested": sum(o.status == "requested" for o in self.orders),
                   "approved": sum(o.status == "approved" for o in self.orders),
                   "ordered": sum(o.status in ("ordered", "backordered")
-                                 for o in self.orders),
-                  "received": sum(o.status == "received" for o in self.orders)}
-        page.add(tile_row(ORDER_TILES, counts, self.filter, self._set_filter))
-        self.search_input = page.add(self._search_box(
-            self.search, "Search items, vendors, catalogue numbers, people",
-            self._search_orders))
+                                 for o in self.orders)}
+        lay.addWidget(tile_row(ORDER_TILES, counts, self.filter, self._set_filter))
 
-        shown = [o for o in self.orders if self._matches(o)]
-        title = dict((k, t) for k, t, _ in ORDER_TILES).get(self.filter, "All")
-        page.header(f"{title} orders · {len(shown)}")
-        card = page.add(Card())
-        if not self.orders:
-            card.add(Row("No orders yet", "Add one, or import the lab's order "
-                                          "spreadsheet (Excel or CSV) as it is."))
-        elif not shown:
-            card.add(Row("No orders match", "Clear the search, or choose another tile."))
-        for o in shown[:SHOW_AT_MOST]:
-            card.add(self._order_row(o))
-        if len(shown) > SHOW_AT_MOST:
-            card.add(Row(f"{len(shown) - SHOW_AT_MOST} older orders not shown",
-                         "Search to find them."))
-        if self.filter != "all":
-            r = Row("Show All Orders, Including Cancelled", title_color=APPLE["blue"],
-                    tappable=True)
-            r.clicked.connect(lambda: self._set_filter("all"))
-            card.add(r)
+        bar = QHBoxLayout()
+        bar.setSpacing(10)
+        self.search_input = self._search_box(
+            self.search, "Search items, vendors, catalogue numbers, people, places",
+            self._search_orders)
+        bar.addWidget(self.search_input, 1)
+        new = filled_button("+  New Row")
+        new.clicked.connect(self.new_row)
+        bar.addWidget(new)
+        for text, handler in (("Import Spreadsheet…", self.import_sheet),
+                              ("Export CSV…", self.export_sheet)):
+            b = plain_button(text)
+            b.clicked.connect(handler)
+            bar.addWidget(b)
+        if any(o.example for o in self.orders):
+            b = plain_button("Remove Example Rows", destructive=True)
+            b.clicked.connect(self.remove_examples)
+            bar.addWidget(b)
+        lay.addLayout(bar)
 
-        again = frequent_items(self.orders)
-        if again:
-            page.header("Order again")
-            card = page.add(Card())
-            for o in again:
-                sub = " · ".join(b for b in (o.vendor, o.catalog and f"#{o.catalog}",
-                                             self.lab.money(o.unit_price)) if b)
-                r = Row(o.item, sub, leading=dot(SOFT["blue"]), tappable=True)
-                r.clicked.connect(lambda o=o: self.reorder(o))
-                card.add(r)
-
-        page.header("")
-        card = page.add(Card())
-        for text, handler in (("New Order…", self.new_order),
-                              ("Import Order Spreadsheet (Excel or CSV)…",
-                               self.import_sheet),
-                              ("Export Orders (CSV)…", self.export_sheet)):
-            r = Row(text, title_color=APPLE["blue"], tappable=True)
-            r.clicked.connect(handler)
-            card.add(r)
-        page.footnote("Click an order to move it on: approve, order, mark as "
-                      "received and say where it went, order it again, or copy "
-                      "its details for purchasing. Red: requested · indigo: "
-                      "approved · amber: ordered · purple: back-ordered · green: "
-                      "received.")
+        ids = {a.order.id for a in stuck}
+        shown = [o for o in self.orders if self._matches(o, ids)]
+        if self.filter != "all" or self.search:
+            what = dict((k, t) for k, t, _ in ORDER_TILES).get(
+                self.filter, "Needing attention" if self.filter == "attention" else "All")
+            lay.addWidget(label(f"{what.upper()} · {len(shown)} of {len(self.orders)}",
+                                "sectionHeader"))
+        self.sheet = OrderSheet(self, shown)
+        self.sheet.menuRequested.connect(self.order_menu_at)
+        lay.addWidget(self.sheet, 1)
+        lay.addWidget(label("Double-click a cell to edit it; Status offers a menu and "
+                            "dates a calendar. Click a row number (or right-click a "
+                            "row) to mark it received, order it again or copy its "
+                            "details. Double-click a column name to rename it.",
+                            "footnote", wrap=True))
+        return page
 
     def _set_filter(self, key: str):
-        self.filter = key
+        self.filter = "all" if key == self.filter else key    # a second click clears
         self.render()
 
     def _search_orders(self, text: str):
@@ -456,13 +369,20 @@ class LabPage(QWidget):
         if o.url:
             items.append(("Open Product Page", o.url[:60], None,
                           lambda: QDesktopServices.openUrl(QUrl(o.url)), True))
-        items.append(("Edit…", "", None, lambda: self.edit(o), True))
         if o.is_open:
             items.append(("Cancel Order", "", STATUS_COLOR["cancelled"],
                           step("cancelled"), True))
         items.append(("Delete…", "Remove it from the tracker", None,
                       lambda: self.delete(o), True))
         return items
+
+    def order_menu_at(self, o: Order, pos):
+        menu = ActionMenu(STATUS_LABEL[o.status] + " · " + o.item[:50],
+                          self.order_menu_items(o), self)
+        menu.adjustSize()
+        menu.move(pos.x() + 8, pos.y())
+        menu.show()
+        self._menu = menu
 
     def order_menu(self, o: Order, anchor: QWidget):
         menu = ActionMenu(STATUS_LABEL[o.status] + " · " + o.item[:50],
@@ -493,38 +413,41 @@ class LabPage(QWidget):
         if self._save(o):
             self.render()
 
-    def new_order(self):
-        dlg = OrderDialog(self.lab, catalogue(self.orders), self.me.name, parent=self)
-        if dlg.exec() != QDialog.Accepted:
-            return
-        d = dlg.details()
-        o = new_order(d.pop("item"), d.pop("requested_by"), self.today, **d)
-        if self._save(o):
-            self.orders.insert(0, o)
-            self.filter = "open" if self.filter not in ("open", "requested", "all") \
-                else self.filter
+    def new_row(self):
+        """Add a blank row at the top of the sheet to type the order into."""
+        if self.filter not in ("all", "requested") or self.search or self.sheet is None:
+            self.filter, self.search, self.tab = "all", "", ORDERS
             self.render()
+        return self.sheet.new_row()
+
+    def save_edit(self, o: Order) -> bool:
+        """Save an order edited in the sheet, without redrawing the page."""
+        if not self._save(o):
+            return False
+        if all(x is not o for x in self.orders):
+            self.orders.insert(0, o)            # a new row, now it has an item
+        self.attentionChanged.emit(self.attention_count())
+        return True
 
     def reorder(self, o: Order):
         again = order_again(o, self.me.name, self.today)
-        dlg = OrderDialog(self.lab, catalogue(self.orders), self.me.name, again, self)
-        dlg.setWindowTitle("Order Again")
-        if dlg.exec() != QDialog.Accepted:
-            return
-        for k, v in dlg.details().items():
-            setattr(again, k, v)
         if self._save(again):
             self.orders.insert(0, again)
+            self.filter, self.search, self.tab = "all", "", ORDERS
             self.render()
+            self.sheet.setCurrentCell(0, 0)
 
-    def edit(self, o: Order):
-        dlg = OrderDialog(self.lab, catalogue(self.orders), self.me.name, o, self)
-        if dlg.exec() != QDialog.Accepted:
-            return
-        for k, v in dlg.details().items():
-            setattr(o, k, v)
-        if self._save(o):
-            self.render()
+    def rename_column(self, key: str, text: str):
+        if text:
+            self.lab.columns[key] = text
+        else:
+            self.lab.columns.pop(key, None)
+        try:
+            save_lab(self.lab, self.folder)
+        except OSError as e:
+            QMessageBox.warning(self, "Couldn't save", str(e))
+        if self.sheet is not None:
+            self.sheet.set_headers()
 
     def delete(self, o: Order):
         if QMessageBox.question(self, "Delete order",
@@ -741,6 +664,15 @@ class LabPage(QWidget):
         al.addStretch(1)
         card.add(actions)
 
+        if lab.columns:
+            page.header("Spreadsheet")
+            card = page.add(Card())
+            r = Row("Restore Original Column Names",
+                    ", ".join(f"{v}" for v in lab.columns.values()),
+                    title_color=APPLE["blue"], tappable=True)
+            r.clicked.connect(self.reset_columns)
+            card.add(r)
+
         page.header("Lab folder")
         card = page.add(Card())
         card.add(Row(str(self.folder), f"{len(self.orders)} orders"))
@@ -774,6 +706,11 @@ class LabPage(QWidget):
         except OSError as e:
             QMessageBox.warning(self, "Couldn't save", str(e))
             return
+        self.render()
+
+    def reset_columns(self):
+        self.lab.columns = {}
+        save_lab(self.lab, self.folder)
         self.render()
 
     def choose_folder(self):

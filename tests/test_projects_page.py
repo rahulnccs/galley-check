@@ -47,33 +47,47 @@ def test_home_lists_projects(app, setup):
     assert "Gut microbiome" in shown and "2 samples" in shown
 
 
-def test_samples_tab_tiles_and_chips(app, setup):
+def test_samples_tab_has_no_tiles_and_search_works(app, setup):
     from galley.gui.app import Tile
     folder, p, _ = setup
     page = page_for(folder)
     page.open_project(p.id)
-    tiles = {t.key: t.text().split()[0] for t in page.current.findChildren(Tile)}
-    assert tiles["all"] == "2" and tiles["RNA-seq"] == "1"
+    assert page.current.findChildren(Tile) == []
     assert "M01" in texts(page.current) and "RNA-seq" in texts(page.current)
-    page._filter_analysis("RNA-seq")
-    assert "M02" not in texts(page.current)
+    page._search_samples("colon")
+    assert "M02" in texts(page.current) and "M01" not in texts(page.current)
 
 
-def test_clicking_a_sample_offers_its_folders(app, setup, monkeypatch):
+def test_a_sample_page_has_coloured_boxes(app, setup, tmp_path, monkeypatch):
+    from galley.gui import projects_page as pp
     folder, p, data = setup
     page = page_for(folder)
     page.open_project(p.id)
-    items = page.sample_menu_items(page.project.sample("M01"))
-    labels = [(t, enabled) for t, _, _, _, enabled in items]
-    assert labels[0] == ("RNA-seq · raw data", True)
-    assert labels[1] == ("RNA-seq · analysis", False)       # folder is gone
-    assert labels[-1][0].startswith("Sample details")
+    page.open_sample("M01")
+    assert "ABOUT THIS SAMPLE · 0" in texts(page.current)
+    s = page.project.sample("M01")
+    page.add_box(s)
+    page.add_box(s)
+    first, second = page.box_cards
+    assert (first.box.color, second.box.color) == ("blue", "green")   # one after another
+    first.title.setText("RNA extraction")
+    first.text.setPlainText("RIN 8.9, 120 ng/ul")
+    first.set_folder(str(data))
+    second.set_color("purple")
+    page._save()
+    saved = next(x for x in __import__("galley.projects", fromlist=["x"])
+                 .load_projects(folder) if x.id == p.id).sample("M01")
+    assert [(b.title, b.color) for b in saved.boxes] == [("RNA extraction", "blue"),
+                                                         ("", "purple")]
+    assert saved.boxes[0].folder == str(data) and "RIN 8.9" in saved.boxes[0].text
+
     opened = []
-    from galley.gui import projects_page as pp
     monkeypatch.setattr(pp.QDesktopServices, "openUrl", lambda url: opened.append(url))
-    items[0][3]()
+    page.box_cards[0].open.click()
     from pathlib import Path
     assert opened and Path(opened[0].toLocalFile()) == data   # \ or / per OS
+    page._remove_box(page.project.sample("M01"), saved.boxes[1].id)   # empty: no question
+    assert len(page.project.sample("M01").boxes) == 1
 
 
 def test_missing_folder_is_reported_not_opened(app, setup, monkeypatch):

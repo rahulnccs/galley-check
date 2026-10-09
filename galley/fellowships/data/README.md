@@ -33,7 +33,7 @@ fellowships, PhD fellowships and travel grants.
 | `career_levels` | no | Who may apply: any of `masters_student`, `phd_student`, `postdoc`, `faculty`. PhD fellowships default to Master's and PhD students; leave it out otherwise if the career-stage rules already say enough. |
 | `purpose` | no | Travel grants: `conference`, `lab_visit`, `course`, `fieldwork` or `other`. |
 | `membership`, `membership_min_months` | no | A society membership the applicant must hold, e.g. `"the British Society for Immunology"`, and for how long. Shown to users to check. |
-| `other_rules` | no | Eligibility rules the fields above can't express, in plain words, e.g. `"Must move to a new research field"`. Each one makes the result "possibly eligible" and is shown to the user to check. |
+| `other_rules` | no | Eligibility rules the fields above can't express, in plain words, e.g. `"Must move to a new research field"`. Shown to the user as a list to confirm; they don't change the verdict, which comes from the rules Galley can check. |
 | `source` | no | Where the entry came from, for the maintainer. Not shown to users. |
 | `amount`, `duration_months`, `notes` | no | Shown to users as written. `notes` is for information, not rules. |
 
@@ -79,8 +79,9 @@ ids always start with `custom-`.
 ## When a rule doesn't fit
 
 Put it in `other_rules` in plain words. The matcher only decides what it can
-check reliably; a rule in `other_rules` turns "eligible" into "possibly
-eligible" and is shown to the user, so it is never silently treated as met.
+check reliably; a rule in `other_rules` is listed on the fellowship under
+"Also confirm", so it is never silently treated as met. If the rule is one
+most applicants fail, say so plainly so it stands out.
 
 ## From the spreadsheet
 

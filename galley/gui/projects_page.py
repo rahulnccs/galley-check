@@ -1,40 +1,39 @@
 """The Projects screen: a README, a sample tracker and a lab notebook per
 project, in the same iOS-style lists and soft palette as Fellowships.
 
-Clicking a sample opens a menu of the analyses it went through; choosing one
-opens that folder in Finder or Explorer. Galley only records where the data
-lives, it never copies or moves it.
+Clicking a sample opens its page: coloured boxes of information, each of
+which can link the folder holding its data, plus its analyses and notebook
+entries. Galley only records where the data lives, it never copies or moves
+it.
 """
 from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
 
-from PySide6.QtCore import QDate, Qt, QUrl
+from PySide6.QtCore import QDate, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import (
     QDateEdit, QDialog, QDialogButtonBox, QFileDialog, QFormLayout, QFrame,
-    QGraphicsDropShadowEffect, QHBoxLayout, QLabel, QLineEdit, QMessageBox,
-    QPlainTextEdit, QPushButton, QStackedWidget, QVBoxLayout, QWidget,
+    QGraphicsDropShadowEffect, QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QMessageBox, QPlainTextEdit, QPushButton, QStackedWidget, QVBoxLayout,
+    QWidget,
 )
 
-from ..projects import (ANALYSIS_STATUSES, DEFAULT_ANALYSES, Analysis, Sample,
-                        delete_project, export_sample_sheet,
-                        import_sample_sheet, load_projects, new_project,
-                        save_project)
+from ..projects import (ANALYSIS_STATUSES, BOX_COLORS, DEFAULT_ANALYSES,
+                        Analysis, Sample, SampleBox, delete_project,
+                        export_sample_sheet, import_sample_sheet,
+                        load_projects, new_project, save_project)
 from .fellowships_page import (APPLE, SOFT, Card, Picker, Row, ScrollPage,
                                Segmented, apple_font, apple_stylesheet, day,
                                dot, field_row, filled_button, label, nav_bar,
-                               pill, plain_button, tile_row)
+                               pill, plain_button)
 
 README, SAMPLES, NOTEBOOK = 0, 1, 2
 STATUS_LABEL = {"planned": "Planned", "in_progress": "In progress",
                 "done": "Done", "failed": "Failed"}
 STATUS_COLOR = {"planned": SOFT["grey"], "in_progress": SOFT["amber"],
                 "done": SOFT["green"], "failed": SOFT["red"]}
-# Colours for the per-analysis tiles, in turn.
-TILE_COLORS = [SOFT["blue"], SOFT["indigo"], SOFT["green"], SOFT["purple"],
-               SOFT["amber"], SOFT["red"], SOFT["grey"]]
 
 
 def open_folder(parent: QWidget, path: str) -> bool:
@@ -244,6 +243,153 @@ class NoteDialog(QDialog):
         return [s.strip() for s in self.samples.text().split(",") if s.strip()]
 
 
+# ---- a sample's boxes ---------------------------------------------------------
+
+def tint(color: str, alpha: float) -> str:
+    c = QColor(color)
+    return f"rgba({c.red()},{c.green()},{c.blue()},{alpha})"
+
+
+class BoxCard(QFrame):
+    """One coloured box on a sample's page, edited in place: a title, notes,
+    a linked data folder and its colour. Every edit is saved."""
+    changed = Signal()
+    removeRequested = Signal(str)
+
+    def __init__(self, box: SampleBox, parent=None):
+        super().__init__(parent)
+        self.box = box
+        self.setObjectName("sampleBox")
+        self.setMinimumHeight(230)
+        lay = QVBoxLayout(self)
+        lay.setContentsMargins(16, 12, 12, 14)
+        lay.setSpacing(6)
+
+        top = QHBoxLayout()
+        top.setSpacing(6)
+        self.swatches = []
+        for name in BOX_COLORS:
+            sw = QPushButton()
+            sw.setFixedSize(16, 16)
+            sw.setCursor(Qt.PointingHandCursor)
+            sw.setToolTip(name.capitalize())
+            sw.clicked.connect(lambda _=False, name=name: self.set_color(name))
+            top.addWidget(sw)
+            self.swatches.append((name, sw))
+        top.addStretch(1)
+        if box.date:
+            when = QLabel(day(date.fromisoformat(box.date)))
+            when.setObjectName("boxMeta")
+            top.addWidget(when)
+        remove = QPushButton("\u2715")
+        remove.setObjectName("boxRemove")
+        remove.setCursor(Qt.PointingHandCursor)
+        remove.setToolTip("Delete this box")
+        remove.clicked.connect(lambda: self.removeRequested.emit(box.id))
+        top.addWidget(remove)
+        lay.addLayout(top)
+
+        self.title = QLineEdit(box.title)
+        self.title.setObjectName("boxTitle")
+        self.title.setPlaceholderText("Title, e.g. RNA extraction")
+        self.title.textChanged.connect(self._edited)
+        lay.addWidget(self.title)
+        self.text = QPlainTextEdit(box.text)
+        self.text.setObjectName("boxText")
+        self.text.setPlaceholderText("Details: protocol, results, concentrations, "
+                                     "where it is stored…")
+        self.text.setMinimumHeight(90)
+        self.text.textChanged.connect(self._edited)
+        lay.addWidget(self.text, 1)
+
+        folder = QHBoxLayout()
+        folder.setSpacing(6)
+        self.folder_label = QLabel()
+        self.folder_label.setObjectName("boxMeta")
+        folder.addWidget(self.folder_label, 1)
+        self.link = QPushButton()
+        self.link.setObjectName("boxButton")
+        self.link.setCursor(Qt.PointingHandCursor)
+        self.link.clicked.connect(self.choose_folder)
+        folder.addWidget(self.link)
+        self.open = QPushButton("Open")
+        self.open.setObjectName("boxButton")
+        self.open.setCursor(Qt.PointingHandCursor)
+        self.open.clicked.connect(lambda: open_folder(self, self.box.folder))
+        folder.addWidget(self.open)
+        lay.addLayout(folder)
+        self._style()
+        self._show_folder()
+
+    def _style(self):
+        c = SOFT.get(self.box.color, SOFT["blue"])
+        self.setStyleSheet(f"""
+            #sampleBox {{ background:{tint(c, 0.16)}; border:1px solid {tint(c, 0.55)};
+                          border-left:5px solid {c}; border-radius:14px; }}
+            #boxTitle {{ background:transparent; border:none; font-size:17px;
+                         font-weight:700; color:{APPLE['label']}; padding:2px 0; }}
+            #boxText {{ background:{tint('#FFFFFF', 0.7)}; border:none;
+                        border-radius:8px; font-size:14px; padding:4px; }}
+            #boxMeta {{ background:transparent; color:{APPLE['secondary']};
+                        font-size:12px; }}
+            #boxButton {{ background:white; color:{APPLE['blue']}; border:none;
+                          border-radius:8px; padding:5px 10px; font-size:13px;
+                          font-weight:600; }}
+            #boxButton:disabled {{ color:{APPLE['tertiary']}; }}
+            #boxRemove {{ background:transparent; border:none; color:{APPLE['gray']};
+                          font-size:14px; padding:0 4px; }}
+            #boxRemove:hover {{ color:{SOFT['red']}; }}""")
+        for name, sw in self.swatches:
+            ring = APPLE["label"] if name == self.box.color else "white"
+            sw.setStyleSheet(f"background:{SOFT[name]}; border:2px solid {ring}; "
+                             f"border-radius:8px;")
+
+    def _show_folder(self):
+        f = self.box.folder
+        missing = bool(f) and not Path(f).expanduser().exists()
+        name = Path(f).name or f
+        self.folder_label.setText(("\u26A0 Not found: " if missing else "\U0001F4C1 ") + name
+                                  if f else "No data folder linked")
+        self.folder_label.setToolTip(f)
+        self.link.setText("Change…" if f else "Link Folder…")
+        self.open.setEnabled(bool(f) and not missing)
+
+    def _edited(self):
+        self.box.title = self.title.text().strip()
+        self.box.text = self.text.toPlainText().strip()
+        self.changed.emit()
+
+    def set_color(self, name: str):
+        self.box.color = name
+        self._style()
+        self.changed.emit()
+
+    def set_folder(self, path: str):
+        self.box.folder = path
+        self._show_folder()
+        self.changed.emit()
+
+    def choose_folder(self):
+        path = QFileDialog.getExistingDirectory(self, "Choose the folder for this box",
+                                                self.box.folder)
+        if path:
+            self.set_folder(path)
+
+
+def add_box_tile(on_click) -> QPushButton:
+    b = QPushButton("+\nAdd a Box")
+    b.setObjectName("addBox")
+    b.setCursor(Qt.PointingHandCursor)
+    b.setMinimumHeight(230)
+    b.setStyleSheet(f"""
+        #addBox {{ background:transparent; border:2px dashed {APPLE['tertiary']};
+                   border-radius:14px; color:{APPLE['blue']}; font-size:17px;
+                   font-weight:600; }}
+        #addBox:hover {{ background:white; border-color:{APPLE['blue']}; }}""")
+    b.clicked.connect(on_click)
+    return b
+
+
 # ---- the page ----------------------------------------------------------------
 
 class ProjectsPage(QWidget):
@@ -255,9 +401,12 @@ class ProjectsPage(QWidget):
         self.folder = folder
         self.project = None
         self.tab = SAMPLES
-        self.analysis_filter = "all"
         self.search = ""
         self.note_search = ""
+        self._save_timer = QTimer(self)
+        self._save_timer.setSingleShot(True)
+        self._save_timer.setInterval(400)
+        self._save_timer.timeout.connect(self._save)
         self.stack = QStackedWidget()
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
@@ -275,10 +424,14 @@ class ProjectsPage(QWidget):
         self.current = w
 
     def _save(self):
-        save_project(self.project, self.folder)
+        self._save_timer.stop()
+        if self.project is not None:
+            save_project(self.project, self.folder)
 
     # -- home: the list of projects ---------------------------------------------
     def show_home(self):
+        if self._save_timer.isActive():         # an edit still waiting to be saved
+            self._save()
         self.project = None
         page = ScrollPage()
         page.add(label("Projects", "largeTitle"))
@@ -440,14 +593,6 @@ class ProjectsPage(QWidget):
 
     def _samples(self, page: ScrollPage):
         p = self.project
-        kinds = self._kinds()
-        tiles = [("all", "Samples", SOFT["all"])] + [
-            (k, k, TILE_COLORS[i % len(TILE_COLORS)]) for i, k in enumerate(kinds[:6])]
-        counts = {"all": len(p.samples)} | {k: p.count(k, None) for k in kinds}
-        if self.analysis_filter not in counts:
-            self.analysis_filter = "all"
-        page.add(tile_row(tiles, counts, self.analysis_filter, self._filter_analysis))
-
         search = QLineEdit(self.search)
         search.setPlaceholderText("Search sample IDs and descriptions")
         search.setClearButtonEnabled(True)
@@ -458,9 +603,8 @@ class ProjectsPage(QWidget):
         self.search_box = search
 
         shown = [s for s in p.samples
-                 if (self.analysis_filter == "all" or s.analysis(self.analysis_filter))
-                 and (not self.search or self.search.lower() in
-                      f"{s.sample_id} {s.description}".lower())]
+                 if not self.search or self.search.lower() in
+                 f"{s.sample_id} {s.description}".lower()]
         page.header(f"Samples · {len(shown)}")
         card = page.add(Card())
         if not p.samples:
@@ -475,8 +619,11 @@ class ProjectsPage(QWidget):
             cl.setSpacing(4)
             for a in s.analyses:
                 cl.addWidget(pill(a.kind, STATUS_COLOR[a.status]))
+            for b in s.boxes[:4]:
+                if b.title:
+                    cl.addWidget(pill(b.title[:18], SOFT.get(b.color, SOFT["blue"])))
             row = Row(s.sample_id, s.description, trailing=chips, tappable=True)
-            row.clicked.connect(lambda s=s, row=row: self.sample_menu(s, row))
+            row.clicked.connect(lambda s=s: self.open_sample(s.sample_id))
             card.add(row)
 
         page.header("")
@@ -487,48 +634,18 @@ class ProjectsPage(QWidget):
             r = Row(text, title_color=APPLE["blue"], tappable=True)
             r.clicked.connect(handler)
             card.add(r)
-        page.footnote("Green: done \u00b7 amber: in progress \u00b7 grey: planned "
-                      "\u00b7 red: failed. Click a sample to open its data folders. "
+        page.footnote("Click a sample to open its page, where you add boxes of "
+                      "information and link the folders holding its data. "
                       "A sample sheet has "
                       "a sample_id column and, for each analysis, columns such as "
                       "“RNA-seq data” and “RNA-seq analysis” "
                       "holding folder paths.")
-
-    def _filter_analysis(self, key: str):
-        self.analysis_filter = key
-        self.render_project()
 
     def _search_samples(self, text: str):
         self.search = text
         self.render_project()
         self.search_box.setFocus()
         self.search_box.setCursorPosition(len(text))
-
-    def sample_menu_items(self, s: Sample):
-        """What clicking a sample offers: each analysis folder, then details."""
-        items = []
-        for a in s.analyses:
-            for which, path in a.folders():
-                exists = Path(path).expanduser().exists()
-                items.append((f"{a.kind} · {which}",
-                              path if exists else "Folder not found: " + path,
-                              STATUS_COLOR[a.status],
-                              lambda path=path: open_folder(self, path), exists))
-            if not a.folders():
-                items.append((a.kind, f"{STATUS_LABEL[a.status]} · no folder recorded",
-                              STATUS_COLOR[a.status],
-                              lambda s=s: self.open_sample(s.sample_id), True))
-        items.append(("Sample details and analyses…", "", None,
-                      lambda s=s: self.open_sample(s.sample_id), True))
-        return items
-
-    def sample_menu(self, s: Sample, anchor: QWidget):
-        menu = ActionMenu(f"{s.sample_id} — open data", self.sample_menu_items(s), self)
-        menu.adjustSize()
-        pos = anchor.mapToGlobal(anchor.rect().bottomLeft())
-        menu.move(pos.x() + 40, pos.y() - 8)
-        menu.show()
-        self._menu = menu
 
     def _add_sample(self):
         dlg = SampleDialog(self)
@@ -567,7 +684,7 @@ class ProjectsPage(QWidget):
             export_sample_sheet(self.project, path)
 
     # -- one sample -----------------------------------------------------------------
-    def open_sample(self, sample_id: str):
+    def open_sample(self, sample_id: str, focus_box: str | None = None):
         s = self.project.sample(sample_id)
         if s is None:
             self.render_project()
@@ -577,6 +694,28 @@ class ProjectsPage(QWidget):
         page.add(label(s.sample_id, "detailTitle", wrap=True))
         if s.description:
             page.add(label(s.description, "secondary", wrap=True))
+
+        page.header(f"About this sample · {len(s.boxes)}")
+        grid_holder = page.add(QWidget())
+        grid = QGridLayout(grid_holder)
+        grid.setContentsMargins(0, 2, 0, 2)
+        grid.setSpacing(12)
+        self.box_cards = []
+        for i, b in enumerate(s.boxes):
+            w = BoxCard(b)
+            w.changed.connect(self._schedule_save)
+            w.removeRequested.connect(lambda bid, s=s: self._remove_box(s, bid))
+            grid.addWidget(w, i // 2, i % 2)
+            self.box_cards.append(w)
+            if b.id == focus_box:
+                QTimer.singleShot(0, w.title.setFocus)
+        n = len(s.boxes)
+        grid.addWidget(add_box_tile(lambda: self.add_box(s)), n // 2, n % 2)
+        grid.setColumnStretch(0, 1)
+        grid.setColumnStretch(1, 1)
+        page.footnote("Add a box for each thing worth recording about this "
+                      "sample (extraction, sequencing, QC, results) and link the "
+                      "folder holding its data. Everything saves as you type.")
 
         page.header("Analyses")
         card = page.add(Card())
@@ -612,24 +751,13 @@ class ProjectsPage(QWidget):
         collected = QLineEdit(s.collected)
         collected.setPlaceholderText("YYYY-MM-DD")
         card.add(field_row("Collected", collected))
-        notes = QPlainTextEdit(s.notes)
-        notes.setPlaceholderText("Storage location, treatment, anything to remember")
-        notes.setFixedHeight(80)
-        notes.setStyleSheet("border:none;")
-        box = QWidget()
-        bl = QVBoxLayout(box)
-        bl.setContentsMargins(12, 6, 12, 6)
-        bl.addWidget(notes)
-        card.add(box)
 
         def save_details():
             s.description = desc.text().strip()
             s.collected = collected.text().strip()
-            s.notes = notes.toPlainText().strip()
             self._save()
         for w in (desc, collected):
             w.editingFinished.connect(save_details)
-        notes.textChanged.connect(save_details)
 
         entries = sorted(self.project.notes_for(s.sample_id), key=lambda n: n.date,
                          reverse=True)
@@ -653,9 +781,31 @@ class ProjectsPage(QWidget):
         al.addStretch(1)
         card.add(actions)
         page.footnote("Galley only records where your data is; deleting a sample "
-                      "here never touches its folders.")
+                      "or a box here never touches its folders.")
         page.finish()
         self._show(page)
+        self.sample_page = s.sample_id
+
+    def add_box(self, s: Sample):
+        box = s.add_box()
+        self._save()
+        self.open_sample(s.sample_id, focus_box=box.id)
+
+    def _remove_box(self, s: Sample, box_id: str):
+        box = next((b for b in s.boxes if b.id == box_id), None)
+        if box is None:
+            return
+        if (box.title or box.text or box.folder) and QMessageBox.question(
+                self, "Delete box", f"Delete “{box.title or 'this box'}”? A linked "
+                                    f"folder is not touched.") != QMessageBox.Yes:
+            return
+        s.remove_box(box_id)
+        self._save()
+        self.open_sample(s.sample_id)
+
+    def _schedule_save(self):
+        """Save shortly after typing stops, rather than on every key."""
+        self._save_timer.start()
 
     def _edit_analysis(self, s: Sample, current: Analysis | None):
         dlg = AnalysisDialog(self._kinds(), current, self)

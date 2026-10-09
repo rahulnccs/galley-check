@@ -44,6 +44,21 @@ class Analysis:
                                         ("analysis", self.results_path)) if p]
 
 
+BOX_COLORS = ["blue", "green", "amber", "purple", "indigo", "red"]
+
+
+@dataclass
+class SampleBox:
+    """A coloured box of information on a sample's page: what was done or
+    found, and optionally the folder holding the data that goes with it."""
+    id: str
+    title: str = ""
+    text: str = ""
+    folder: str = ""
+    color: str = "blue"             # one of BOX_COLORS
+    date: str = ""                  # YYYY-MM-DD, when it was added
+
+
 @dataclass
 class Sample:
     sample_id: str
@@ -51,6 +66,7 @@ class Sample:
     collected: str = ""             # YYYY-MM-DD, or free text
     notes: str = ""
     analyses: list[Analysis] = field(default_factory=list)
+    boxes: list[SampleBox] = field(default_factory=list)
 
     def analysis(self, kind: str) -> Analysis | None:
         for a in self.analyses:
@@ -62,6 +78,17 @@ class Sample:
         """Add an analysis, or replace the one of the same kind."""
         self.analyses = [x for x in self.analyses if x.kind.lower() != a.kind.lower()]
         self.analyses.append(a)
+
+    def add_box(self, title: str = "", on: date | None = None) -> SampleBox:
+        """A new box, in the next colour along."""
+        color = BOX_COLORS[len(self.boxes) % len(BOX_COLORS)]
+        box = SampleBox(uuid.uuid4().hex[:12], title, color=color,
+                        date=(on or date.today()).isoformat())
+        self.boxes.append(box)
+        return box
+
+    def remove_box(self, box_id: str) -> None:
+        self.boxes = [b for b in self.boxes if b.id != box_id]
 
 
 @dataclass
@@ -130,7 +157,8 @@ class Project:
 
     @classmethod
     def from_dict(cls, d: dict) -> "Project":
-        samples = [Sample(**{**s, "analyses": [Analysis(**a) for a in s.get("analyses", [])]})
+        samples = [Sample(**{**s, "analyses": [Analysis(**a) for a in s.get("analyses", [])],
+                             "boxes": [SampleBox(**b) for b in s.get("boxes", [])]})
                    for s in d.get("samples", [])]
         notes = [NoteEntry(**n) for n in d.get("notebook", [])]
         known = {k: v for k, v in d.items()

@@ -4,9 +4,13 @@ Every rule gives one of three answers: met, not met, or can't tell (because
 the profile leaves something out, or the rules leave room for judgement).
 A fellowship is
 
-  * eligible when every rule is met,
+  * eligible when every rule Galley can check is met,
   * not eligible when any rule is clearly not met,
   * possibly eligible otherwise.
+
+Rules written in words (an age limit, "a lead-author paper") can't be
+checked from a profile. They don't change the verdict; they are listed for
+the user to confirm, as CHECK reasons, so they are never silently met.
 
 Wrongly telling someone they can't apply costs them a real opportunity, so
 when in doubt the answer is "possibly", with the reason spelled out and the
@@ -22,14 +26,14 @@ from datetime import date, timedelta
 from .model import Deadline, Fellowship, Researcher
 
 ELIGIBLE, POSSIBLE, NOT_ELIGIBLE = "eligible", "possibly eligible", "not eligible"
-MET, NOT_MET, UNSURE, INFO = "met", "not met", "unsure", "info"
+MET, NOT_MET, UNSURE, INFO, CHECK = "met", "not met", "unsure", "info", "check"
 STATUS_ORDER = {ELIGIBLE: 0, POSSIBLE: 1, NOT_ELIGIBLE: 2}
 STALE_AFTER_MONTHS = 12
 
 
 @dataclass
 class Reason:
-    outcome: str                # MET | NOT_MET | UNSURE | INFO
+    outcome: str                # MET | NOT_MET | UNSURE | INFO | CHECK
     text: str
 
 
@@ -48,6 +52,11 @@ class Match:
         if UNSURE in outcomes:
             return POSSIBLE
         return ELIGIBLE
+
+    @property
+    def to_confirm(self) -> list[Reason]:
+        """Rules the user has to confirm themselves."""
+        return [r for r in self.reasons if r.outcome == CHECK]
 
     @property
     def is_open(self) -> bool:
@@ -234,7 +243,7 @@ def _membership(f: Fellowship) -> list[Reason]:
         return []
     time = (f" for at least {f.membership_min_months} months"
             if f.membership_min_months else "")
-    return [Reason(UNSURE, f"Requires membership of {f.membership}{time}.")]
+    return [Reason(CHECK, f"Requires membership of {f.membership}{time}.")]
 
 
 def _field_fit(f: Fellowship, r: Researcher) -> int:
@@ -257,7 +266,7 @@ def match(f: Fellowship, r: Researcher, today: date) -> Match:
     result.reasons += _track(f, r)
     result.reasons += _career_level(f, r)
     result.reasons += _membership(f)
-    result.reasons += [Reason(UNSURE, f"Also requires: {rule}")
+    result.reasons += [Reason(CHECK, rule[:1].upper() + rule[1:])
                        for rule in f.other_rules]
 
     if deadline is None and not f.rolling:

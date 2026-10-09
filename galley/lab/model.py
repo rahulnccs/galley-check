@@ -81,6 +81,8 @@ class Lab:
     currency: str = "$"
     order_within_days: int = 7      # a request not yet ordered after this is flagged
     deliver_within_days: int = 14   # an order not yet received after this is flagged
+    columns: dict[str, str] = field(default_factory=dict)   # renamed column headers
+    examples_added: bool = False    # the example rows were added once already
 
     def money(self, amount: float | None) -> str:
         return "" if amount is None else f"{self.currency}{amount:,.2f}"
@@ -125,6 +127,7 @@ class Order:
     sublocation: str = ""
     notes: str = ""
     history: list[dict] = field(default_factory=list)   # {date, status, by}
+    example: bool = False           # an example row, to show how the tracker works
     updated: str = ""
 
     def __post_init__(self):
@@ -526,3 +529,45 @@ def request_text(o: Order, lab: Lab) -> str:
         if value:
             lines.append(f"{label}: {value}")
     return "\n".join(lines)
+
+
+# ---- examples --------------------------------------------------------------------
+
+EXAMPLES = [
+    # status, item, vendor, catalog, qty, unit price, unit size, account, location, place
+    ("requested", "TRIzol Reagent", "Thermo Fisher Scientific", "15596026", 1, 312.00,
+     "100 ml", "", "", ""),
+    ("approved", "Phosphate-buffered saline (PBS), 10X", "Fisher Scientific", "BP3994",
+     2, 46.50, "1 L", "", "", ""),
+    ("ordered", "Fetal bovine serum, heat inactivated", "Gibco", "A5256801", 1, 648.00,
+     "500 ml", "", "", ""),
+    ("received", "Filter tips, 200 µl, sterile", "USA Scientific", "1120-8710", 6,
+     63.25, "960/pack", "", "Bench 1", "Drawer 2"),
+    ("received", "Penicillin-Streptomycin, 100X", "Corning", "30-002-CI", 1, 94.61,
+     "100 ml", "", "-20 °C freezer", "Shelf 3"),
+    ("received", "Agarose, molecular biology grade", "Sigma-Aldrich", "A9539", 1, 182.00,
+     "100 g", "", "Chemical shelf", "Shelf A"),
+]
+
+
+def example_orders(today: date, by: str = "") -> list[Order]:
+    """A few typical reagent orders at different stages, marked as examples,
+    so a new tracker shows how it works. The prices are illustrative."""
+    out = []
+    for i, (status, item, vendor, cat, qty, price, size, account, loc, sub) in \
+            enumerate(EXAMPLES):
+        asked = date.fromordinal(today.toordinal() - 3 - 4 * i)
+        o = new_order(item, by or "Example", asked, vendor=vendor, catalog=cat, qty=qty,
+                      unit_price=price, unit_size=size, account=account,
+                      notes="Example row: remove it when you start.")
+        o.example = True
+        if status != "requested":
+            advance(o, "approved", by, asked)
+        if status in ("ordered", "received"):
+            advance(o, "ordered", by, date.fromordinal(asked.toordinal() + 1))
+        if status == "received":
+            advance(o, "received", by, date.fromordinal(asked.toordinal() + 3),
+                    location=loc, sublocation=sub)
+        out.append(o)
+    return out
+

@@ -200,11 +200,15 @@ def test_clinical_track():
     assert match(f, Researcher(), TODAY).status == POSSIBLE
 
 
-def test_other_rules_are_never_silently_met():
-    f = fellowship(other_rules=["Must move to a new research field"])
+def test_other_rules_are_listed_to_confirm_not_silently_met():
+    f = fellowship(other_rules=["must move to a new research field"])
     m = match(f, Researcher(), TODAY)
-    assert m.status == POSSIBLE
-    assert "Must move to a new research field" in texts(m)
+    # The rules Galley can check decide the verdict; rules in words are
+    # listed for the user to confirm.
+    assert m.status == ELIGIBLE
+    assert [r.text for r in m.to_confirm] == ["Must move to a new research field"]
+    blocked = fellowship(other_rules=["Age under 35"], nationalities=["DE"])
+    assert match(blocked, Researcher(nationalities=["IN"]), TODAY).status == NOT_ELIGIBLE
 
 
 def test_past_deadline_predicts_next_call():
@@ -260,7 +264,7 @@ def test_shipped_examples_match_sensibly():
                                 stays=[Stay("IN", date(2015, 1, 1))])
     results = {m.fellowship.id: m.status
                for m in match_all(list(entries.values()), indian_postdoc, TODAY)}
-    assert results["example-national-fellowship"] == POSSIBLE   # other_rules
+    assert results["example-national-fellowship"] == ELIGIBLE   # rules to confirm
     assert results["example-clinical-rolling"] == NOT_ELIGIBLE  # clinical, GB
     assert results["example-international-postdoc"] == ELIGIBLE
 
@@ -388,8 +392,8 @@ def test_membership_is_always_for_the_user_to_check():
     f = fellowship(category="travel", membership="the British Society for Immunology",
                    membership_min_months=12)
     m = match(f, Researcher(career_level="postdoc"), TODAY)
-    assert m.status == POSSIBLE
-    assert "membership of the British Society for Immunology for at least 12 months" in texts(m)
+    assert [r.text for r in m.to_confirm] == [
+        "Requires membership of the British Society for Immunology for at least 12 months."]
 
 
 def test_travel_grant_plan_is_shorter():

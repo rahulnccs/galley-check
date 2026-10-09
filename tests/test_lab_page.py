@@ -50,16 +50,83 @@ def page(lab):
     return LabPage(lab[1], today=TODAY)
 
 
-def test_orders_tab_shows_open_orders_and_what_is_stuck(app, lab):
+def sheet_items(p):
+    from galley.gui.lab_sheet import KEYS
+    col = KEYS.index("item")
+    return [p.sheet.item(r, col).text() for r in range(p.sheet.rowCount())]
+
+
+def test_orders_are_a_spreadsheet_with_the_lab_sheet_columns(app, lab):
+    from galley.gui.app import Tile
     p = page(lab)
-    shown = texts(p.current)
-    assert "Nayak Lab" in shown and "NEEDS ATTENTION" in shown
-    assert "Ordered 37 days ago, not received yet" in shown
-    assert "Filter tips" in shown and "Plates" in shown
-    assert "OPEN ORDERS · 2" in shown and "$379.50" in shown
-    assert p.attention_count() == 1
-    p._set_filter("received")
-    assert "Lab tape" in texts(p.current) and "Plates" not in texts(p.current)
+    assert "Nayak Lab" in texts(p.current)
+    headers = [p.sheet.horizontalHeaderItem(c).text() for c in range(p.sheet.columnCount())]
+    assert headers[:8] == ["Status", "Date Requested", "Date Approved", "Approved By",
+                           "Date Ordered", "Account", "Item Name", "Requested By"]
+    assert sorted(sheet_items(p)) == ["Filter tips", "Lab tape", "Plates"]
+    tiles = {t.key: t.text() for t in p.current.findChildren(Tile)}
+    assert set(tiles) == {"requested", "approved", "ordered"}      # no Open / Received
+    assert "1 order needs attention" in " ".join(
+        b.text() for b in p.current.findChildren(__import__(
+            "PySide6.QtWidgets", fromlist=["QPushButton"]).QPushButton))
+    p._set_filter("ordered")
+    assert sheet_items(p) == ["Filter tips"]
+    p._set_filter("ordered")                                   # again: everything
+    assert len(sheet_items(p)) == 3
+
+
+def test_new_row_is_typed_into_the_sheet_and_saved(app, lab):
+    from galley.gui.lab_sheet import KEYS
+    p = page(lab)
+    o = p.new_row()
+    assert p.sheet.rows[0] is o and o.requested_by == "Rahul"
+    assert len(load_orders(lab[0])) == 3                       # nothing saved yet
+    p.sheet.commit(0, KEYS.index("item"), "Filter tips")      # known: filled in
+    saved = {x.id: x for x in load_orders(lab[0])}[o.id]
+    assert saved.vendor == "USA Scientific" and saved.unit_price == 63.25
+    p.sheet.commit(0, KEYS.index("qty"), "2")
+    p.sheet.commit(0, KEYS.index("received"), "2026-10-09")
+    assert p.sheet.item(0, KEYS.index("total")).text() == "$126.50"
+    assert p.sheet.item(0, KEYS.index("received")).text() == "9 Oct 2026"
+    from PySide6.QtWidgets import QMessageBox
+    warned = []
+    QMessageBox.warning = staticmethod(lambda *a: warned.append(a[2]))
+    assert not p.sheet.commit(0, KEYS.index("unit_price"), "lots")
+    assert warned and {x.id: x for x in load_orders(lab[0])}[o.id].unit_price == 63.25
+
+
+def test_status_cell_moves_the_order_on(app, lab):
+    from PySide6.QtWidgets import QApplication
+    from galley.gui.lab_sheet import KEYS
+    p = page(lab)
+    r = sheet_items(p).index("Plates")
+    p.sheet.commit(r, KEYS.index("status"), "approved")
+    QApplication.processEvents()                               # the deferred redraw
+    saved = {o.item: o for o in load_orders(lab[0])}
+    assert (saved["Plates"].status, saved["Plates"].approved_by) == ("approved", "Rahul")
+
+
+def test_columns_can_be_renamed_for_the_whole_lab(app, lab):
+    from galley.lab import load_lab
+    p = page(lab)
+    p.rename_column("account", "System")
+    assert p.sheet.horizontalHeaderItem(5).text() == "System"
+    assert load_lab(lab[0]).columns == {"account": "System"}
+    assert page(lab).sheet.horizontalHeaderItem(5).text() == "System"
+    p.rename_column("account", "")
+    assert p.sheet.horizontalHeaderItem(5).text() == "Account"
+
+
+def test_a_new_tracker_starts_with_example_rows_once(app, tmp_path):
+    from galley.gui.lab_page import LabPage
+    me = tmp_path / "me.json"
+    save_me(Me("Rahul", str(tmp_path / "new-lab")), me)
+    p = LabPage(me, today=TODAY)
+    assert len(p.orders) == 6 and all(o.example for o in p.orders)
+    assert {o.status for o in p.orders} == {"requested", "approved", "ordered", "received"}
+    p.remove_examples()
+    assert p.orders == []
+    assert LabPage(me, today=TODAY).orders == []                # not added again
 
 
 def test_menu_offers_next_steps_and_marking_received_records_where(app, lab):
@@ -67,17 +134,15 @@ def test_menu_offers_next_steps_and_marking_received_records_where(app, lab):
     tips = next(o for o in p.orders if o.item == "Filter tips")
     names = [i[0] for i in p.order_menu_items(tips)]
     assert names[:2] == ["Mark as Received…", "Back-ordered"]
-    assert "Approve" not in names and "Order Again" in names
+    assert "Approve" not in names and "Order Again" in names and "Edit…" not in names
     plates = next(o for o in p.orders if o.item == "Plates")
     assert [i[0] for i in p.order_menu_items(plates)][:2] == ["Approve", "Mark as Ordered"]
-
-    p.move(plates, "approved")
-    saved = {o.item: o for o in load_orders(lab[0])}
-    assert saved["Plates"].approved_by == "Rahul"
     p.move(tips, "received", location="-20 °C", sublocation="box 3")
     saved = {o.item: o for o in load_orders(lab[0])}
     assert (saved["Filter tips"].status, saved["Filter tips"].location) == ("received", "-20 °C")
     assert p.attention_count() == 0
+    p.reorder(saved["Filter tips"])
+    assert sheet_items(p)[0] == "Filter tips" and len(load_orders(lab[0])) == 4
 
 
 def test_inventory_finds_where_things_are(app, lab):

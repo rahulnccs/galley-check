@@ -13,7 +13,7 @@ from datetime import date
 from PySide6.QtCore import QDate, QObject, QRectF, QSize, Qt, QThread, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QFontDatabase, QPainter
 from PySide6.QtWidgets import (
-    QAbstractButton, QComboBox, QDateEdit, QGraphicsDropShadowEffect, QDialog, QDialogButtonBox,
+    QAbstractButton, QCalendarWidget, QComboBox, QDateEdit, QGraphicsDropShadowEffect, QDialog, QDialogButtonBox,
     QFileDialog, QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit,
     QMessageBox, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy,
     QSpinBox, QStackedWidget, QVBoxLayout, QWidget,
@@ -26,7 +26,7 @@ from ..fellowships import (ELIGIBLE, NOT_ELIGIBLE, POSSIBLE, STATUSES,
                            save_applications, start_application)
 from ..fellowships.application_check import FAIL, PASS, WARN
 from ..fellowships.application_check import INFO as NOTE
-from ..fellowships.match import INFO, MET, NOT_MET, UNSURE
+from ..fellowships.match import CHECK, INFO, MET, NOT_MET, UNSURE
 from ..fellowships.update import fetch_updates, last_updated
 from ..fellowships.model import (FIELDS, Researcher, Stay,
                                  delete_custom_fellowship, load_researcher,
@@ -60,12 +60,13 @@ STATUS_COLOR = {ELIGIBLE: SOFT["green"], POSSIBLE: SOFT["amber"],
                 NOT_ELIGIBLE: SOFT["red"]}
 STATUS_LABEL = {ELIGIBLE: "Eligible", POSSIBLE: "Check", NOT_ELIGIBLE: "Not eligible"}
 REASON_MARK = {MET: ("✓", SOFT["green"]), NOT_MET: ("✕", SOFT["red"]),
-               UNSURE: ("?", SOFT["amber"]), INFO: ("i", SOFT["blue"])}
+               UNSURE: ("?", SOFT["amber"]), INFO: ("i", SOFT["blue"]),
+               CHECK: ("!", SOFT["indigo"])}
 FINDING_MARK = {PASS: MET, FAIL: NOT_MET, WARN: UNSURE, NOTE: INFO}
 URGENCY_COLOR = {"overdue": SOFT["red"], "changed": SOFT["amber"],
                  "soon": SOFT["amber"], "upcoming": SOFT["blue"]}
 # The three tabs, in order.
-PROFILE, MATCHES, APPLICATIONS = 0, 1, 2
+PROFILE, MATCHES, APPLICATIONS, CALENDAR = 0, 1, 2, 3
 
 # A colour per application stage, in the same soft palette.
 STAGE_COLOR = {"planning": SOFT["blue"], "submitted": SOFT["indigo"],
@@ -391,6 +392,63 @@ class Picker(QPushButton):
         menu.move(pos.x() - menu.width() + 14, pos.y() - 4)
         menu.show()
         self._menu = menu                               # keep it alive while open
+
+
+class DateButton(QPushButton):
+    """A date shown in blue that opens a calendar when clicked, like the iOS
+    date picker. It has the parts of QDateEdit's interface the screens use."""
+    dateChanged = Signal(QDate)
+
+    def __init__(self, value: QDate | None = None):
+        super().__init__()
+        self.setObjectName("picker")
+        self.setCursor(Qt.PointingHandCursor)
+        self.setStyleSheet(f"#picker {{ color:{APPLE['blue']}; background:transparent; "
+                           f"border:none; font-size:15px; font-weight:500; "
+                           f"padding:6px 2px; text-align:right; }}"
+                           f"#picker:hover {{ color:{APPLE['label']}; }}")
+        self._date = value if value is not None and value.isValid() else QDate.currentDate()
+        self._show()
+        self.clicked.connect(self._open)
+
+    def date(self) -> QDate:
+        return self._date
+
+    def setDate(self, value: QDate):
+        if not value.isValid():
+            return
+        changed = value != self._date
+        self._date = value
+        self._show()
+        if changed:
+            self.dateChanged.emit(value)
+
+    def _show(self):
+        self.setText(f"{self._date.toString('d MMM yyyy')}  \u25BE")
+
+    def _open(self):
+        popup = QFrame(self, Qt.Popup | Qt.FramelessWindowHint)
+        popup.setStyleSheet(f"QFrame {{ background:white; border:1px solid {APPLE['fill']}; "
+                            f"border-radius:12px; }}")
+        lay = QVBoxLayout(popup)
+        lay.setContentsMargins(8, 8, 8, 8)
+        cal = QCalendarWidget()
+        cal.setGridVisible(False)
+        cal.setVerticalHeaderFormat(QCalendarWidget.NoVerticalHeader)
+        cal.setSelectedDate(self._date)
+        lay.addWidget(cal)
+
+        def chosen(d):
+            self.setDate(d)
+            popup.close()
+        cal.clicked.connect(chosen)
+        cal.activated.connect(chosen)
+        popup.adjustSize()
+        pos = self.mapToGlobal(self.rect().bottomRight())
+        popup.move(pos.x() - popup.width() + 14, pos.y() - 4)
+        popup.show()
+        self._popup = popup                             # keep it alive while open
+        self.calendar = cal
 
 
 class Card(QFrame):
@@ -723,6 +781,7 @@ class FellowshipsPage(QWidget):
         self.show_examples = False      # the invented entries, for trying Galley
         self.status_filter = "all"      # Matches tile selected
         self.stage_filter = "all"       # Applications tile selected
+        self.cal_scope = 0              # Calendar: my applications only
         self._update_thread: QThread | None = None
         self.update_note = ""           # result of the last "Check for Updates"
         self.reload_data()
@@ -747,7 +806,7 @@ class FellowshipsPage(QWidget):
         self.title = label("Fellowships", "largeTitle")
         col.addWidget(self.title)
         seg_row = QHBoxLayout()
-        self.tabs = Segmented(["Profile", "Matches", "Applications"])
+        self.tabs = Segmented(["Profile", "Matches", "Applications", "Calendar"])
         self.tabs.changed.connect(self._tab_changed)
         seg_row.addWidget(self.tabs)
         seg_row.addStretch(1)
@@ -801,6 +860,7 @@ class FellowshipsPage(QWidget):
         self.tab_stack.addWidget(self._profile_tab())       # PROFILE
         self.tab_stack.addWidget(self._matches_tab())       # MATCHES
         self.tab_stack.addWidget(self._applications_tab())  # APPLICATIONS
+        self.tab_stack.addWidget(self._calendar_tab())      # CALENDAR
         self.tabs.select(tab, emit=False)
         self.tab_stack.setCurrentIndex(tab)
         n = self.attention_count()
@@ -910,6 +970,9 @@ class FellowshipsPage(QWidget):
                 tl.setContentsMargins(0, 0, 0, 0)
                 if f.id in self.apps:
                     tl.addWidget(label("Added", "rowSubtitle"))
+                n = len(m.to_confirm)
+                if n and status != NOT_ELIGIBLE:
+                    tl.addWidget(label(f"{n} to confirm", "rowSubtitle"))
                 tl.addWidget(pill(STATUS_LABEL[status], STATUS_COLOR[status]))
                 row = card.add(Row(f.name, sub, trailing=trailing, tappable=True))
                 row.clicked.connect(lambda f=f: self.open_fellowship(f.id))
@@ -997,23 +1060,34 @@ class FellowshipsPage(QWidget):
 
         page.header("Eligibility")
         card = page.add(Card())
-        for r in m.reasons or []:
+        checked = [r for r in m.reasons if r.outcome != CHECK]
+        for r in checked:
             card.add(Row(r.text, leading=mark(r.outcome), plain=True))
-        if not m.reasons:
+        if not checked:
             card.add(Row("No eligibility rules are listed.", leading=mark(INFO),
                          plain=True))
+        confirm = m.to_confirm
+        if confirm:
+            page.header(f"Also confirm · {len(confirm)}")
+            card = page.add(Card())
+            for r in confirm:
+                card.add(Row(r.text, leading=mark(CHECK), plain=True))
+            page.footnote("Galley can't check these from your profile. Read them "
+                          "against the funder's page before you apply.")
 
         if f.deadlines or f.rolling:
             page.header("Dates")
             card = page.add(Card())
             if f.rolling:
                 card.add(Row("Open all year"))
-            for d in f.deadlines:
-                if d.date < self.today:
-                    continue
+            upcoming = [d for d in f.deadlines if d.date >= self.today]
+            # With nothing upcoming, show the last call's dates as a guide.
+            for d in upcoming or [d for d in f.deadlines if d.kind == "final"][-1:]:
                 name = d.label or DEADLINE_LABEL.get(d.kind, d.kind)
                 extra = " (estimated)" if d.estimated else ""
                 tz = f" {d.time} {d.timezone or ''}".rstrip() if d.time else ""
+                if not upcoming:
+                    name = f"Last call: {name.lower()}"
                 card.add(Row(name, f"{day(d.date, '%B %Y')}{tz}{extra} · "
                                    f"{countdown(d.date, self.today)}"))
 
@@ -1221,6 +1295,131 @@ class FellowshipsPage(QWidget):
         page.finish()
         return page
 
+    # -- Calendar ------------------------------------------------------------
+    def _calendar_tab(self) -> QWidget:
+        from PySide6.QtGui import QBrush, QTextCharFormat
+
+        from ..fellowships.calendar import KIND_LABEL, deadline_events
+        page = ScrollPage()
+        scope = Segmented(["My applications", "Everything I can apply for"])
+        scope.select(self.cal_scope, emit=False)
+        scope.changed.connect(self._calendar_scope)
+        holder = QWidget()
+        hl = QHBoxLayout(holder)
+        hl.setContentsMargins(0, 4, 0, 4)
+        hl.addWidget(scope)
+        hl.addStretch(1)
+        page.add(holder)
+
+        matches = None
+        if self.cal_scope == 1:
+            real = [f for f in self.fellowships if not f.template]
+            matches = match_all(real, self.researcher, self.today)
+        events = deadline_events(self.fellowships, self.apps, matches)
+        self.calendar_events = events
+
+        cal = QCalendarWidget()
+        cal.setGridVisible(False)
+        cal.setVerticalHeaderFormat(QCalendarWidget.NoVerticalHeader)
+        cal.setMinimumHeight(330)
+        today = QDate(self.today.year, self.today.month, self.today.day)
+        cal.setSelectedDate(today)
+        by_day: dict = {}
+        for e in events:
+            by_day.setdefault(e.date, []).append(e)
+        for d, es in by_day.items():
+            fmt = QTextCharFormat()
+            fmt.setBackground(QBrush(QColor(STAGE_COLOR["planning"] if any(e.mine for e in es)
+                                            else SOFT["green"])))
+            fmt.setForeground(QBrush(QColor("white")))
+            fmt.setFontWeight(700)
+            fmt.setToolTip("\n".join(e.title for e in es))
+            cal.setDateTextFormat(QDate(d.year, d.month, d.day), fmt)
+        card = page.add(Card())
+        box = QWidget()
+        bl = QVBoxLayout(box)
+        bl.setContentsMargins(10, 8, 10, 8)
+        bl.addWidget(cal)
+        card.add(box)
+        page.footnote("Blue: your applications · green: fellowships you could "
+                      "apply for. Click a day to see what's due.")
+        self.calendar = cal
+
+        list_header = label("", "sectionHeader")
+        list_header.setContentsMargins(16, 14, 0, 2)
+        page.add(list_header)
+        list_holder = page.add(QWidget())
+        ll = QVBoxLayout(list_holder)
+        ll.setContentsMargins(0, 0, 0, 0)
+
+        def fill(year: int, month: int, only: date | None = None):
+            while ll.count():
+                w = ll.takeAt(0).widget()
+                if w is not None:
+                    w.deleteLater()
+            shown = [e for e in events if (e.date == only if only else
+                                           (e.date.year, e.date.month) == (year, month))]
+            title = day(only) if only else f"{date(year, month, 1):%B %Y}"
+            list_header.setText(f"{title.upper()} · {len(shown)}")
+            c = Card()
+            ll.addWidget(c)
+            if not shown:
+                c.add(Row("Nothing due" + (" that day" if only else " this month"),
+                          "Deadlines of your applications appear here."
+                          if self.cal_scope == 0 else
+                          "Deadlines of fellowships you're eligible for appear here."))
+            for e in shown:
+                sub = f"{KIND_LABEL[e.kind]} · {day(e.date)} · {countdown(e.date, self.today)}"
+                if e.estimated:
+                    sub += " · estimated"
+                name = e.title.split(": ", 1)[-1]
+                row = Row(name, sub, leading=dot(STAGE_COLOR["planning"] if e.mine
+                                                 else SOFT["green"]), tappable=True)
+                if e.mine:
+                    row.clicked.connect(lambda e=e: self.open_application(e.fellowship_id))
+                else:
+                    row.clicked.connect(lambda e=e: self.open_fellowship(e.fellowship_id))
+                c.add(row)
+        cal.currentPageChanged.connect(lambda y, m: fill(y, m))
+        cal.clicked.connect(lambda d: fill(d.year(), d.month(), d.toPython()))
+        fill(self.today.year, self.today.month)
+        self.calendar_fill = fill
+
+        page.header("")
+        card = page.add(Card())
+        export = Row("Add to My Calendar (.ics)…", title_color=APPLE["blue"],
+                     tappable=True)
+        export.clicked.connect(self.export_calendar)
+        card.add(export)
+        page.footnote("Saves the upcoming deadlines shown here as a file that "
+                      "Apple Calendar, Google Calendar and Outlook can import, "
+                      "each with a reminder a week before.")
+        page.finish()
+        return page
+
+    def _calendar_scope(self, i: int):
+        self.cal_scope = i
+        self.refresh(CALENDAR)
+
+    def calendar_ics(self) -> str:
+        from ..fellowships.calendar import to_ics
+        upcoming = [e for e in self.calendar_events if e.date >= self.today]
+        return to_ics(upcoming, {f.id: f.url for f in self.fellowships if f.url})
+
+    def export_calendar(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Save the deadlines",
+                                              "fellowship-deadlines.ics",
+                                              "Calendar files (*.ics)")
+        if not path:
+            return
+        try:
+            with open(path, "w", encoding="utf-8", newline="") as fh:
+                fh.write(self.calendar_ics())
+        except OSError as e:
+            QMessageBox.warning(self, "Couldn't save", str(e))
+            return
+        QDesktopServices.openUrl(QUrl.fromLocalFile(path))   # opens the calendar app
+
     def _acknowledge(self, fid: str):
         app, f = self.apps[fid], self.by_id[fid]
         nxt = f.next_deadline(self.today)
@@ -1257,11 +1456,8 @@ class FellowshipsPage(QWidget):
             status.addItem(APP_STATUS_LABEL[s], s, STAGE_COLOR[s])
         status.setCurrentIndex(STATUSES.index(app.status))
         card.add(field_row("Stage", status))
-        interview = QDateEdit()
-        interview.setCalendarPopup(True)
-        interview.setDisplayFormat("d MMM yyyy")
-        interview.setDate(QDate.fromString(app.interview_date, "yyyy-MM-dd")
-                          if app.interview_date else QDate.currentDate())
+        interview = DateButton(QDate.fromString(app.interview_date, "yyyy-MM-dd")
+                               if app.interview_date else QDate.currentDate())
         interview_row = card.add(field_row("Interview date", interview))
         Card.show_row(interview_row, app.status == "interview")
 
@@ -1419,13 +1615,9 @@ class FellowshipsPage(QWidget):
         self.p_phd_state.addItems(["Awarded", "In progress", "Not set"])
         self.p_phd_state.setCurrentIndex(0 if r.phd_date else 1 if r.phd_expected else 2)
         phd_row = card.add(field_row("PhD", self.p_phd_state))
-        self.p_phd_date = QDateEdit()
-        self.p_phd_date.setCalendarPopup(True)
-        self.p_phd_date.setDisplayFormat("d MMM yyyy")
         when = r.phd_date or r.phd_expected
-        self.p_phd_date.setDate(QDate(when.year, when.month, when.day) if when
-                                else QDate.currentDate())
-        self.p_phd_date.setObjectName("valueEditor")
+        self.p_phd_date = DateButton(QDate(when.year, when.month, when.day) if when
+                                     else QDate.currentDate())
         self.p_phd_label = QLabel()
         date_row = QWidget()
         dl = QHBoxLayout(date_row)
