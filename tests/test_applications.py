@@ -349,3 +349,20 @@ def test_pdf_pages_text_size_and_margins(tmp_path):
     assert (FAIL, "4 pages, over the 3-page limit.") in bad
     assert any(o == FAIL and "9 pt" in t for o, t in bad)
     assert any(o == FAIL and "Margins are narrower" in t for o, t in bad)
+
+
+def test_furthest_stage_bands_and_funnel():
+    from galley.fellowships.tracker import Application, funnel
+    prep = Application("a")
+    lost = Application("b")
+    for st in ("submitted", "shortlisted", "interview", "not_funded"):
+        lost.set_status(st, date(2026, 5, 1))
+    won = Application("c", status="awarded")          # outcome only: was submitted
+    review = Application("d")
+    review.set_status("submitted", date(2026, 9, 1))
+    assert [x.furthest_stage() for x in (prep, lost, won, review)] == [-1, 2, 0, 0]
+    assert [x.band for x in (prep, lost, won, review)] == ["preparing", "unsuccessful",
+                                                          "awarded", "pending"]
+    f = funnel([prep, lost, won, review])
+    assert (f.total, f.submitted, f.shortlisted, f.interview, f.awarded) == (4, 3, 1, 1, 1)
+    assert f.success_rate == 0.5

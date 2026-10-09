@@ -180,7 +180,14 @@ silently assumed. Every entry links to the funder's own page.
 **Applications.** Add a fellowship to **My Applications** to get a preparation
 plan worked back from its deadline (contact host labs, start drafting, get
 feedback, final check), track its stage from preparing to awarded, and keep
-notes. Whenever you open Galley, a banner lists steps that are overdue or
+notes. Your applications are shown as a pipeline: one row each, grouped into
+Preparing, Pending, Awarded and Unsuccessful, with a dot for every stage it
+reached (submitted, shortlisted, interview). An award ends in a filled circle;
+an unsuccessful application in a cross, reached by a dashed line from where
+it stopped, so you can see how far each one got. A result note ("Top 15%",
+"Decision Dec 2026") shows at the end of its row, and a line above sums it
+up: how many were submitted, shortlisted, interviewed and awarded, and your
+success rate. Whenever you open Galley, a banner lists steps that are overdue or
 coming up, and deadlines that have moved.
 
 **Calendar.** A month calendar with your applications' deadlines and

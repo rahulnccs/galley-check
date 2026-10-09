@@ -27,6 +27,7 @@ from ..fellowships import (ELIGIBLE, NOT_ELIGIBLE, POSSIBLE, STATUSES,
 from ..fellowships.application_check import FAIL, PASS, WARN
 from ..fellowships.application_check import INFO as NOTE
 from ..fellowships.match import CHECK, INFO, MET, NOT_MET, UNSURE
+from ..fellowships.tracker import BANDS, funnel
 from ..fellowships.update import fetch_updates, last_updated
 from ..fellowships.model import (FIELDS, Researcher, Stay,
                                  delete_custom_fellowship, load_researcher,
@@ -73,13 +74,6 @@ STAGE_COLOR = {"planning": SOFT["blue"], "submitted": SOFT["indigo"],
                "shortlisted": SOFT["amber"], "interview": SOFT["purple"],
                "awarded": SOFT["green"], "not_funded": SOFT["red"],
                "withdrawn": SOFT["grey"]}
-# The Applications tiles group the stages.
-STAGE_GROUPS = [("all", "All", SOFT["all"], None),
-                ("preparing", "Preparing", SOFT["blue"], {"planning"}),
-                ("review", "Under review", SOFT["indigo"],
-                 {"submitted", "shortlisted", "interview"}),
-                ("awarded", "Awarded", SOFT["green"], {"awarded"}),
-                ("closed", "Closed", SOFT["grey"], {"not_funded", "withdrawn"})]
 MATCH_TILES = [("all", "All", SOFT["all"]), (ELIGIBLE, "Eligible", SOFT["green"]),
                (POSSIBLE, "Worth checking", SOFT["amber"]),
                (NOT_ELIGIBLE, "Not eligible", SOFT["red"])]
@@ -581,7 +575,7 @@ def filled_button(text: str) -> QPushButton:
 class ScrollPage(QScrollArea):
     """A scrolling page with a centred column, like an iOS grouped list."""
 
-    def __init__(self):
+    def __init__(self, max_width: int = 720):
         super().__init__()
         self.setWidgetResizable(True)
         self.setFrameShape(QFrame.NoFrame)
@@ -590,7 +584,7 @@ class ScrollPage(QScrollArea):
         outer = QHBoxLayout(body)
         outer.setContentsMargins(20, 12, 20, 28)
         column = QWidget()
-        column.setMaximumWidth(720)
+        column.setMaximumWidth(max_width)
         self.col = QVBoxLayout(column)
         self.col.setContentsMargins(0, 0, 0, 0)
         self.col.setSpacing(6)
@@ -780,7 +774,6 @@ class FellowshipsPage(QWidget):
         self.category_filter: str | None = None     # None = all categories
         self.show_examples = False      # the invented entries, for trying Galley
         self.status_filter = "all"      # Matches tile selected
-        self.stage_filter = "all"       # Applications tile selected
         self.cal_scope = 0              # Calendar: my applications only
         self._update_thread: QThread | None = None
         self.update_note = ""           # result of the last "Check for Updates"
@@ -1035,10 +1028,6 @@ class FellowshipsPage(QWidget):
         self.status_filter = key
         self.refresh(MATCHES)
 
-    def _filter_stage(self, key: str):
-        self.stage_filter = key
-        self.refresh(APPLICATIONS)
-
     def _filter_category(self, index: int):
         self.category_filter = CATEGORY_FILTERS[index]
         self.refresh(MATCHES)
@@ -1237,12 +1226,44 @@ class FellowshipsPage(QWidget):
 
     # -- Applications --------------------------------------------------------
     def _applications_tab(self) -> QWidget:
-        page = ScrollPage()
+        # Wider than the other tabs: the chart needs room for its stages.
+        page = ScrollPage(max_width=1040)
+        apps = [a for a in self.apps.values() if a.fellowship_id in self.by_id]
+        page.header("My applications")
+        if not apps:
+            card = page.add(Card())
+            card.add(Row("No applications yet",
+                         "Open a fellowship in Matches and choose Add to My "
+                         "Applications."))
+        else:
+            f = funnel(apps)
+            steps = [f"{f.total} application{'s' if f.total != 1 else ''}",
+                     f"{f.submitted} submitted"]
+            if f.shortlisted:
+                steps.append(f"{f.shortlisted} shortlisted")
+            if f.interview:
+                steps.append(f"{f.interview} interviewed")
+            steps.append(f"{f.awarded} awarded")
+            summary = " → ".join(steps[1:])
+            rate = (f" · {f.success_rate:.0%} success rate ({f.awarded} of "
+                    f"{f.decided} decided)" if f.success_rate is not None else "")
+            page.add(label(f"{steps[0]}: {summary}{rate}", "secondary", wrap=True))
+            from .pipeline_chart import PipelineChart
+            card = page.add(Card())
+            self.pipeline = PipelineChart(self._chart_rows(apps))
+            self.pipeline.rowClicked.connect(self.open_application)
+            card.add(self.pipeline)
+            page.footnote("Dots mark the stages each application reached. A cross "
+                          "is an unsuccessful outcome, reached by a dashed line from "
+                          "where it stopped; a filled circle an award. Click a row "
+                          "to open the application, and add a result note (“Top "
+                          "15%”, “Decision Dec 2026”) there.")
+
         found = self.current_reminders()
         if found:
             page.header("Coming up")
             card = page.add(Card())
-            for r in found:
+            for r in found[:5]:
                 if r.urgency == "changed":
                     sub = f"{r.fellowship} · tap to acknowledge"
                 else:
@@ -1254,35 +1275,9 @@ class FellowshipsPage(QWidget):
                     row.clicked.connect(lambda r=r: self._acknowledge(r.fellowship_id))
                 else:
                     row.clicked.connect(lambda r=r: self.open_application(r.fellowship_id))
-
-        apps_all = [a for a in self.apps.values() if a.fellowship_id in self.by_id]
-        if apps_all:
-            counts = {key: sum(1 for a in apps_all if stages is None or a.status in stages)
-                      for key, _, _, stages in STAGE_GROUPS}
-            page.add(tile_row([(k, t, c) for k, t, c, _ in STAGE_GROUPS], counts,
-                              self.stage_filter, self._filter_stage))
-        page.header("My applications")
-        card = page.add(Card())
-        wanted = dict((k, st) for k, _, _, st in STAGE_GROUPS)[self.stage_filter]
-        apps = [a for a in apps_all if wanted is None or a.status in wanted]
-        if not apps_all:
-            card.add(Row("No applications yet",
-                         "Open a fellowship in Matches and choose Add to My "
-                         "Applications."))
-        elif not apps:
-            card.add(Row("None at this stage", "Choose All to see every application."))
-        order = {s: i for i, s in enumerate(STATUSES)}
-        for a in sorted(apps, key=lambda a: (order[a.status],
-                                             self.by_id[a.fellowship_id].name)):
-            f = self.by_id[a.fellowship_id]
-            nxt = f.next_deadline(self.today)
-            sub = (f"Deadline {day(nxt.date)} · {countdown(nxt.date, self.today)}"
-                   if nxt else "No upcoming deadline")
-            color = STAGE_COLOR[a.status]
-            row = card.add(Row(f.name, sub,
-                               trailing=pill(APP_STATUS_LABEL[a.status], color),
-                               tappable=True))
-            row.clicked.connect(lambda a=a: self.open_application(a.fellowship_id))
+            if len(found) > 5:
+                card.add(Row(f"{len(found) - 5} more coming up",
+                             "Open an application to see its whole plan."))
 
         page.header("")
         card = page.add(Card())
@@ -1294,6 +1289,45 @@ class FellowshipsPage(QWidget):
                       "internal fellowship. Saved on this computer only.")
         page.finish()
         return page
+
+    def _chart_rows(self, apps) -> list:
+        from .pipeline_chart import ChartRow
+        order = {b: i for i, (b, _) in enumerate(BANDS)}
+
+        def when(a):
+            return a.status_dates.get(a.status) or a.started or ""
+
+        def key(a):
+            f = self.by_id[a.fellowship_id]
+            nxt = f.next_deadline(self.today)
+            if a.band == "preparing":
+                return (order[a.band], nxt.date.isoformat() if nxt else "9999", f.name)
+            if a.band == "pending":
+                return (order[a.band], -a.furthest_stage(), when(a), f.name)
+            try:                                # newest outcome first
+                day_no = date.fromisoformat(when(a)[:10]).toordinal()
+            except ValueError:
+                day_no = 0
+            return (order[a.band], -day_no, f.name)
+
+        rows = []
+        for a in sorted(apps, key=key):
+            f = self.by_id[a.fellowship_id]
+            year = (when(a) or self.today.isoformat())[:4]
+            sub = " · ".join(x for x in (CATEGORY_LABEL[f.category], f.funder, year) if x)
+            note = a.outcome_note
+            if a.band == "preparing":
+                nxt = f.next_deadline(self.today)
+                note = (f"Deadline {day(nxt.date)} · {countdown(nxt.date, self.today)}"
+                        if nxt else "Open all year" if f.rolling else
+                        "No deadline announced")
+            elif a.band == "pending" and not note:
+                if a.status == "interview" and a.interview_date:
+                    note = f"Interview {day(date.fromisoformat(a.interview_date))}"
+                elif when(a):
+                    note = f"{APP_STATUS_LABEL[a.status]} {day(date.fromisoformat(when(a)[:10]))}"
+            rows.append(ChartRow(f.id, f.name, sub, a.band, a.furthest_stage(), note))
+        return rows
 
     # -- Calendar ------------------------------------------------------------
     def _calendar_tab(self) -> QWidget:
@@ -1473,6 +1507,16 @@ class FellowshipsPage(QWidget):
             app.interview_date = d.toPython().isoformat()
             self.save_apps()
         interview.dateChanged.connect(interview_changed)
+
+        result = QLineEdit(app.outcome_note)
+        result.setPlaceholderText("e.g. Top 15%, Scored 82%, Decision Dec 2026")
+        result.setMinimumWidth(260)
+        card.add(field_row("Result note", result))
+
+        def result_changed():
+            app.outcome_note = result.text().strip()
+            self.save_apps()
+        result.editingFinished.connect(result_changed)
 
         req = f.requirements
         if req and req.documents:

@@ -17,6 +17,14 @@ from .timeline import plan
 STATUSES = ["planning", "submitted", "shortlisted", "interview",
             "awarded", "not_funded", "withdrawn"]
 ACTIVE = {"planning"}
+# The stages an application can reach before its outcome, in order.
+REVIEW_STAGES = ["submitted", "shortlisted", "interview"]
+# How the Applications chart groups them: what needs work first.
+BANDS = [("preparing", {"planning"}),
+         ("pending", {"submitted", "shortlisted", "interview"}),
+         ("awarded", {"awarded"}),
+         ("unsuccessful", {"not_funded"}),
+         ("withdrawn", {"withdrawn"})]
 FINISHED = {"awarded", "not_funded", "withdrawn"}
 REMIND_WITHIN_DAYS = 42
 
@@ -38,6 +46,23 @@ class Application:
     notes: str = ""
     snoozed_until: dict[str, str] = field(default_factory=dict)  # step -> date
     files: dict[str, str] = field(default_factory=dict)  # document -> path
+    outcome_note: str = ""      # shown at the end of its row: "Top 15%"
+
+    def furthest_stage(self) -> int:
+        """How far the application got: -1 not submitted, 0 submitted,
+        1 shortlisted, 2 interview. An outcome implies it was submitted."""
+        reached = set(self.status_dates) | {self.status}
+        best = -1
+        for i, stage in enumerate(REVIEW_STAGES):
+            if stage in reached:
+                best = i
+        if best < 0 and reached & {"awarded", "not_funded"}:
+            best = 0
+        return best
+
+    @property
+    def band(self) -> str:
+        return next(b for b, statuses in BANDS if self.status in statuses)
 
     def set_status(self, status: str, today: date) -> None:
         if status not in STATUSES:
@@ -157,3 +182,31 @@ def reminders(apps: dict[str, Application], fellowships: list[Fellowship],
 
     order = {"overdue": 0, "changed": 1, "soon": 2, "upcoming": 3}
     return sorted(out, key=lambda r: (order[r.urgency], r.date, r.fellowship))
+
+
+@dataclass
+class Funnel:
+    """How many applications reached each stage, for the summary line."""
+    total: int = 0
+    submitted: int = 0
+    shortlisted: int = 0
+    interview: int = 0
+    awarded: int = 0
+    decided: int = 0            # awarded or not funded
+
+    @property
+    def success_rate(self) -> float | None:
+        return self.awarded / self.decided if self.decided else None
+
+
+def funnel(apps: list[Application]) -> Funnel:
+    f = Funnel(total=len(apps))
+    for a in apps:
+        reached = a.furthest_stage()
+        f.submitted += reached >= 0
+        f.shortlisted += reached >= 1
+        f.interview += reached >= 2
+        f.awarded += a.status == "awarded"
+        f.decided += a.status in ("awarded", "not_funded")
+    return f
+

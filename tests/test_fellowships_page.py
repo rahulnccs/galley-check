@@ -290,16 +290,26 @@ def test_match_tiles_count_and_filter(app, settings):
     assert not [h for k, h in heading.items() if k != key and h in shown]
 
 
-def test_application_tiles_group_the_stages(app, settings):
-    from galley.gui.app import Tile
+def test_applications_are_a_pipeline_chart(app, settings):
+    from galley.gui.pipeline_chart import PipelineChart
     page = make_page(app)
     page._add_application("example-international-postdoc")
-    page.apps["example-international-postdoc"].set_status("interview", TODAY)
+    a = page.apps["example-international-postdoc"]
+    a.set_status("submitted", TODAY)
+    a.set_status("shortlisted", TODAY)
+    a.set_status("not_funded", TODAY)
+    a.outcome_note = "Top 15%"
     page._add_application("example-travel-grant")
     page.refresh(APPLICATIONS)
-    tiles = {t.key: t.text().split()[0]
-             for t in page.tab_stack.widget(APPLICATIONS).findChildren(Tile)}
-    assert tiles == {"all": "2", "preparing": "1", "review": "1",
-                     "awarded": "0", "closed": "0"}
-    page._filter_stage("awarded")
-    assert "None at this stage" in texts(page.tab_stack.widget(APPLICATIONS))
+    tab = page.tab_stack.widget(APPLICATIONS)
+    [chart] = tab.findChildren(PipelineChart)
+    rows = {r.key: r for r in chart.rows}
+    lost = rows["example-international-postdoc"]
+    assert (lost.band, lost.reached, lost.note) == ("unsuccessful", 1, "Top 15%")
+    prep = rows["example-travel-grant"]
+    assert prep.band == "preparing" and chart.rows[0] is prep      # work first
+    assert "2 applications: 1 submitted → 1 shortlisted → 0 awarded" in texts(tab)
+    opened = []
+    chart.rowClicked.connect(opened.append)
+    chart.rowClicked.emit(prep.key)
+    assert opened == ["example-travel-grant"]
