@@ -35,6 +35,15 @@ shown as "worth checking", never "eligible".
 The list is licensed under [CC BY 4.0](fellowships/LICENSE): you may reuse it
 with credit.
 
+## The journal list
+
+[`journals/`](journals/) holds the requirements of the life-science journals
+Galley checks manuscripts against: word limits, structured abstracts,
+required sections, reference style. **Check for Updates** in the journal
+list downloads the latest version from here. Journals not yet checked
+against their author guidelines say so, and their limits are reported as
+"not yet confirmed".
+
 ## Feedback
 
 Found a fellowship that's out of date, or a check that got something wrong?

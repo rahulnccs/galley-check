@@ -1,0 +1,13 @@
+{
+  "id": "genome-research",
+  "name": "Genome Research",
+  "publisher": "Cold Spring Harbor Laboratory Press",
+  "article_type": "Research",
+  "guidelines_url": "https://genome.cshlp.org/site/misc/ifora.xhtml",
+  "verified": null,
+  "limits": {
+    "abstract_words": 250
+  },
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

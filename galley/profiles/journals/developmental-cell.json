@@ -1,0 +1,22 @@
+{
+  "id": "developmental-cell",
+  "name": "Developmental Cell",
+  "publisher": "Cell Press",
+  "article_type": "Article",
+  "guidelines_url": "https://www.cell.com/developmental-cell/authors",
+  "verified": null,
+  "limits": {
+    "abstract_words": 150,
+    "figures": 7
+  },
+  "required_sections": [
+    "Highlights",
+    "STAR Methods",
+    "Key resources table",
+    "Resource availability",
+    "Author contributions",
+    "Declaration of interests"
+  ],
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

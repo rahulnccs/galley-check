@@ -1,0 +1,17 @@
+{
+  "id": "journal-of-neuroscience",
+  "name": "The Journal of Neuroscience",
+  "publisher": "Society for Neuroscience",
+  "article_type": "Research Article",
+  "guidelines_url": "https://www.jneurosci.org/content/information-authors",
+  "verified": null,
+  "limits": {
+    "title_words": 50,
+    "abstract_words": 250
+  },
+  "required_sections": [
+    "Significance statement"
+  ],
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

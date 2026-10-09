@@ -13,9 +13,9 @@ from pathlib import Path
 
 from PySide6.QtCore import (
     QObject, QSettings, QSize, Qt, QThread, QTimer, QUrl, Signal)
-from PySide6.QtGui import QBrush, QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
+    QApplication, QFileDialog, QFrame, QHBoxLayout, QLabel, QLineEdit,
     QListView, QListWidget,
     QListWidgetItem, QMainWindow, QMessageBox, QProgressBar, QPushButton,
     QMenu, QSizePolicy, QSplitter, QToolButton,
@@ -23,10 +23,11 @@ from PySide6.QtWidgets import (
 )
 
 from ..checks.offline.submission import (
-    PROFILE_DIR, Profile, available_profiles, delete_profile, is_user_profile)
+    Profile, available_profiles, delete_profile, is_user_profile)
 from ..report.compare_versions import compare, highlight, summarize
 from ..report.compare_versions import default_output_path as changes_path
 from .journal_dialog import JournalDialog
+from .journal_picker import JournalPicker
 from ..engine import load, run_checks
 from ..model.document import SEVERITY_ORDER, Document, Issue
 from ..report.docx_comments import annotate, default_output_path
@@ -39,10 +40,7 @@ INK_SOFT = "#6B7480"     # secondary text
 PAPER = "#F2F3F5"        # window background
 SHEET = "#FFFFFF"        # surfaces
 RULE = "#DEE1E6"         # borders
-# Tints for the journal list, so each kind of row reads differently.
-ROW_NONE = "#EDEFF2"     # "No journal limits"
-ROW_JOURNAL = "#E7EFFA"  # a saved journal
-ROW_ACTION = "#FBEEF2"   # "Enter journal requirements…"
+ROW_JOURNAL = "#E7EFFA"  # the journal button
 GREEN_INK = "#3E7BC4"    # primary action
 
 TILE = {
@@ -282,12 +280,19 @@ class StartPage(QWidget):
         path_row.addWidget(go)
 
         profile_row = QHBoxLayout()
-        self.profile_label = QLabel("No journal limits")
+        self.profile_label = QLabel("")
         self.profile_label.setObjectName("muted")
-        self.journal_box = QComboBox()
-        self.journal_box.setMinimumWidth(190)
-        self.journal_box.addItem("No journal limits", None)
-        self.journal_box.currentIndexChanged.connect(self._journal_chosen)
+        self.profile_label.setWordWrap(True)
+        self.profile_label.setOpenExternalLinks(True)
+        self.journal_button = QPushButton("No journal limits  \u25BE")
+        self.journal_button.setObjectName("journalButton")
+        self.journal_button.setCursor(Qt.PointingHandCursor)
+        self.journal_button.setMinimumWidth(240)
+        self.journal_button.setStyleSheet(
+            f"#journalButton {{ background:{ROW_JOURNAL}; border:none; border-radius:8px; "
+            f"padding:7px 12px; text-align:left; font-weight:600; }}"
+            f"#journalButton:hover {{ background:#D6E4F7; }}")
+        self.journal_button.clicked.connect(self.choose_journal)
         self.edit_profile = QPushButton("Edit")
         self.edit_profile.setCursor(Qt.PointingHandCursor)
         self.edit_profile.clicked.connect(self._edit_profile)
@@ -298,7 +303,7 @@ class StartPage(QWidget):
         self.remove_profile.hide()
         profile_row.setSpacing(8)
         profile_row.addWidget(QLabel("Journal:"))
-        profile_row.addWidget(self.journal_box, 1)
+        profile_row.addWidget(self.journal_button, 1)
         profile_row.addWidget(self.edit_profile)
         profile_row.addWidget(self.remove_profile)
 
@@ -327,55 +332,72 @@ class StartPage(QWidget):
         lay.addWidget(self.message)
         lay.addStretch(2)
         outer.addWidget(col, alignment=Qt.AlignHCenter)
-        self._rebuild_journal_box()
+        self._set_profile(None)
         self._restore_last_profile()
 
-    def _journal_chosen(self, index: int):
-        value = self.journal_box.itemData(index)
-        if value == "new":
-            self._new_profile()
+    def choose_journal(self):
+        """Pick from the journal list, or enter one that isn't listed."""
+        picker = JournalPicker(self, self.profile)
+        if picker.exec() != JournalPicker.Accepted:
             return
-        self.profile = value
-        self._describe_profile()
+        if picker.wants_new:
+            self._new_profile()
+        else:
+            self._set_profile(picker.chosen)
 
     def _new_profile(self):
         """Fill in a journal's requirements by hand, and keep them."""
         dialog = JournalDialog(self)
         if dialog.exec() != JournalDialog.Accepted or not dialog.saved_path:
-            self.journal_box.setCurrentIndex(0)
             return
         try:
-            self.profile = Profile.load(dialog.saved_path)
+            self._set_profile(Profile.load(dialog.saved_path))
         except (OSError, ValueError) as e:
             self.show_error(f"The profile was saved but couldn't be read: {e}")
-            self.journal_box.setCurrentIndex(0)
-            return
-        self._rebuild_journal_box(select=self.profile)
+
+    def _set_profile(self, profile: Profile | None):
+        self.profile = profile
+        self.journal_button.setText(
+            f"{profile.label if profile else 'No journal limits'}  \u25BE")
+        self._describe_profile()
 
     def _describe_profile(self):
-        """Say how old the profile is; a stale limit is worse than none."""
+        """Say where the rules came from and whether they've been checked; a
+        stale limit is worse than none."""
         mine = self.profile is not None and is_user_profile(self.profile)
-        self.edit_profile.setVisible(mine)
+        self.edit_profile.setVisible(self.profile is not None)
+        self.edit_profile.setText("Edit" if mine else "Correct…")
+        self.edit_profile.setToolTip(
+            "" if mine else "Save your own corrected copy of these requirements")
         self.remove_profile.setVisible(mine)
         if self.profile is None:
-            self.profile_label.setText("")
+            self.profile_label.setText("Galley counts words, references and figures "
+                                       "without comparing them with a journal.")
             self._remember(None)
             return
         self._remember(self.profile)
         age = self.profile.months_old
         if age is None:
-            note = "no verification date"
+            note = ("<span style='color:#9A6200'>Requirements not yet confirmed "
+                    "against the journal's guidelines</span>")
         elif age > 12:
-            note = f"verified {self.profile.verified} — may be out of date"
+            note = (f"<span style='color:#9A6200'>Checked {self.profile.verified}, "
+                    f"over a year ago: may be out of date</span>")
         else:
-            note = f"verified {self.profile.verified}"
+            note = f"<span style='color:#2E7D4F'>✓ Checked {self.profile.verified}</span>"
+        if self.profile.guidelines_url:
+            note += (f" · <a href='{self.profile.guidelines_url}'>author guidelines</a>")
         self.profile_label.setText(note)
 
     def _edit_profile(self):
-        """Change a journal's requirements; limits move, and typos happen."""
+        """Change a journal's requirements: limits move, and typos happen. A
+        listed journal is corrected into the user's own copy."""
         if self.profile is None:
             return
-        dialog = JournalDialog(self, profile=self.profile)
+        mine = is_user_profile(self.profile)
+        stem = self.profile.path.stem if self.profile.path else None
+        dialog = JournalDialog(self, profile=self.profile,
+                               filename=None if mine else stem)
         if dialog.exec() != JournalDialog.Accepted or not dialog.saved_path:
             return
         try:
@@ -384,11 +406,9 @@ class StartPage(QWidget):
             self.show_error(f"The profile was saved but couldn't be read: {e}")
             return
         # A rename writes a new file; drop the old one so it isn't listed twice.
-        if (self.profile.path and dialog.saved_path != self.profile.path
-                and is_user_profile(self.profile)):
+        if (mine and self.profile.path and dialog.saved_path != self.profile.path):
             delete_profile(self.profile)
-        self.profile = updated
-        self._rebuild_journal_box(select=updated)
+        self._set_profile(updated)
 
     def _remove_profile(self):
         if self.profile is None:
@@ -397,38 +417,19 @@ class StartPage(QWidget):
         answer = QMessageBox.question(
             self, "Remove journal",
             f"Remove the requirements you saved for {name}?\n\n"
-            f"This deletes the profile file. Your manuscript is not affected.",
+            f"This deletes your profile file; if {name} is in Galley's journal "
+            f"list, the listed requirements are used again. Your manuscript is "
+            f"not affected.",
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if answer != QMessageBox.Yes:
             return
         if not delete_profile(self.profile):
             self.show_error(f"{name} couldn't be removed.")
             return
-        self.profile = None
-        self._rebuild_journal_box()
-
-    def _rebuild_journal_box(self, select: Profile | None = None):
-        """Refresh the dropdown after a profile is added, edited or removed."""
-        self.journal_box.blockSignals(True)
-        self.journal_box.clear()
-        self.journal_box.addItem("No journal limits", None)
-        self.journal_box.setItemData(0, QBrush(QColor(ROW_NONE)), Qt.BackgroundRole)
-        chosen = 0
-        for profile in available_profiles():
-            self.journal_box.addItem(profile.name, profile)
-            row = self.journal_box.count() - 1
-            self.journal_box.setItemData(row, QBrush(QColor(ROW_JOURNAL)),
-                                         Qt.BackgroundRole)
-            if select is not None and profile.path == select.path:
-                chosen = row
-        self.journal_box.insertSeparator(self.journal_box.count())
-        self.journal_box.addItem("Enter journal requirements\u2026", "new")
-        self.journal_box.setItemData(self.journal_box.count() - 1,
-                                     QBrush(QColor(ROW_ACTION)), Qt.BackgroundRole)
-        self.journal_box.setCurrentIndex(chosen)
-        self.journal_box.blockSignals(False)
-        self.profile = self.journal_box.itemData(chosen) if chosen else None
-        self._describe_profile()
+        stem = self.profile.path.stem if self.profile.path else None
+        listed = [p for p in available_profiles()
+                  if stem and p.path is not None and p.path.stem == stem]
+        self._set_profile(listed[0] if listed else None)
 
     def _remember(self, profile: Profile | None):
         """Keep the last journal, so a second manuscript doesn't need re-picking."""
@@ -446,8 +447,7 @@ class StartPage(QWidget):
             profile = Profile.load(Path(str(path)))
         except (OSError, ValueError):
             return
-        self.profile = profile
-        self._rebuild_journal_box(select=profile)
+        self._set_profile(profile)
 
     def _check_path(self):
         text = self.path_edit.text().strip().strip('"').strip("'")

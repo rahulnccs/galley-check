@@ -1,0 +1,13 @@
+{
+  "id": "isme-journal",
+  "name": "The ISME Journal",
+  "publisher": "Oxford University Press",
+  "article_type": "Original Article",
+  "guidelines_url": "https://academic.oup.com/ismej/pages/general-instructions",
+  "verified": null,
+  "limits": {
+    "abstract_words": 250
+  },
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

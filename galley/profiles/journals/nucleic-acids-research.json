@@ -1,0 +1,16 @@
+{
+  "id": "nucleic-acids-research",
+  "name": "Nucleic Acids Research",
+  "publisher": "Oxford University Press",
+  "article_type": "Research Article",
+  "guidelines_url": "https://academic.oup.com/nar/pages/ms_prep_gen",
+  "verified": null,
+  "limits": {
+    "abstract_words": 200
+  },
+  "required_sections": [
+    "Data availability"
+  ],
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

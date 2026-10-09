@@ -1,0 +1,17 @@
+{
+  "id": "embo-journal",
+  "name": "The EMBO Journal",
+  "publisher": "EMBO Press",
+  "article_type": "Article",
+  "guidelines_url": "https://www.embopress.org/page/journal/14602075/authorguide",
+  "verified": null,
+  "limits": {
+    "abstract_words": 175
+  },
+  "required_sections": [
+    "Data availability",
+    "Author contributions"
+  ],
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

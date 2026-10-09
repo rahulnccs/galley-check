@@ -1,0 +1,21 @@
+{
+  "id": "frontiers-in-microbiology",
+  "name": "Frontiers in Microbiology",
+  "publisher": "Frontiers",
+  "article_type": "Original Research",
+  "guidelines_url": "https://www.frontiersin.org/guidelines/author-guidelines",
+  "verified": null,
+  "limits": {
+    "abstract_words": 350,
+    "main_text_words": 12000,
+    "keywords": 8,
+    "display_items": 15
+  },
+  "required_sections": [
+    "Data availability statement",
+    "Author contributions",
+    "Conflict of interest"
+  ],
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

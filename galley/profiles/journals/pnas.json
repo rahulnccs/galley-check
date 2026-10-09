@@ -1,0 +1,18 @@
+{
+  "id": "pnas",
+  "name": "PNAS",
+  "publisher": "National Academy of Sciences",
+  "article_type": "Research Report",
+  "guidelines_url": "https://www.pnas.org/author-center/submitting-your-manuscript",
+  "verified": null,
+  "limits": {
+    "title_chars": 135,
+    "abstract_words": 250,
+    "keywords": 5
+  },
+  "required_sections": [
+    "Significance"
+  ],
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

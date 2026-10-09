@@ -1,0 +1,18 @@
+{
+  "id": "bioinformatics",
+  "name": "Bioinformatics",
+  "publisher": "Oxford University Press",
+  "article_type": "Original Paper",
+  "guidelines_url": "https://academic.oup.com/bioinformatics/pages/instructions_for_authors",
+  "verified": null,
+  "limits": {
+    "abstract_words": 150
+  },
+  "abstract_headings": [
+    "Motivation",
+    "Results",
+    "Availability and implementation"
+  ],
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

@@ -109,7 +109,7 @@ def test_profile_provenance_is_reported():
 
 def test_profile_with_no_date_warns():
     issues = check_submission(make_doc(BODY), Profile(name="Test Journal"))
-    assert any(i.severity == "warning" and "no verification date" in i.message
+    assert any(i.severity == "warning" and "haven't been checked" in i.message
                for i in issues)
 
 

@@ -1,0 +1,17 @@
+{
+  "id": "plos-genetics",
+  "name": "PLOS Genetics",
+  "publisher": "PLOS",
+  "article_type": "Research Article",
+  "guidelines_url": "https://journals.plos.org/plosgenetics/s/submission-guidelines",
+  "verified": null,
+  "limits": {
+    "title_chars": 250,
+    "abstract_words": 300
+  },
+  "required_sections": [
+    "Author summary"
+  ],
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

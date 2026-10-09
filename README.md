@@ -52,26 +52,37 @@ expect an abbreviation to be defined once in each.
 - Reference, figure and table counts
 - Anything over a journal's limit, and any required section that's missing
 
-Choose **Journal → Enter journal requirements…** and fill in what the journal
-asks for: abstract, main text and total word limits, title length, maximum
-references and display items, required sections, the citation style, how many
-authors an entry lists before "et al.", and whether every reference needs a DOI.
-Anything left blank isn't checked.
+Choose the journal next to **Journal:** on the first screen. The list is
+searchable by journal or publisher and covers about 50 life-science journals
+(the Nature and Cell Press journals, Science, PNAS, eLife, PLOS, Frontiers,
+BMC, ASM, EMBO, Oxford journals and more). For each, Galley checks the word
+limits (title, abstract, main text, whole manuscript), the title length in
+characters, the number of keywords, references, figures and tables, the
+headings of a structured abstract, required sections and statements (data
+availability, competing interests, STAR Methods...), the citation style,
+authors before "et al." and DOIs.
 
-The profile is saved under your user folder and appears in the dropdown next
-time, so you fill it in once per journal. Galley remembers the last journal you
-used, and profiles you made can be edited or removed from the same row.
-Profiles are small JSON files, so you can share one with your lab, or pass it on
-the command line with `--profile myjournal.json`.
+Problems are pointed out in the manuscript itself: for a word limit, the
+sentence where the limit is reached is highlighted, so you can see what
+would have to go; an over-long title, a keywords line with too many entries,
+or the first reference or figure past a limit is marked where it is. Click a
+finding to jump to it.
 
-Every profile records the date its rules were checked and a link to the
-journal's own guidelines, and Galley reports both. A profile with no date, or
-one older than a year, produces a warning rather than quietly implying its
-numbers are current.
+Every journal records the date its requirements were last checked against
+the journal's author guidelines, and links to them. The list is being built:
+entries not yet checked say so, their limits are marked "not yet confirmed",
+and a missing section is a warning rather than an error. **Check for
+Updates** in the journal list downloads the latest version.
 
-Galley ships a template rather than real journals, because a stale limit is
-worse than none, and there is no way for the app to know when a journal changed
-its rules. Profiles for journals you submit to are welcome as pull requests.
+**Another journal.** Choose **Another Journal…** to enter the requirements of
+a journal that isn't listed, from its author guidelines. If a listed journal's
+requirements are wrong, choose **Correct…** to save your own copy, which then
+takes the listed one's place for you. Your journals are small JSON files in
+your user folder, so you can share one with your lab, or pass it on the
+command line with `--profile myjournal.json`. To suggest a journal for the
+list, fill in
+[`templates/journal-database-template.xlsx`](templates/journal-database-template.xlsx)
+or open an issue.
 
 **Comparing two versions**
 

@@ -1,0 +1,21 @@
+{
+  "id": "nature-cell-biology",
+  "name": "Nature Cell Biology",
+  "publisher": "Springer Nature",
+  "article_type": "Article",
+  "guidelines_url": "https://www.nature.com/ncb/submission-guidelines",
+  "verified": null,
+  "limits": {
+    "abstract_words": 150,
+    "references": 50,
+    "display_items": 8
+  },
+  "required_sections": [
+    "Methods",
+    "Data availability",
+    "Author contributions",
+    "Competing interests"
+  ],
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

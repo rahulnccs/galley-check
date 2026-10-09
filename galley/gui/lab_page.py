@@ -25,7 +25,7 @@ from ..lab import (STATUS_LABEL, Lab, Order, advance, attention, delete_order,
                    save_me, save_order, spend, total)
 from ..lab.model import month_start, months_back
 from .fellowships_page import (APPLE, SOFT, Card, Row, ScrollPage, Segmented,
-                               apple_font, apple_stylesheet, day, dot,
+                               apple_font, apple_stylesheet, day,
                                field_row, filled_button, label, pill,
                                plain_button, tile_row)
 from .lab_sheet import OrderSheet

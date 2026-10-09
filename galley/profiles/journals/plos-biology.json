@@ -1,0 +1,14 @@
+{
+  "id": "plos-biology",
+  "name": "PLOS Biology",
+  "publisher": "PLOS",
+  "article_type": "Research Article",
+  "guidelines_url": "https://journals.plos.org/plosbiology/s/submission-guidelines",
+  "verified": null,
+  "limits": {
+    "title_chars": 250,
+    "abstract_words": 300
+  },
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

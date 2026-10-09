@@ -1,0 +1,13 @@
+{
+  "id": "molecular-biology-evolution",
+  "name": "Molecular Biology and Evolution",
+  "publisher": "Oxford University Press",
+  "article_type": "Article",
+  "guidelines_url": "https://academic.oup.com/mbe/pages/general-instructions",
+  "verified": null,
+  "limits": {
+    "abstract_words": 250
+  },
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

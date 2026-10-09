@@ -1,0 +1,27 @@
+{
+  "id": "bmc-biology",
+  "name": "BMC Biology",
+  "publisher": "BMC (Springer Nature)",
+  "article_type": "Research",
+  "guidelines_url": "https://bmcbiol.biomedcentral.com/submission-guidelines/preparing-your-manuscript/research",
+  "verified": null,
+  "limits": {
+    "abstract_words": 350,
+    "keywords": 10
+  },
+  "abstract_headings": [
+    "Background",
+    "Results",
+    "Conclusions"
+  ],
+  "required_sections": [
+    "Availability of data and materials",
+    "Competing interests",
+    "Funding",
+    "Authors' contributions",
+    "Ethics approval and consent to participate",
+    "Consent for publication"
+  ],
+  "reference_style": "numbered",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}

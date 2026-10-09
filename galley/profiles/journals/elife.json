@@ -1,0 +1,17 @@
+{
+  "id": "elife",
+  "name": "eLife",
+  "publisher": "eLife Sciences",
+  "article_type": "Research Article",
+  "guidelines_url": "https://reviewer.elifesciences.org/author-guide/full",
+  "verified": null,
+  "limits": {
+    "abstract_words": 150
+  },
+  "required_sections": [
+    "Materials and methods",
+    "Data availability"
+  ],
+  "reference_style": "author_year",
+  "notes": "Pre-filled from the journal's usual requirements for research articles; not yet checked against its current guidelines. Confirm before relying on it."
+}
