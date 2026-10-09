@@ -72,7 +72,8 @@ def test_clicking_a_sample_offers_its_folders(app, setup, monkeypatch):
     from galley.gui import projects_page as pp
     monkeypatch.setattr(pp.QDesktopServices, "openUrl", lambda url: opened.append(url))
     items[0][3]()
-    assert opened and opened[0].toLocalFile() == str(data)
+    from pathlib import Path
+    assert opened and Path(opened[0].toLocalFile()) == data   # \ or / per OS
 
 
 def test_missing_folder_is_reported_not_opened(app, setup, monkeypatch):
