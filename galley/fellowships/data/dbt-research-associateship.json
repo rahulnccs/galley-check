@@ -1,0 +1,58 @@
+{
+  "id": "dbt-research-associateship",
+  "name": "DBT Research Associateship (DBT-RA)",
+  "funder": "Department of Biotechnology (DBT), Government of India",
+  "url": "https://ra.dbtindia.gov.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-04-13",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-05-12",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Fellowship per DBT norms (not stated in the 2026 call summary; confirm on the call notice)",
+  "duration_months": 24,
+  "other_rules": [
+    "PhD in science/engineering or MD/MS with research interest in biotechnology or life sciences (thesis-submitted candidates may apply)",
+    "age limit 40 for men and 45 for women",
+    "can be availed only once",
+    "tenable only in India",
+    "cannot work with PhD/MD/MS supervisor or at the institution where that degree was earned",
+    "employed candidates must resign if selected"
+  ],
+  "notes": "2026 call ran 13 Apr to 12 May 2026; next call expected around the same time. Initial 2 years, extendable to 4 years in exceptional cases. Mentor consent letter and referee letters uploaded on the portal. Details from a Biotecnika summary of the official call (fellowships.gov.in/documents/DBT_RA_CALL_MARCH_2026.pdf); confirm amount and dates there.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Mentor consent letter",
+        "notes": "Format on the fellowships.gov.in portal"
+      },
+      {
+        "name": "Recommendation letters",
+        "notes": "Uploaded by referees on the portal before the deadline"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://fellowships.gov.in/"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "id": "dbt-ramalingaswami-re-entry",
+  "name": "Ramalingaswami Re-entry Research Programme (formerly Ramalingaswami Re-entry Fellowship, RRF)",
+  "funder": "Department of Biotechnology (DBT), Government of India",
+  "url": "https://rcb.res.in/RRF/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "min_years_since_phd": 3
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2025-01-28",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2025-03-15",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 1,35,000/month consolidated + Rs 13 lakh/year research support grant + Rs 50,000/year overhead to host",
+  "duration_months": 36,
+  "other_rules": [
+    "Indian citizens only",
+    "upper age limit 45 years on the closing date",
+    "at least 3 years of postdoctoral research experience in overseas laboratories (min_years_since_phd is used as a proxy)",
+    "must currently work overseas, or have returned to India within 1 year of the closing date (2 years for women) without holding a permanent position",
+    "research areas: life sciences, biotechnology, bioengineering, human/animal health, agricultural/veterinary biotechnology, bioenergy and allied areas"
+  ],
+  "notes": "Dates are from the 2024-25 call (opened 28 Jan 2025, closed 28 Feb 2025, extended to 15 Mar 2025); no new call announced as of 8 Oct 2026. Renamed \"Research Programme\" by DBT notice of 17 Jun 2026, with no change to eligibility or funding. 3 years, extendable by 2 years after fresh appraisal (up to 60 months). Managed by DBT-HRD PMU at RCB Faridabad (rrf.dbt@rcb.res.in). On taking a permanent post the fellowship component stops but the research grant continues.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Research proposal",
+        "template_url": "https://rcb.res.in/RRF/formats.php",
+        "notes": "Detailing the proposed research work"
+      },
+      {
+        "name": "Certificate by host institute",
+        "template_url": "https://rcb.res.in/RRF/formats.php",
+        "notes": "Mandatory; application rejected without it"
+      },
+      {
+        "name": "Details of research contribution"
+      },
+      {
+        "name": "Reprints of 5 best publications",
+        "notes": "First page only"
+      },
+      {
+        "name": "Letters of recommendation"
+      },
+      {
+        "name": "Undertaking / statement from current employer",
+        "notes": "Certifies the applicant does not hold a permanent position in India, if applicable"
+      }
+    ],
+    "cv_format": "funder_template",
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://fellowships.gov.in/"
+  }
+}

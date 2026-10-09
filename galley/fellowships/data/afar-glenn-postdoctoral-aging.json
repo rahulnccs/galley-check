@@ -1,0 +1,37 @@
+{
+  "id": "afar-glenn-postdoctoral-aging",
+  "name": "Glenn Foundation for Medical Research Postdoctoral Fellowship in Aging Research",
+  "funder": "Glenn Foundation for Medical Research / American Federation for Aging Research (AFAR)",
+  "url": "https://www.afar.org/grants/glenn-postdoc",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "molecular_cell_biology"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "pre_proposal",
+      "date": "2026-01-27",
+      "estimated": true
+    }
+  ],
+  "amount": "USD 80,000 (at least USD 62,652 to salary)",
+  "duration_months": 12,
+  "other_rules": [
+    "Postdocs (MD, PhD or equivalent) at any training level, degree held by the LOI deadline",
+    "more than 5 years of postdoc training must be justified",
+    "research at a US non-profit",
+    "not NIH intramural staff, not in labs funded by a Paul F. Glenn Center, not former awardees"
+  ],
+  "notes": "Biology of aging. 2026 cycle: LOI 27 Jan 2026, full applications by invitation in late June; next cycle expected on a similar schedule. Up to 12 awards; possible second year through a Continuation Award.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "embl-ebi-cambridge-ebpod",
+  "name": "EMBL-EBI / Cambridge Computational Biomedical Postdoctoral Fellowship (EBPOD)",
+  "funder": "EMBL-EBI and University of Cambridge",
+  "url": "https://ecrcentral.org/fundings/embl-ebi-cambridge-computational-biomedical-postdoctoral-fellowships/",
+  "verified": "2026-10-08",
+  "fields": [
+    "bioinformatics",
+    "biomedical_clinical"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "GB"
+  ],
+  "amount": "EMBL stipend rates (details given at interview)",
+  "duration_months": 36,
+  "other_rules": [
+    "Open worldwide",
+    "computational projects in medicine, health sciences or computational biology, co-supervised by EMBL-EBI and the University of Cambridge clinical school"
+  ],
+  "notes": "Annual call, usually closing in July (exact date not found). 2-3 fellowships a year. Sister schemes: ESPOD (with Sanger) and ETPOD (with IIT, Italy).",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

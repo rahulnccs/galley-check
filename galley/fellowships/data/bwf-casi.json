@@ -1,0 +1,42 @@
+{
+  "id": "bwf-casi",
+  "name": "Burroughs Wellcome Fund Career Award at the Scientific Interface (CASI)",
+  "funder": "Burroughs Wellcome Fund (BWF)",
+  "url": "https://www.bwfund.org/grants/interfaces-in-science/career-awards-at-the-scientific-interface/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "min_years_since_phd": 1,
+    "max_years_since_phd": 5
+  },
+  "deadlines": [
+    {
+      "kind": "pre_proposal",
+      "date": "2026-08-14"
+    },
+    {
+      "kind": "final",
+      "date": "2027-01-11",
+      "time": "15:00",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "USD 560,000 over 5 years",
+  "duration_months": 60,
+  "other_rules": [
+    "US and Canadian citizens, permanent residents and temporary residents",
+    "12-60 months of postdoc experience",
+    "PhD in mathematics, physics, chemistry, computer science, statistics or engineering (biology PhDs only with approval)",
+    "at least one first-author paper",
+    "US or Canadian non-profit",
+    "no tenure-track appointment or K99/R00"
+  ],
+  "notes": "Bridges advanced postdoc training and the first 3 years of faculty. 2027 cycle: LOI 14 Aug 2026 (passed), full proposals by invitation 11 Jan 2027.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

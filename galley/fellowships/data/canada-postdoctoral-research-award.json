@@ -1,0 +1,33 @@
+{
+  "id": "canada-postdoctoral-research-award",
+  "name": "Canada Postdoctoral Research Award (CPRA)",
+  "funder": "Government of Canada tri-agency (CIHR, NSERC, SSHRC)",
+  "url": "https://www.nserc-crsng.gc.ca/Students-Etudiants/PD-NP/cpra-bprc_eng.asp",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3,
+    "career_breaks_extend": true
+  },
+  "host_countries": [
+    "CA"
+  ],
+  "amount": "CAD 70,000/year",
+  "duration_months": 24,
+  "other_rules": [
+    "Doctorate completed no more than 3 years before 1 September of the application year (extensions for career interruptions, caregiving, industry work, clinical training)",
+    "non-Canadians must have a Canadian doctorate or be doing postdoc research at a Canadian institution at the deadline (up to 20% of awards)",
+    "held abroad only by Canadian citizens/PRs with a Canadian doctorate",
+    "no tenure-track position",
+    "no previous tri-agency postdoc award or Banting",
+    "up to 3 applications"
+  ],
+  "notes": "Replaces the Banting Postdoctoral Fellowship and the separate CIHR, NSERC and SSHRC postdoctoral fellowships (Banting's last competition was 2024). Deadline not shown on the NSERC page; usually in autumn, with earlier internal institutional deadlines. Results by 31 March.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

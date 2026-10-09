@@ -1,0 +1,51 @@
+{
+  "id": "dst-inspire-faculty-fellowship",
+  "name": "DST INSPIRE Faculty Fellowship",
+  "funder": "Department of Science and Technology (DST), Government of India",
+  "url": "https://online-inspire.gov.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2025-08-15",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2025-09-14",
+      "time": "23:59",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 1,25,000/month consolidated (Rs 2,000 annual increment) + Rs 7 lakh/year research grant",
+  "duration_months": 60,
+  "other_rules": [
+    "Indian citizens and Persons of Indian Origin",
+    "age 32 or under on 1 January of the call year (37 for SC/ST/women, 42 for benchmark disability)",
+    "at least 60% marks from Class 12 onwards",
+    "PhD awarded or thesis submitted",
+    "no permanent academic or research position",
+    "contractual staff in India must resign on selection",
+    "publications in reputed journals expected"
+  ],
+  "notes": "2025 call ran 15 Aug to 14 Sep 2025; a 2026 call was not found. Open to applicants abroad who are Indian citizens or PIO. Fellows can later apply for the SERB Research Scientist scheme. Details from a Biotecnika summary of the 2025 call.",
+  "requirements": {
+    "cv_format": "funder_template",
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://online-inspire.gov.in/"
+  }
+}

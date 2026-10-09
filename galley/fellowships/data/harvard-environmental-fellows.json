@@ -1,0 +1,36 @@
+{
+  "id": "harvard-environmental-fellows",
+  "name": "Harvard University Center for the Environment Environmental Fellows",
+  "funder": "Harvard University Center for the Environment (HUCE)",
+  "url": "https://environment.harvard.edu/environmental-fellows-program",
+  "verified": "2026-10-08",
+  "fields": [
+    "ecology_evolution"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-12-01",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "USD 92,000/year salary + USD 2,500/year professional allowance + up to USD 2,500 relocation",
+  "duration_months": 24,
+  "other_rules": [
+    "Doctorate awarded within the window set for the cohort (2027 cohort: May 2023 to August 2027)",
+    "research on the environment in any discipline",
+    "Harvard PhDs eligible only if moving into significantly new directions",
+    "needs a Harvard faculty host"
+  ],
+  "notes": "About 5 fellows a year. 2027 cohort deadline 1 Dec 2026.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

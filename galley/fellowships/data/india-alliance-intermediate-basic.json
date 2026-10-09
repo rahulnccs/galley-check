@@ -1,0 +1,56 @@
+{
+  "id": "india-alliance-intermediate-basic",
+  "name": "India Alliance Intermediate Fellowship in Basic Biomedical Research",
+  "funder": "DBT/Wellcome Trust India Alliance",
+  "url": "https://www.indiaalliance.org/fellowshiptype/basic-biomedical-research-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "min_years_since_phd": 4,
+    "max_years_since_phd": 15
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-03-23",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Personal salary up to Rs 13.8 lakh/year + research funds up to Rs 3.6 crore + collaboration and travel funds",
+  "duration_months": 60,
+  "other_rules": [
+    "No age or nationality restriction",
+    "need not be resident in India when applying but must relocate to and work in India",
+    "hypothesis-driven proposal answering an original biomedical research question within India Alliance remit",
+    "Intermediate usually suits 4-7 years post-PhD (overall SIF window 4-15 years)",
+    "not-for-profit host institution in India and a sponsor there who guarantees space and resources"
+  ],
+  "notes": "Deadline shown is the 2026 preliminary-application round (23 Mar 2026, from a university listing); the next call is not yet announced. Process: preliminary application on IASys, then invited full application with international peer review, then interview. Salary and grant figures come from the ISTI government summary (last updated 2021) because the India Alliance page could not be read automatically; confirm current amounts. No salaried host position required; salary top-up if host already pays a salary. Needs at least one recommendation letter and an official sponsor support letter at full-application stage.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Preliminary application",
+        "notes": "Online form on IASys; full application only if invited"
+      },
+      {
+        "name": "Letter of recommendation",
+        "notes": "At least one"
+      },
+      {
+        "name": "Sponsor support letter",
+        "notes": "Required at full-application stage"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://grants.indiaalliance.org/"
+  }
+}

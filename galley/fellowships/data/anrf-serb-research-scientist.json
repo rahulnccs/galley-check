@@ -1,0 +1,30 @@
+{
+  "id": "anrf-serb-research-scientist",
+  "name": "SERB Research Scientist (SRS) Scheme",
+  "funder": "Anusandhan National Research Foundation (ANRF, formerly SERB), Government of India",
+  "url": "https://serb.gov.in/page/english/awards_fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "rolling": true,
+  "amount": "Rs 1,20,000/month consolidated + Rs 7 lakh/year research grant + Rs 1 lakh/year overhead",
+  "duration_months": 24,
+  "other_rules": [
+    "Open only to INSPIRE Faculty Fellows and Ramanujan Fellows who have completed (or are within 6 months of completing) their 5-year tenure without a regular position",
+    "age limit 40 at application",
+    "can be availed once",
+    "cannot be held at the PhD department or institution"
+  ],
+  "notes": "Bridge after Ramanujan or INSPIRE Faculty. 2 years, extendable by 1 year on performance (3 years maximum). Apply within 6 months before or after the end of the tenure.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "email"
+  }
+}

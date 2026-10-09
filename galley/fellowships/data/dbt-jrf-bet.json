@@ -1,0 +1,50 @@
+{
+  "id": "dbt-jrf-bet",
+  "name": "DBT Junior Research Fellowship via Biotechnology Eligibility Test (DBT-JRF / BET)",
+  "funder": "Department of Biotechnology (DBT), Government of India (exam by NTA)",
+  "url": "https://rcb.res.in/BET/",
+  "verified": "2026-10-08",
+  "category": "phd",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "residence": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-03-19",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-04-09",
+      "time": "17:00",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 37,000/month JRF (2 years) then Rs 42,000/month SRF (3 years) + HRA + Rs 30,000/year contingency",
+  "duration_months": 60,
+  "other_rules": [
+    "Indian citizens residing in India",
+    "relevant master's (MSc/MTech/MVSc/MPharm/MBBS etc.) with 60% (55% SC/ST/PwD)",
+    "age up to 28 (33 SC/ST/PwD/women, 31 OBC-NCL)",
+    "Category I awardees must register for PhD within 2 years"
+  ],
+  "notes": "2026 cycle: applications 19 Mar to 9 Apr 2026, exam 17 May 2026; next cycle expected at the same time. Category II rank holders are eligible for project positions but get no DBT fellowship.",
+  "requirements": {
+    "submission": "portal",
+    "submission_url": "https://exams.nta.nic.in/gat-bet/"
+  }
+}

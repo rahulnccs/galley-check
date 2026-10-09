@@ -1,0 +1,35 @@
+{
+  "id": "ugc-ds-kothari-postdoctoral",
+  "name": "UGC Dr. D. S. Kothari Postdoctoral Fellowship (DSKPDF)",
+  "funder": "University Grants Commission (UGC), Government of India",
+  "url": "https://ugcdskpdf.unipune.ac.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "amount": "Rs 43,400-46,500/month (Rs 46,500 flat for outstanding candidates) + Rs 1 lakh/year contingency",
+  "duration_months": 36,
+  "other_rules": [
+    "Below 35 years (relaxation 3 years OBC, 5 years SC/ST/women, 10 years PwD)",
+    "PhD in a science subject",
+    "tenable only in science departments of Indian universities and UGC inter-university centres (not IITs, CSIR/DRDO/DAE labs or colleges)",
+    "PhD guide cannot be mentor",
+    "postdoc should generally be at a different place from the PhD",
+    "reapply only 1 year after an unsuccessful result"
+  ],
+  "notes": "Annual renewal; maximum 3 years with no extension. Call dates not found (IndiaBioscience listing dates from 2018); check the official portal.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://ugcdskpdf.unipune.ac.in/"
+  }
+}

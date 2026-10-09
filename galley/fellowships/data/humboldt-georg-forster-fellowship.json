@@ -1,0 +1,37 @@
+{
+  "id": "humboldt-georg-forster-fellowship",
+  "name": "Georg Forster Research Fellowship (paused)",
+  "funder": "Alexander von Humboldt Foundation",
+  "url": "https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/georg-forster-research-fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 4,
+    "career_breaks_extend": true
+  },
+  "excluded_nationalities": [
+    "DE",
+    "CN",
+    "IN"
+  ],
+  "host_countries": [
+    "DE"
+  ],
+  "annual": false,
+  "amount": "EUR 3,000/month (postdocs) or EUR 3,600/month (experienced researchers) plus benefits",
+  "duration_months": 24,
+  "other_rules": [
+    "NOT CURRENTLY ACCEPTING APPLICATIONS",
+    "citizens of developing and transition countries on the OECD list, excluding China and India",
+    "lived and worked in an eligible country for at least 12 of the last 18 months",
+    "postdocs within 4 years of PhD, experienced researchers within 12 years"
+  ],
+  "notes": "Humboldt has suspended the programme because of budget cuts and is redesigning it; awards made through 2026 are unaffected. The Humboldt Research Fellowship is the suggested alternative.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

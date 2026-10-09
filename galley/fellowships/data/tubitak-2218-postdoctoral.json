@@ -1,0 +1,28 @@
+{
+  "id": "tubitak-2218-postdoctoral",
+  "name": "TÜBİTAK 2218 National Postdoctoral Research Fellowship",
+  "funder": "Scientific and Technological Research Council of Türkiye (TÜBİTAK)",
+  "url": "https://tubitak.gov.tr/en/scholarships/postdoctoral/research-scholarship-programs/2218-national-postdoctoral-research-fellowship-program",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "TR"
+  ],
+  "amount": "TRY 43,500/month (full) or TRY 11,500/month (partial, depending on other income)",
+  "duration_months": 24,
+  "other_rules": [
+    "Doctorate or medical/dental/pharmacy/veterinary specialty (or about to obtain one)",
+    "research at a state or private university in Türkiye",
+    "check the current call for nationality rules (historically focused on Turkish citizens)"
+  ],
+  "notes": "6-24 months. Call periods not listed; contact bideb2218@tubitak.gov.tr.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

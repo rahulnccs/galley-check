@@ -1,0 +1,28 @@
+{
+  "id": "pnnl-linus-pauling-fellowship",
+  "name": "Linus Pauling Distinguished Postdoctoral Fellowship",
+  "funder": "Pacific Northwest National Laboratory (PNNL)",
+  "url": "https://www.pnnl.gov/pauling",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "host_countries": [
+    "US"
+  ],
+  "amount": "Full funding for an independent research project (salary not stated)",
+  "other_rules": [
+    "PhD within the last 3 years or before the start",
+    "science or engineering related to PNNL missions (energy, environment, national security), which can include biological and environmental sciences",
+    "legal right to work in the US"
+  ],
+  "notes": "FY27 application period opens August 2026; check PNNL careers for the deadline.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "csir-sra-scientists-pool",
+  "name": "CSIR Senior Research Associateship (Scientists' Pool Scheme)",
+  "funder": "Council of Scientific and Industrial Research (CSIR), Government of India",
+  "url": "https://csirhrdg.res.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "min_years_since_phd": 2
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "rolling": true,
+  "amount": "Basic pay Rs 21,000-25,810/month (set by selection board) + DA and HRA as for CSIR staff + Rs 20,000/year contingency",
+  "duration_months": 36,
+  "other_rules": [
+    "Indian scientists without regular employment in India, mainly those returning from abroad",
+    "maximum age 40",
+    "natural-science PhDs need 2 years of postdoc or teaching experience (fresh PhD allowed in pharma, veterinary and engineering)",
+    "medical candidates need MD/MS/MDS plus 2 years of residency or research",
+    "minimum marks and SCI publications required"
+  ],
+  "notes": "Stopgap placement while looking for a permanent post, not a regular appointment. Interviews can be held in absentia for applicants still abroad. Selection takes up to 4 months. Pay figures from an ISTI summary (2021) and likely revised; confirm on csirhrdg.res.in.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

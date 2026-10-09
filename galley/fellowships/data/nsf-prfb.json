@@ -1,0 +1,66 @@
+{
+  "id": "nsf-prfb",
+  "name": "NSF Postdoctoral Research Fellowships in Biology (PRFB)",
+  "funder": "US National Science Foundation (NSF)",
+  "url": "https://www.nsf.gov/funding/opportunities/prfb-postdoctoral-research-fellowships-biology/nsf26-504/solicitation",
+  "verified": "2026-10-08",
+  "fields": [
+    "bioinformatics"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-09-29",
+      "time": "17:00"
+    }
+  ],
+  "amount": "USD 220,000 over 24 months (USD 85,000/year stipend + USD 25,000/year research and training allowance)",
+  "duration_months": 24,
+  "other_rules": [
+    "US citizens, nationals or permanent residents at submission",
+    "doctorate before the fellowship starts",
+    "no more than 15 months in positions requiring a doctorate before the deadline",
+    "two lifetime submissions, one per year",
+    "sponsor must broaden the applicant's research",
+    "2026 solicitation focuses on AI and biology for biotechnology"
+  ],
+  "notes": "Deadlines: 29 Sep 2026, 28 Sep 2027, then the fourth Tuesday of September. About 75 awards. Candidate submits via Research.gov.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Project summary",
+        "max_pages": 1,
+        "notes": "Separate intellectual merit and broader impacts statements"
+      },
+      {
+        "name": "Project description",
+        "max_pages": 6,
+        "notes": "Sections titled Intellectual Merit and Broader Impacts; includes figures"
+      },
+      {
+        "name": "Doctoral research abstract",
+        "max_pages": 1
+      },
+      {
+        "name": "Sponsoring scientist statement",
+        "max_pages": 3,
+        "notes": "Single integrated statement"
+      },
+      {
+        "name": "Reference letters",
+        "max_pages": 3,
+        "notes": "Up to two, each max 3 pages, submitted by referees"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://www.research.gov/"
+  }
+}

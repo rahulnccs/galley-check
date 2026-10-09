@@ -1,0 +1,43 @@
+{
+  "id": "fapesp-postdoctoral-fellowship",
+  "name": "FAPESP Post-Doctoral Fellowship",
+  "funder": "São Paulo Research Foundation (FAPESP)",
+  "url": "https://fapesp.br/en/postdoc",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 7
+  },
+  "host_countries": [
+    "BR"
+  ],
+  "rolling": true,
+  "amount": "Monthly stipend per FAPESP table (fapesp.br/3162) + research overhead (Research Contingency Fund)",
+  "duration_months": 36,
+  "other_rules": [
+    "Any nationality",
+    "PhD (Brazil or abroad) completed less than 7 years ago",
+    "supervisor must be employed at a São Paulo state research institution and have international research experience"
+  ],
+  "notes": "Applications any time (review about 75 days; slower Oct-Jan). Up to 36 months, renewable up to 48 if linked to certain grants. Many positions are advertised through FAPESP Opportunities linked to specific projects.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Data management plan",
+        "max_pages": 2
+      },
+      {
+        "name": "Research project"
+      },
+      {
+        "name": "Letter from head of host institution"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://fapesp.br/sage"
+  }
+}

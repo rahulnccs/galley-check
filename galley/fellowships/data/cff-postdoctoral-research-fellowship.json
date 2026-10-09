@@ -1,0 +1,43 @@
+{
+  "id": "cff-postdoctoral-research-fellowship",
+  "name": "Cystic Fibrosis Foundation Postdoctoral Research Fellowship",
+  "funder": "Cystic Fibrosis Foundation (CFF)",
+  "url": "https://www.cff.org/media/11166/download",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "molecular_cell_biology"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-03-13",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-05-12",
+      "time": "17:00",
+      "timezone": "America/New_York",
+      "estimated": true
+    }
+  ],
+  "amount": "Up to USD 75,000 (year 1) and USD 76,000 (year 2): stipend USD 66,000-67,000 + USD 1,500 travel + USD 7,500 research",
+  "duration_months": 24,
+  "other_rules": [
+    "US citizens, permanent residents, or non-residents working in a US lab",
+    "any stage of the postdoc (preference for recent graduates)",
+    "non-profit or academic institution"
+  ],
+  "notes": "Basic CF research. Spring 2026 cycle closed 12 May 2026; CFF also runs a Postdoc-to-Faculty Transition Award.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

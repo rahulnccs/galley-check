@@ -1,0 +1,50 @@
+{
+  "id": "embl-arise2",
+  "name": "EMBL ARISE2 Postdoctoral Fellowship (Research Infrastructure Scientists)",
+  "funder": "European Molecular Biology Laboratory (EMBL), co-funded by MSCA COFUND",
+  "url": "https://www.embl.org/editorhub/wp-content/uploads/2026/06/2026ARISE2-Guide-For-Applicants.pdf",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-06-30",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-30",
+      "timezone": "Europe/Berlin",
+      "estimated": true
+    }
+  ],
+  "amount": "EMBL postdoctoral fellow salary (monthly, by duty site, with annual increases) + social security and family allowances",
+  "duration_months": 36,
+  "other_rules": [
+    "Open worldwide",
+    "PhD held or defended by the deadline",
+    "prior experience in technology or method development relevant to EMBL research infrastructures",
+    "prior EMBL association no more than 12 months in the 3 years before the deadline"
+  ],
+  "notes": "Trains technology and infrastructure scientists (imaging, structural biology, bioinformatics services etc.). About 17 fellowships per call. 2026 call ran 30 Jun to 30 Sep 2026; interviews late November. Up to 2 host groups and 3 referees. Check whether further calls are planned (contact arise2@embl.org).",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Project proposal",
+        "notes": "Programme template; page limit set in the template"
+      },
+      {
+        "name": "References",
+        "notes": "Up to 3 referees, at least one by the deadline"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

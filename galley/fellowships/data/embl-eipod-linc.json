@@ -1,0 +1,51 @@
+{
+  "id": "embl-eipod-linc",
+  "name": "EMBL EIPOD-LinC Postdoctoral Fellowship (Exploring Life in Context)",
+  "funder": "European Molecular Biology Laboratory (EMBL)",
+  "url": "https://www.embl.org/about/info/postdoctoral-programme/eipod-linc-exploring-life-in-context/eipod-linc-application/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 8,
+    "career_breaks_extend": true
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-11-25"
+    },
+    {
+      "kind": "final",
+      "date": "2027-02-01",
+      "timezone": "Europe/Berlin"
+    }
+  ],
+  "amount": "EMBL postdoctoral fellow salary (monthly, by duty site, with annual increases) + social security and benefits",
+  "duration_months": 36,
+  "other_rules": [
+    "Open worldwide",
+    "PhD held or defended by the call deadline",
+    "no more than 8 years of research experience since the PhD (career breaks and non-research time excluded)",
+    "prior work with the EMBL supervisor or partner lab no more than 12 months in the 3 years before the deadline",
+    "project co-supervised with a partner lab in an EMBL member state (3-12 month secondment)"
+  ],
+  "notes": "Interdisciplinary \"life in context\" projects across EMBL sites (Heidelberg, Hinxton, Grenoble, Hamburg, Barcelona, Rome). 2026 call: webinar 19 Nov 2026, opens 25 Nov 2026, closes 1 Feb 2027; interviews 8-9 Apr 2027; latest start 1 Sep 2027. 3-year contract, extendable to 5. References emailed to EIPOD-references@embl.de by the deadline.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Project proposal",
+        "notes": "Programme template with ethics self-assessment; page limit set in the template"
+      },
+      {
+        "name": "References",
+        "notes": "Emailed to EIPOD-references@embl.de by the deadline"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

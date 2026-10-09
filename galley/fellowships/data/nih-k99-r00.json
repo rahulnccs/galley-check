@@ -1,0 +1,35 @@
+{
+  "id": "nih-k99-r00",
+  "name": "NIH Pathway to Independence Award (K99/R00)",
+  "funder": "US National Institutes of Health (NIH)",
+  "url": "https://grants.nih.gov/grants/guide/pa-files/PA-24-194.html",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2027-02-12",
+      "time": "17:00"
+    }
+  ],
+  "amount": "K99: about USD 90,000-130,000/year total costs (varies by institute); R00: up to USD 249,000/year",
+  "duration_months": 60,
+  "other_rules": [
+    "Any nationality, if in an eligible position at a US research institution (R00 must be at a US institution)",
+    "no more than 4 years of postdoc research experience at application (exceptions for leave or field change)",
+    "must not already hold an independent faculty position"
+  ],
+  "notes": "Postdoc-to-faculty transition: 1-2 years mentored (K99) then up to 3 years independent (R00). New applications due 12 Feb, 12 Jun, 12 Oct; resubmissions 12 Mar, 12 Jul, 12 Nov. Institute-specific rules vary (e.g. NCI early-stage K99).",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

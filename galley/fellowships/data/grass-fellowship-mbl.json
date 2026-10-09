@@ -1,0 +1,26 @@
+{
+  "id": "grass-fellowship-mbl",
+  "name": "Grass Fellowship (Marine Biological Laboratory)",
+  "funder": "Grass Foundation",
+  "url": "https://grassfoundation.org/fellowship-overview",
+  "verified": "2026-10-08",
+  "fields": [
+    "neuroscience"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "amount": "Lab space, animals, equipment and supplies plus housing, meals and travel for the fellow and family",
+  "duration_months": 3.5,
+  "other_rules": [
+    "Early-career investigators from late-stage PhD students upward",
+    "any nationality (non-US applicants need a suitable visa)",
+    "independent neuroscience project at MBL, Woods Hole"
+  ],
+  "notes": "14-week summer residency starting Memorial Day. Deadline not shown on the overview page; contact gfp@grassfoundation.org.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://grassfoundation.org/application-portal/"
+  }
+}

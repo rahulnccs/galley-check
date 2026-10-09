@@ -1,0 +1,31 @@
+{
+  "id": "tata-trusts-travel-grant",
+  "name": "Tata Trusts Travel Grant (Individual Grants Programme)",
+  "funder": "Tata Trusts",
+  "url": "https://www.tatatrusts.org/our-work/individual-grants-programme/travel-grants",
+  "verified": "2026-10-08",
+  "category": "travel",
+  "purpose": "other",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "residence": [
+    "IN"
+  ],
+  "rolling": true,
+  "amount": "Partial travel assistance (amount not published)",
+  "other_rules": [
+    "Indian residents",
+    "for travel abroad for postgraduate or doctoral study, mid-career training programmes, workshops or (for medical professionals) observerships",
+    "some cycles have excluded conference attendance and presentation",
+    "apply 1-2 months before travel"
+  ],
+  "notes": "Current status unclear: the Tata Trusts page did not load and the most recent call found was 2018-19 (via the Goodera portal). ISTI lists conference and seminar travel as eligible, while the 2018-19 call excluded conferences. Confirm with talktous@tatatrusts.org before listing it as open.",
+  "requirements": {
+    "submission": "portal",
+    "submission_url": "https://tatatrusts.goodera.com/"
+  }
+}

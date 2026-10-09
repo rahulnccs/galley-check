@@ -1,0 +1,44 @@
+{
+  "id": "daad-prime-postdoc",
+  "name": "DAAD P.R.I.M.E. - Postdoctoral Researchers International Mobility Experience",
+  "funder": "German Academic Exchange Service (DAAD)",
+  "url": "https://www.daad.de/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 6
+  },
+  "host_countries": [
+    "DE"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2027-01-01",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2027-04-30",
+      "estimated": true
+    }
+  ],
+  "amount": "Salary at TV-L E13 postdoc rate + expatriate allowance + lump-sum travel allowance (incl. family)",
+  "duration_months": 18,
+  "other_rules": [
+    "Any nationality and subject",
+    "at least 3 years of research in Germany within the 5 years before the deadline (PhD time counts)",
+    "doctorate no more than 6 years old (exceptions for parental or care leave)",
+    "long-term career perspective in Germany",
+    "no more than 12 months in the destination country in the 3 years before the deadline",
+    "non-EU applicants must spend the abroad phase within the EU"
+  ],
+  "notes": "Employed by a German university: 12 months abroad then 6 months back in Germany. Portal opens January 2027, closes April 2027 (exact date not confirmed); earliest start 1 Apr 2028. Needs approval from the German university's leadership.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "schmidt-science-fellows",
+  "name": "Schmidt Science Fellows",
+  "funder": "Schmidt Science Fellows (Schmidt Sciences, with the Rhodes Trust)",
+  "url": "https://schmidtsciencefellows.org/selection/who-can-apply/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-05-19",
+      "estimated": true
+    },
+    {
+      "kind": "pre_proposal",
+      "date": "2026-06-01",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-07-13",
+      "estimated": true
+    }
+  ],
+  "amount": "USD 100,000 stipend (per academicpositions.com; confirm current value)",
+  "other_rules": [
+    "Must be nominated by your PhD-awarding institution (a nominating partner)",
+    "PhD requirements, including defence, completed within the window set for each cohort (2027 cohort: 1 May 2026 to 30 Jun 2027)",
+    "PhD in astronomy, biology, chemistry, physics, earth sciences, engineering, mathematics or computing",
+    "fellows must pivot to a new field",
+    "social/political science and economics PhDs and clinical-track MD-PhD or veterinary-PhD applicants typically ineligible"
+  ],
+  "notes": "2027 cohort: institutional nominations by 15 May 2026, preliminary information 1 Jun, full application 13 Jul 2026, interviews Aug 2026 to Feb 2027, selection March 2027, placements start July or October 2027. Placement can be anywhere in the world.",
+  "requirements": {
+    "submission": "institution"
+  }
+}

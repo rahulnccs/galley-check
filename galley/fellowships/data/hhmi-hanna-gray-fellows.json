@@ -1,0 +1,43 @@
+{
+  "id": "hhmi-hanna-gray-fellows",
+  "name": "HHMI Hanna H. Gray Fellows Program",
+  "funder": "Howard Hughes Medical Institute (HHMI)",
+  "url": "https://www.hhmi.org/programs/hanna-h-gray-fellows-program",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-11-03"
+    },
+    {
+      "kind": "final",
+      "date": "2026-12-15",
+      "time": "23:59",
+      "timezone": "America/New_York"
+    }
+  ],
+  "annual": false,
+  "amount": "Salary or stipend by postdoc experience plus support for fellowship expenses",
+  "duration_months": 24,
+  "other_rules": [
+    "Authorized to work in the US for the appointment",
+    "no more than 7 years of postdoc experience by 15 Dec 2026",
+    "in a mentored postdoc at an HHMI-eligible US institution",
+    "must intend to start a tenure-track faculty post at an eligible institution by 1 May 2030",
+    "aimed at people from groups underrepresented in science"
+  ],
+  "notes": "Biennial competition, now combined with the Freeman Hrabowski Scholars Program. 2028 competition opens 3 Nov 2026 and closes 15 Dec 2026; appointments start May-Aug 2028. Fellows who land a faculty job become Hrabowski Scholars.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

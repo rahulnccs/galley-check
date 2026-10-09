@@ -1,0 +1,34 @@
+{
+  "id": "jsps-postdoctoral-fellowship-standard",
+  "name": "JSPS Postdoctoral Fellowship for Research in Japan (Standard)",
+  "funder": "Japan Society for the Promotion of Science (JSPS)",
+  "url": "https://www.jsps.go.jp/english/e-fellow/postdoctoral.html",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 6,
+    "career_breaks_extend": true
+  },
+  "excluded_nationalities": [
+    "JP"
+  ],
+  "host_countries": [
+    "JP"
+  ],
+  "amount": "JPY 362,000/month + JPY 200,000 settling-in allowance + round-trip airfare + travel insurance",
+  "duration_months": 24,
+  "other_rules": [
+    "Citizens of countries with diplomatic relations with Japan (not Japanese citizens or permanent residents)",
+    "doctorate within 6 years of 1 April of the fellowship year (FY2027: awarded on or after 2 April 2021) or expected before the start date",
+    "no previous JSPS Standard or PU fellowship",
+    "continuous stay in Japan"
+  ],
+  "notes": "Two routes: a Japanese host applies through open recruitment in Japan, or you apply through your country's overseas nominating authority, which sets its own deadline. 12-24 months; FY2027 start window 1 Apr to 30 Nov 2027. Results about 3 months after JSPS receives the application.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

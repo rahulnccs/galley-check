@@ -1,0 +1,44 @@
+{
+  "id": "berkeley-miller-research-fellowship",
+  "name": "Miller Research Fellowship",
+  "funder": "Miller Institute for Basic Research in Science, UC Berkeley",
+  "url": "https://miller.berkeley.edu/fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "pre_proposal",
+      "date": "2026-09-10"
+    },
+    {
+      "kind": "final",
+      "date": "2026-10-09",
+      "time": "23:59",
+      "timezone": "America/Los_Angeles"
+    }
+  ],
+  "amount": "USD 95,000/year stipend (3% annual increase) + USD 10,000/year research fund + benefits and relocation",
+  "duration_months": 36,
+  "other_rules": [
+    "Must be nominated by a faculty member, chair or research scientist (no self-nomination)",
+    "PhD received within the cycle window (2027-30 cycle: 1 Jan 2025 to 31 Aug 2027)",
+    "no more than 2 years of postdoc experience elsewhere by the start date",
+    "never an assistant/associate/full professor",
+    "no current UC Berkeley position",
+    "non-US citizens must qualify for J-1 status"
+  ],
+  "notes": "Basic sciences including molecular and cell biology. 2027-30 cycle: nominations 10 Sep 2026, applications 9 Oct 2026 (1-page research statement, CV, 3 references, Berkeley host letter). Results Dec 2026 to Feb 2027.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "nwo-veni",
+  "name": "NWO Talent Programme - Veni",
+  "funder": "Dutch Research Council (NWO) / ZonMw",
+  "url": "https://www.nwo.nl/en/calls/nwo-talent-programme-veni-science-domain",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3,
+    "career_breaks_extend": true
+  },
+  "host_countries": [
+    "NL"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-09-01",
+      "timezone": "Europe/Amsterdam",
+      "estimated": true
+    }
+  ],
+  "amount": "Up to EUR 320,000",
+  "duration_months": 36,
+  "other_rules": [
+    "Any nationality, based in the Netherlands or abroad",
+    "PhD obtained within 3 years before 1 January of the call year (or during the call year up to the deadline), with extensions for personal circumstances",
+    "research at an NWO-recognised Dutch institution that supports your development"
+  ],
+  "notes": "2026 deadline was 1 Sep 2026 (from a third-party listing; NWO page did not load). Part-time projects can run up to 4 years. Separate calls per domain (Science, ENW; Health, ZonMw; etc.).",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

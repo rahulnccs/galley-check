@@ -1,0 +1,32 @@
+{
+  "id": "lalor-postdoctoral-fellowship",
+  "name": "Lalor Foundation Postdoctoral Fellowship",
+  "funder": "Lalor Foundation",
+  "url": "https://lalorfound.org/postdoctoral-fellowship-program/application-instructions/",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "molecular_cell_biology"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2027-01-15",
+      "time": "23:59",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "See Fellowship Guidelines on lalorfound.org",
+  "other_rules": [
+    "Early-career postdocs in mammalian reproductive biology related to contraception, fertility and reproductive health",
+    "see the Foundation's guidelines for career-stage and institution rules"
+  ],
+  "notes": "2027 deadline 15 Jan 2027, 11:59 pm EST (letters of recommendation by 1 Jan). Amount and duration are on the Fellowship Guidelines page, which could not be read.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": "royal-society-newton-international",
+  "name": "Newton International Fellowship",
+  "funder": "The Royal Society (UK)",
+  "url": "https://royalsociety.org/grants/newton-international/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5,
+    "career_breaks_extend": true
+  },
+  "excluded_nationalities": [
+    "GB"
+  ],
+  "host_countries": [
+    "GB"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-01-15",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-03-11",
+      "timezone": "Europe/London",
+      "estimated": true
+    }
+  ],
+  "amount": "Up to GBP 280,000 total (salary and on-costs, research expenses, relocation and visa costs, indirect costs)",
+  "duration_months": 24,
+  "other_rules": [
+    "Any nationality except UK citizens",
+    "must be based outside the UK when applying",
+    "PhD held or thesis defended by the closing date",
+    "no more than 5 years of active full-time postdoctoral experience (career breaks excluded)",
+    "natural sciences (humanities and social sciences go to the British Academy)",
+    "good English",
+    "UK sponsor required (one application per sponsor per round)"
+  ],
+  "notes": "2026 round opened 15 Jan and closed 11 Mar 2026; next round expected on a similar schedule. One nominated reference. Eligible for Global Talent visa fast-track. Applied via Flexi-Grant.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

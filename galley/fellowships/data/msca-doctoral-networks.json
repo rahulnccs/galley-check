@@ -1,0 +1,33 @@
+{
+  "id": "msca-doctoral-networks",
+  "name": "Marie Sklodowska-Curie Doctoral Networks (MSCA DN) - doctoral candidate positions",
+  "funder": "European Commission (Horizon Europe)",
+  "url": "https://marie-sklodowska-curie-actions.ec.europa.eu/actions/doctoral-networks",
+  "verified": "2026-10-08",
+  "category": "phd",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "mobility": {
+    "max_months_in_host": 12,
+    "window_years": 3
+  },
+  "rolling": true,
+  "amount": "Employment contract with living allowance, mobility allowance and family/leave/special-needs allowances where applicable",
+  "duration_months": 36,
+  "other_rules": [
+    "Any nationality",
+    "must not hold a doctorate at the recruitment date",
+    "must enrol in a doctoral programme",
+    "must not have lived or worked mainly in the recruiting country for more than 12 months in the 36 months before recruitment",
+    "industrial doctorates need at least 50% of time outside academia"
+  ],
+  "notes": "Not a single call: individual PhD positions (3-36 months, up to 48 for joint doctorates) are advertised by funded networks on EURAXESS throughout the year, each with its own deadline. Apply directly to the recruiting institution.",
+  "requirements": {
+    "submission": "institution",
+    "submission_url": "https://euraxess.ec.europa.eu/jobs/search"
+  }
+}

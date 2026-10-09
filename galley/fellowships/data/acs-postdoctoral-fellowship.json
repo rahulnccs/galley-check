@@ -1,0 +1,38 @@
+{
+  "id": "acs-postdoctoral-fellowship",
+  "name": "American Cancer Society Postdoctoral Fellowship",
+  "funder": "American Cancer Society (ACS)",
+  "url": "https://www.cancer.org/research/we-fund-cancer-research/apply-research-grant/grant-types/postdoctoral-fellowships.html",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "molecular_cell_biology"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-12-01"
+    }
+  ],
+  "amount": "USD 66,000 / 68,000 / 70,000 stipend (years 1-3) + USD 4,000/year allowance + USD 1,500 in final year for a meeting",
+  "duration_months": 36,
+  "other_rules": [
+    "Doctorate no more than 3 years old and/or 3 or fewer years of postdoc research at application",
+    "US citizens or non-citizens with appropriate visa or immigration status",
+    "postdoc at a US academic institution or eligible nonprofit",
+    "no faculty or staff-scientist roles",
+    "one application per cycle"
+  ],
+  "notes": "Deadlines 1 June and 1 December. Paid parental leave of 4-12 weeks available.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

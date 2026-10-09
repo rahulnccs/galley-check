@@ -1,0 +1,40 @@
+{
+  "id": "alzheimers-association-aarfa",
+  "name": "Alzheimer's Association Research Fellowship for All (AARFA)",
+  "funder": "Alzheimer's Association",
+  "url": "https://www.alz.org/research/for_researchers/grants/types-of-grants/aarfa",
+  "verified": "2026-10-08",
+  "fields": [
+    "neuroscience",
+    "biomedical_clinical"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 10
+  },
+  "deadlines": [
+    {
+      "kind": "pre_proposal",
+      "date": "2026-08-14"
+    },
+    {
+      "kind": "final",
+      "date": "2026-10-20",
+      "time": "17:00",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "Up to USD 200,000 (up to USD 180,000 research budget, max USD 70,000/year, plus USD 20,000 dissemination stipend)",
+  "duration_months": 36,
+  "other_rules": [
+    "Open to US and international researchers",
+    "within 10 years of the terminal doctorate at LOI",
+    "full-time at a non-profit institution",
+    "must not hold an independent faculty position at award"
+  ],
+  "notes": "Replaces the former AARF. LOI 14 Aug 2026, full application 20 Oct 2026, awards by 30 Jan 2027. 2-3 years; indirect costs capped at 10%.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

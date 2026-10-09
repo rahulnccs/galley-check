@@ -1,0 +1,38 @@
+{
+  "id": "snsf-postdoc-mobility",
+  "name": "SNSF Postdoc.Mobility",
+  "funder": "Swiss National Science Foundation (SNSF)",
+  "url": "https://www.snf.ch/en/aK0GyCwNg3knzGat/news/call-for-postdocmobility",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "excluded_host_countries": [
+    "CH"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-08-04",
+      "time": "17:00",
+      "timezone": "Europe/Zurich",
+      "estimated": true
+    }
+  ],
+  "amount": "Living costs and travel allowance abroad (amounts in SNSF regulations); possible 3-12 month return grant",
+  "duration_months": 24,
+  "other_rules": [
+    "Must have a link with Switzerland (Swiss nationality, or a Swiss doctorate or Swiss research affiliation",
+    "see regulations)",
+    "doctorate held or completed within 6 months after the deadline",
+    "research must be done abroad"
+  ],
+  "notes": "Last confirmed deadline 4 Aug 2026; SNSF runs regular calls, check snf.ch for the next one. Generally 24 months, never under 12.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

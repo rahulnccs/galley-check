@@ -1,0 +1,40 @@
+{
+  "id": "blood-cancer-united-cdp-special-fellow",
+  "name": "Blood Cancer United Career Development Program - Special Fellow (formerly LLS)",
+  "funder": "Blood Cancer United (formerly The Leukemia & Lymphoma Society)",
+  "url": "https://bloodcancerunited.org/research/grants/career-development-program-cdp",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "min_years_since_phd": 3,
+    "max_years_since_phd": 5
+  },
+  "deadlines": [
+    {
+      "kind": "pre_proposal",
+      "date": "2026-11-01"
+    },
+    {
+      "kind": "final",
+      "date": "2026-11-15",
+      "time": "15:00",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "Up to USD 75,000/year (minimum USD 70,000 stipend) + up to USD 3,600/year childcare",
+  "duration_months": 36,
+  "other_rules": [
+    "Postdocs or instructors with 3-5 years of postdoc research training by the start date (years since PhD used as a proxy)",
+    "in a mentored position",
+    "need 2-3 more years to compete for independence",
+    "research relevant to hematologic malignancies"
+  ],
+  "notes": "Same 2026-27 deadlines as the Fellow award. 2 or 3 years depending on eligibility.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

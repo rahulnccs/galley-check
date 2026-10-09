@@ -1,0 +1,75 @@
+{
+  "id": "anrf-ramanujan-fellowship",
+  "name": "Ramanujan Fellowship",
+  "funder": "Anusandhan National Research Foundation (ANRF, formerly SERB), DST, Government of India",
+  "url": "https://serb.gov.in/page/english/awards_fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-01-01"
+    },
+    {
+      "kind": "final",
+      "date": "2026-12-31",
+      "time": "17:00",
+      "timezone": "Asia/Kolkata"
+    }
+  ],
+  "rolling": true,
+  "amount": "Rs 1,35,000/month consolidated (incl. HRA) + Rs 7 lakh/year research grant + Rs 60,000/year overhead to host",
+  "duration_months": 60,
+  "other_rules": [
+    "Indian citizens or persons of Indian origin (OCI/PIO) are eligible",
+    "must be below 40 years of age",
+    "must be working abroad at the time of nomination",
+    "must not hold a permanent, tenure-track or contractual position in any Indian institution",
+    "cannot be hosted at the institution where the PhD was obtained",
+    "cannot be nominated by own PhD supervisor",
+    "proven outstanding track record (publications, recognitions)",
+    "PhD, MD or M.Tech/ME or equivalent accepted"
+  ],
+  "notes": "Rolling nominations for 2026 accepted until 31 Dec 2026, 5 PM IST; results announced twice a year. Nominee fills form on anrfonline.in and sends it to the nominator (head of host institution), who submits. Not extendable. Fellowship ends if fellow takes any salaried position in India. Must join within 6 months of award. One international trip per year allowed. Fellows can later apply for the 2-year SERB Research Scientist scheme.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Proposed area of research and outline of proposal",
+        "max_pages": 5,
+        "file_format": "pdf",
+        "notes": "Single PDF uploaded on anrfonline.in"
+      },
+      {
+        "name": "Nomination letter",
+        "file_format": "pdf",
+        "template_url": "https://serb.gov.in/page/format_guideline5",
+        "notes": "On host institution letterhead, signed and stamped by the nominator"
+      },
+      {
+        "name": "CV of nominee",
+        "file_format": "pdf"
+      },
+      {
+        "name": "Plagiarism undertaking",
+        "file_format": "pdf",
+        "template_url": "https://serb.gov.in/assets/pdf/PUT_RJF.pdf",
+        "notes": "Funder template"
+      }
+    ],
+    "cv_format": "standard",
+    "host_letter": true,
+    "submission": "institution",
+    "submission_url": "https://anrfonline.in/ANRF/Ramanujan_fellowship"
+  }
+}

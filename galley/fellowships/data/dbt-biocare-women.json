@@ -1,0 +1,50 @@
+{
+  "id": "dbt-biocare-women",
+  "name": "DBT BioCARe Programme for Women Researchers",
+  "funder": "Department of Biotechnology (DBT), Government of India",
+  "url": "https://rcb.res.in/files/2026-08/call_for_application_under_dbt-biocare_for_2026-27.pdf",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "residence": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-08-25"
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-23",
+      "timezone": "Asia/Kolkata"
+    }
+  ],
+  "amount": "Consolidated research grant (recurring and non-recurring) plus fellowship; amounts per DBT terms and conditions",
+  "duration_months": 36,
+  "other_rules": [
+    "Indian women nationals residing in India",
+    "up to 55 years",
+    "unemployed or not in a regular position",
+    "first extramural grant as PI (no earlier government grant as PI)",
+    "not enrolled in higher studies or holding another fellowship",
+    "Category I: PhD in biotech/life sciences/allied or MD/MDS/MVSc",
+    "Category II: MTech biotech/MPharm or equivalent"
+  ],
+  "notes": "2026-27 call closed 23 Sep 2026 (the notice says 30 days from 25 Aug). Contact biocare.dbt@rcb.res.in. Renamed DBT schemes may apply; check dbt.gov.in for amounts.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://fellowships.gov.in/"
+  }
+}

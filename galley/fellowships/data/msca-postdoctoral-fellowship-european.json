@@ -1,0 +1,48 @@
+{
+  "id": "msca-postdoctoral-fellowship-european",
+  "name": "Marie Sklodowska-Curie Postdoctoral Fellowship - European Fellowship (MSCA PF-EF)",
+  "funder": "European Commission (Horizon Europe)",
+  "url": "https://marie-sklodowska-curie-actions.ec.europa.eu/actions/postdoctoral-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 8,
+    "career_breaks_extend": true
+  },
+  "mobility": {
+    "max_months_in_host": 12,
+    "window_years": 3
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-04-09",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-09",
+      "timezone": "Europe/Brussels",
+      "estimated": true
+    }
+  ],
+  "amount": "Living allowance, mobility allowance and family/leave/special-needs allowances where applicable, plus research, training and networking costs to the host",
+  "duration_months": 24,
+  "other_rules": [
+    "Any nationality",
+    "PhD held (or defended) by the call deadline",
+    "up to 8 years of research experience after the PhD (career breaks and non-research time excluded)",
+    "host must be in an EU member state or Horizon Europe associated country",
+    "must not have lived or worked mainly in the host country for more than 12 months in the 36 months before the deadline",
+    "resubmission restricted if the previous year scored below 80%"
+  ],
+  "notes": "2026 call (HORIZON-MSCA-2026-PF-01) ran 9 Apr to 9 Sep 2026; the 2027 call is expected on a similar timeline. Fellowships last 1-2 years. The host organisation submits with the researcher. Proposals scoring 85% or more that are not funded get a Seal of Excellence.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution",
+    "submission_url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/"
+  }
+}

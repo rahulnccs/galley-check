@@ -1,0 +1,36 @@
+{
+  "id": "lsrf-postdoctoral-fellowship",
+  "name": "Life Sciences Research Foundation Postdoctoral Fellowship",
+  "funder": "Life Sciences Research Foundation (LSRF)",
+  "url": "https://www.lsrf.org/apply/application-instructions",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-10-31",
+      "time": "20:00",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "USD 85,000/year in direct costs (USD 255,000 total)",
+  "duration_months": 36,
+  "other_rules": [
+    "PhD (or MD/DVM, whichever later) within 5 years of 1 October of the application year",
+    "postdoc lab start between 1 August of the previous year and 31 July of the following year",
+    "must be a different lab from the thesis lab",
+    "US citizens may work anywhere, non-US citizens only in US labs"
+  ],
+  "notes": "Basic life sciences, sponsored by companies and foundations. 2027 awards: deadline 31 Oct 2026, start 1 Aug 2027.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

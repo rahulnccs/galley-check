@@ -1,0 +1,33 @@
+{
+  "id": "csir-research-associateship",
+  "name": "CSIR Research Associateship (CSIR-RA)",
+  "funder": "Council of Scientific and Industrial Research (CSIR), Government of India",
+  "url": "https://csirhrdg.res.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "amount": "Rs 36,000-40,000/month + HRA + Rs 20,000/year contingency (pre-2023 rates; current rates likely higher)",
+  "duration_months": 36,
+  "other_rules": [
+    "Indian nationals",
+    "PhD in science/engineering, or MD/MS/MDS, or ME/MTech/MPharm/MVSc with 3 years of R&D experience",
+    "at least one paper in a refereed journal",
+    "upper age limit 35 (relaxable 5 years for SC/ST/OBC, PwD and women)",
+    "total RA tenure under any agency capped at 3 years"
+  ],
+  "notes": "Selection by CV and interview. Stipend figures come from the ISTI summary last updated 2021; check csirhrdg.res.in for current rates and call dates, which were not listed.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

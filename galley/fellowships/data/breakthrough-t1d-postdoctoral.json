@@ -1,0 +1,29 @@
+{
+  "id": "breakthrough-t1d-postdoctoral",
+  "name": "Breakthrough T1D Postdoctoral Fellowship (formerly JDRF)",
+  "funder": "Breakthrough T1D (formerly JDRF)",
+  "url": "https://www.breakthrought1d.org/wp-content/uploads/2025/05/FY26-Postdoctoral-Fellowships-RFA-FINAL.pdf",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "immunology_infection"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5
+  },
+  "amount": "Stipend by years of postdoc experience + USD 5,500/year research allowance",
+  "duration_months": 36,
+  "other_rules": [
+    "MD, DMD, DVM, PhD or equivalent received no more than 5 years before application (adjustable for leave)",
+    "no citizenship requirement",
+    "domestic or foreign institutions",
+    "at least 75% effort on the project",
+    "not concurrently in internship or residency"
+  ],
+  "notes": "Type 1 diabetes research. Deadlines are posted on the Breakthrough T1D grant opportunities page (not found for FY27). Renewable for up to 2 more years. An Advanced Postdoctoral Fellowship exists for later-stage postdocs.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

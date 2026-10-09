@@ -1,0 +1,27 @@
+{
+  "id": "scb-smith-fellows",
+  "name": "Smith Fellows (Conservation Science)",
+  "funder": "Society for Conservation Biology / Cedar Tree Foundation",
+  "url": "https://conbio.org/mini-sites/smith-fellows",
+  "verified": "2026-10-08",
+  "fields": [
+    "ecology_evolution"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "amount": "Salary and research support (amount not stated on the overview page)",
+  "duration_months": 24,
+  "other_rules": [
+    "Early-career conservation scientists",
+    "see proposal guidelines for PhD timing, nationality and host rules"
+  ],
+  "notes": "Two-year postdoctoral fellowship linking research with conservation practice. The overview page shows the 2024 cycle (due 15 Sep 2023); check for the current cycle.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

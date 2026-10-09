@@ -1,0 +1,48 @@
+{
+  "id": "branco-weiss-fellowship",
+  "name": "Branco Weiss Fellowship - Society in Science",
+  "funder": "Branco Weiss Fellowship (administered by ETH Zurich)",
+  "url": "https://brancoweissfellowship.org/who-should-apply/eligibility-duration-and-funding/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5,
+    "career_breaks_extend": true
+  },
+  "amount": "Up to CHF 600,000 over 5 years (salary, equipment, travel, consumables, personnel)",
+  "duration_months": 60,
+  "other_rules": [
+    "PhD held by 15 January of the award year and obtained no more than 5 years earlier (up to 1 year extra for parental leave or illness)",
+    "research must depart from the mainstream",
+    "must attend the annual symposium in the Greater Zurich Area",
+    "mentor can support only one applicant per round"
+  ],
+  "notes": "2027 call is open; check the Timelines page for the exact deadline. Any field of natural science, engineering or social science. 2.5-year pioneer phase then review before the 2.5-year exploitation phase; fellows may take a faculty post after year 1. Documents: 1-page motivation letter, 5-page proposal, CV, host invitation letter, 3 best publications, 5 suggested reviewers.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Letter of motivation",
+        "max_pages": 1,
+        "notes": "Include how the research differs from the mainstream"
+      },
+      {
+        "name": "Research proposal",
+        "max_pages": 5,
+        "notes": "Including timelines, milestones and references"
+      },
+      {
+        "name": "Host invitation letter"
+      },
+      {
+        "name": "Three best publications",
+        "notes": "Peer-reviewed articles or book chapters only"
+      }
+    ],
+    "cv_notes": "Four pages at most",
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

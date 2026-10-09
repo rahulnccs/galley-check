@@ -1,0 +1,40 @@
+{
+  "id": "embo-postdoctoral-fellowship",
+  "name": "EMBO Postdoctoral Fellowship",
+  "funder": "European Molecular Biology Organization (EMBO)",
+  "url": "https://www.embo.org/funding/fellowships-grants-and-career-support/postdoctoral-fellowships/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 2
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-07-10",
+      "time": "14:00",
+      "timezone": "Europe/Berlin",
+      "estimated": true
+    }
+  ],
+  "amount": "Salary (EMBC member states) or stipend (elsewhere), relocation allowance, child allowance; access to Laboratory Leadership course",
+  "duration_months": 24,
+  "other_rules": [
+    "Doctorate within 2 years of the application date (or held by fellowship start)",
+    "at least one first-author paper accepted or published (or a first-author preprint with public independent peer review)",
+    "must move between countries: cannot go to the country of the PhD or a lab where you spent over 6 months",
+    "cannot join the PhD lab or work with the PhD supervisor",
+    "if already in the host lab, under 6 months there",
+    "project must not directly continue the PhD work",
+    "one application per round and only one reapplication",
+    "one of the PhD institution or host lab must be in an EMBC member state or cooperation partner (India is a partner)"
+  ],
+  "notes": "Last confirmed deadline 10 Jul 2026, 14:00 CEST; EMBO runs regular rounds, so check the next cutoff on embo.org. Fellowships last up to 2 years. Life sciences only.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

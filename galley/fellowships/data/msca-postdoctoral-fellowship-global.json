@@ -1,0 +1,46 @@
+{
+  "id": "msca-postdoctoral-fellowship-global",
+  "name": "Marie Sklodowska-Curie Postdoctoral Fellowship - Global Fellowship (MSCA PF-GF)",
+  "funder": "European Commission (Horizon Europe)",
+  "url": "https://marie-sklodowska-curie-actions.ec.europa.eu/actions/postdoctoral-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 8,
+    "career_breaks_extend": true
+  },
+  "mobility": {
+    "max_months_in_host": 12,
+    "window_years": 3
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-04-09",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-09",
+      "timezone": "Europe/Brussels",
+      "estimated": true
+    }
+  ],
+  "amount": "Living allowance, mobility allowance and family/leave/special-needs allowances where applicable, plus research, training and networking costs",
+  "duration_months": 36,
+  "other_rules": [
+    "Only nationals or long-term residents of an EU member state or Horizon Europe associated country (Indian nationals without EU long-term residence are not eligible)",
+    "up to 8 years post-PhD",
+    "1-2 years at a host outside Europe followed by a mandatory 1-year return phase in Europe",
+    "must not have lived or worked mainly in the outgoing host country for more than 12 months in the 36 months before the deadline"
+  ],
+  "notes": "Same call and deadline as the European Fellowship. Included for completeness; most Indian applicants should use the European Fellowship.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution",
+    "submission_url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/"
+  }
+}

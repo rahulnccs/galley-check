@@ -1,0 +1,49 @@
+{
+  "id": "india-alliance-early-career-basic",
+  "name": "India Alliance Early Career Fellowship in Basic Biomedical Research",
+  "funder": "DBT/Wellcome Trust India Alliance",
+  "url": "https://www.indiaalliance.org/fellowships/early-career-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 4,
+    "career_breaks_extend": true
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-03-16",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Up to Rs 2.25 crore total incl. stipend of Rs 1.45 lakh/month (years 1-2) and Rs 1.55 lakh/month (years 3-5)",
+  "duration_months": 60,
+  "other_rules": [
+    "Final-year PhD students or up to 4 years post-PhD at the full-application deadline (counted from viva)",
+    "no age or nationality limit",
+    "must be based at an Indian host institution",
+    "PhD supervisor cannot be the fellowship supervisor",
+    "must identify a collaborating group outside the host institution for part of the project (Work Outside Host Institution)",
+    "MD/MS/MPH holders may apply for basic biomedical proposals"
+  ],
+  "notes": "2026 round listing closed 16 Mar 2026; next call announced on indiaalliance.org. Process: preliminary application, full application with international review, interview. Stipend only for fellows without host salary. Details from the IndiaBioscience 2026 listing.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Preliminary application",
+        "notes": "IASys form; full application only if invited"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://grants.indiaalliance.org/"
+  }
+}

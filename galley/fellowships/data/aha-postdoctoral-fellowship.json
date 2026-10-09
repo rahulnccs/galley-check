@@ -1,0 +1,38 @@
+{
+  "id": "aha-postdoctoral-fellowship",
+  "name": "American Heart Association Postdoctoral Fellowship",
+  "funder": "American Heart Association (AHA)",
+  "url": "https://professional.heart.org/en/research-programs/aha-funding-opportunities/postdoctoral-fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-08-05",
+      "time": "15:00",
+      "timezone": "America/Chicago"
+    }
+  ],
+  "amount": "Stipend USD 63,480-77,076 by experience + USD 12,200 health insurance + USD 3,000/year project support",
+  "duration_months": 24,
+  "other_rules": [
+    "US citizen, permanent resident, pending permanent resident, or holder of H-1B, J-1, O-1, TN or similar visa at submission",
+    "no more than 5 years of research training since the doctorate at activation",
+    "at least 80% effort on research",
+    "AHA professional member at submission"
+  ],
+  "notes": "Cardiovascular and stroke research. 2027 cycle deadline 5 Aug 2026; start 1 Jan 2027. 1-2 years, up to 4 years of AHA postdoc support in total.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

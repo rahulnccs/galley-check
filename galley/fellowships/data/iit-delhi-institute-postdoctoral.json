@@ -1,0 +1,39 @@
+{
+  "id": "iit-delhi-institute-postdoctoral",
+  "name": "IIT Delhi Institute Post-Doctoral Fellowship (IPDF)",
+  "funder": "Indian Institute of Technology Delhi",
+  "url": "https://home.iitd.ac.in/jobs-iitd/uploads/IPDF_Advertisement_Feb_26_2026-Final.pdf",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-04-15",
+      "time": "17:30",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 80,000/month (Rs 65,000 until thesis defence) + HRA + Rs 1 lakh/year professional development allowance",
+  "duration_months": 12,
+  "other_rules": [
+    "Indian nationals, or foreign candidates with a PhD from outside India",
+    "maximum age 32 for men and 35 for women (relaxation for reserved categories)",
+    "first-class preceding degree",
+    "not aimed at IIT Delhi PhD holders",
+    "separate application per department"
+  ],
+  "notes": "Example of IIT institute postdocs (IIT Bombay, BHU, Dhanbad and others run similar schemes). 2026 call closed 15 Apr 2026. 1 year, extendable by 1 after review. No institute housing.",
+  "requirements": {
+    "submission": "portal",
+    "submission_url": "https://home.iitd.ac.in/jobs-iitd/index.php"
+  }
+}

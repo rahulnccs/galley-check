@@ -1,0 +1,26 @@
+{
+  "id": "wallenberg-bienenstock-stanford",
+  "name": "Wallenberg-Bienenstock Postdoctoral Fellowship at Stanford",
+  "funder": "Knut and Alice Wallenberg Foundation",
+  "url": "https://wallenbergresearchlink.stanford.edu/wallenberg-bienenstock-postdoctoral-fellowship-program-stanford",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "amount": "Not stated",
+  "other_rules": [
+    "For young researchers with a lasting association with a Swedish academic institution (fellows are typically Swedish PhDs nominated by Swedish universities)",
+    "hosted at Stanford"
+  ],
+  "notes": "Sister programmes at MIT/Broad Institute and NTU Singapore. Funding, duration and deadlines not published on the Foundation page; special application periods apply via Swedish universities.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

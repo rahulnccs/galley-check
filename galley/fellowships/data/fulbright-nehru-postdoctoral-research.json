@@ -1,0 +1,59 @@
+{
+  "id": "fulbright-nehru-postdoctoral-research",
+  "name": "Fulbright-Nehru Postdoctoral Research Fellowship",
+  "funder": "United States-India Educational Foundation (USIEF) / Fulbright Program",
+  "url": "https://www.usief.org.in/?p=184",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 4
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-02-18",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-07-15",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Monthly stipend, round-trip economy airfare, J-1 visa support, accident and sickness cover, settling-in and professional allowances; dependent allowance subject to funds",
+  "duration_months": 24,
+  "other_rules": [
+    "Indian citizens",
+    "PhD or DM awarded within the 4 years before the deadline",
+    "publication in a reputed journal",
+    "Government of India and state government employees not eligible (CSIR, ICAR, DRDO, ISRO, IISc, IIT researchers are eligible)",
+    "employed applicants need a home-institution letter granting leave",
+    "only one Fulbright-Nehru category per cycle",
+    "2027-28 cycle limited to priority fields (life sciences only via bioengineering)"
+  ],
+  "notes": "Stays of 8-24 months; the duration you request cannot be changed later. 2027-28 cycle opened 18 Feb 2026 and closed 15 Jul 2026. A host invitation letter is optional but recommended. Contact postdoc@usief.org.in.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Recent significant publication",
+        "max_pages": 30
+      },
+      {
+        "name": "Letter of support from home institution",
+        "notes": "If employed"
+      }
+    ],
+    "submission": "portal",
+    "submission_url": "https://apply.iie.org/fvsp2027"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "novo-nordisk-postdoc-abroad",
+  "name": "Novo Nordisk Foundation Postdoc Fellowship for Research Abroad - Bioscience and Basic Biomedicine",
+  "funder": "Novo Nordisk Foundation",
+  "url": "https://novonordiskfonden.dk/en/grant/postdoc-fellowship-for-research-abroad-bioscience-and-basic-biomedicine/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "excluded_host_countries": [
+    "DK"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2025-10-21",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-01-13",
+      "time": "14:00",
+      "timezone": "Europe/Copenhagen",
+      "estimated": true
+    }
+  ],
+  "amount": "Up to DKK 5 million per fellowship",
+  "duration_months": 48,
+  "other_rules": [
+    "For researchers in Denmark",
+    "must be employed by a Danish research institution for the whole fellowship",
+    "research abroad, with the 4th year paid only on return to Denmark",
+    "one application across NNF postdoc calls"
+  ],
+  "notes": "2026 call ran 21 Oct 2025 to 13 Jan 2026; next call expected autumn 2026. Up to 3 awards. Check the guidelines for years-since-PhD limits.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "research-ireland-goipd",
+  "name": "Government of Ireland Postdoctoral Fellowship (GOIPD)",
+  "funder": "Research Ireland (formerly Irish Research Council)",
+  "url": "https://www.researchireland.ie/funding/government-ireland-postdoctoral/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "IE"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2025-09-11",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2025-10-23",
+      "timezone": "Europe/Dublin",
+      "estimated": true
+    }
+  ],
+  "amount": "Salary EUR 47,273 (year 1), EUR 47,880 (year 2) + EUR 5,000/year research expenses + employer PRSI",
+  "duration_months": 24,
+  "other_rules": [
+    "PhD held or close to conferral within the call's eligibility window",
+    "host must be an eligible Irish research body",
+    "mentor at the host submits a separate statement",
+    "check the annual call document for citizenship or visa conditions"
+  ],
+  "notes": "2026 call ran 11 Sep to 23 Oct 2025 (mentor statements 6 Nov), outcomes end of April, start 1 Sep. The 2027 call (autumn 2026) was not found on the site; check researchireland.ie. Choose 1 or 2 years at application.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

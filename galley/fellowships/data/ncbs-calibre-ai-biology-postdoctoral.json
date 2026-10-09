@@ -1,0 +1,56 @@
+{
+  "id": "ncbs-calibre-ai-biology-postdoctoral",
+  "name": "NCBS-ICTS CALIBRE AI in Biology Postdoctoral Fellowship",
+  "funder": "National Centre for Biological Sciences (NCBS-TIFR) and ICTS, Bengaluru",
+  "url": "https://www.ncbs.res.in/academic/postdoc-calibre-ai-in-biology-postdoctoral-fellowship-program",
+  "verified": "2026-10-08",
+  "fields": [
+    "bioinformatics"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-03-01",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 1,25,000/month consolidated + Rs 3 lakh/year research and travel grant",
+  "duration_months": 24,
+  "other_rules": [
+    "PhD in natural sciences or computer science with an outstanding record",
+    "project must apply AI to biology",
+    "must contact and propose a mentor at NCBS and/or ICTS before applying"
+  ],
+  "notes": "2026 deadline was 1 Mar 2026. Fellows take part in teaching, workshops and outreach. NCBS also runs other linked postdoc programmes (e.g. with Imperial College and CRG Barcelona).",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Lay summary",
+        "max_pages": 1,
+        "notes": "Why and how the AI approach transforms the target area"
+      },
+      {
+        "name": "Research proposal",
+        "max_pages": 3,
+        "notes": "Background, aims, approach, future plans, relevance"
+      },
+      {
+        "name": "Reference letters",
+        "notes": "At least 2, emailed by referees to acadoffice@ncbs.res.in"
+      },
+      {
+        "name": "Host support letter"
+      }
+    ],
+    "host_letter": true,
+    "submission": "email",
+    "submission_url": "mailto:acadoffice@ncbs.res.in"
+  }
+}

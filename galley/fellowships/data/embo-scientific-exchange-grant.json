@@ -1,0 +1,45 @@
+{
+  "id": "embo-scientific-exchange-grant",
+  "name": "EMBO Scientific Exchange Grant",
+  "funder": "European Molecular Biology Organization (EMBO)",
+  "url": "https://www.embo.org/funding/fellowships-grants-and-career-support/scientific-exchange-grants/",
+  "verified": "2026-10-08",
+  "category": "travel",
+  "purpose": "lab_visit",
+  "career_levels": [
+    "phd_student",
+    "postdoc"
+  ],
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "rolling": true,
+  "amount": "Travel and subsistence for the fellow (rate depends on destination); no dependants, visa costs, bench fees or overheads",
+  "duration_months": 3,
+  "other_rules": [
+    "At least 1 year of graduate research experience",
+    "exchange must be between an EMBC member state or cooperation partner (e.g. India) and another country, not within one country",
+    "life sciences only",
+    "cannot visit former supervisors or colleagues, a previously visited lab, or extend an existing collaboration",
+    "must return to the home lab for at least 6 months afterwards",
+    "conferences and courses not funded"
+  ],
+  "notes": "Visits of 1 week to 3 months. Apply at least 30 days (ideally 3 months) before the visit; decisions take 3-4 months. Needs two references and written acceptance from the host. Details from a 2025 summary; confirm current rules on embo.org.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Host acceptance letter",
+        "notes": "Written acceptance from the receiving institute"
+      },
+      {
+        "name": "References",
+        "notes": "Two"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

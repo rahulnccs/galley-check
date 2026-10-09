@@ -263,9 +263,11 @@ def match(f: Fellowship, r: Researcher, today: date) -> Match:
     if deadline is None and not f.rolling:
         last = f.deadlines[-1].date if f.deadlines else None
         if f.annual and last:
+            # Only the month is shown, so 29 Feb can stand in for 28 Feb.
+            expected = date(last.year + 1, last.month, 1)
             result.reasons.append(Reason(
                 INFO, f"The last deadline was {last:%d %b %Y}; the next call "
-                      f"is expected around {last.replace(year=last.year + 1):%b %Y}."))
+                      f"is expected around {expected:%b %Y}."))
         else:
             result.reasons.append(Reason(INFO, "No upcoming deadline is listed."))
     elif deadline is not None and deadline.estimated:

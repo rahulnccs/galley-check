@@ -1,0 +1,32 @@
+{
+  "id": "dfg-emmy-noether",
+  "name": "Emmy Noether Programme",
+  "funder": "Deutsche Forschungsgemeinschaft (DFG)",
+  "url": "https://www.dfg.de/en/research-funding/funding-opportunities/programmes/individual/emmy-noether",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "min_years_since_phd": 2,
+    "max_years_since_phd": 4
+  },
+  "host_countries": [
+    "DE"
+  ],
+  "rolling": true,
+  "amount": "Funds to lead an independent junior research group (group leader position, staff, consumables, equipment, travel; modular budget)",
+  "duration_months": 72,
+  "other_rules": [
+    "Normally up to 4 years after the doctorate with at least 2 years of postdoc experience",
+    "substantial international research experience",
+    "applicants from abroad must commit to continuing their career in Germany (letter of intent)",
+    "not eligible if already qualified for a professorship (habilitation), a positively evaluated junior professor, or already funded for an independent group by a comparable programme"
+  ],
+  "notes": "Proposals accepted any time; decisions take about 8 months. Any discipline.",
+  "requirements": {
+    "submission": "portal",
+    "submission_url": "https://elan.dfg.de/"
+  }
+}

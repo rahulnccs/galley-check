@@ -1,0 +1,39 @@
+{
+  "id": "swiss-government-excellence-postdoc",
+  "name": "Swiss Government Excellence Scholarship - Postdoctoral",
+  "funder": "Swiss Confederation (Federal Commission for Scholarships for Foreign Students, ESKAS)",
+  "url": "https://www.sbfi.admin.ch/sbfi/en/home/education/scholarships-and-grants/swiss-government-excellence-scholarships.html",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "excluded_nationalities": [
+    "CH"
+  ],
+  "host_countries": [
+    "CH"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-11-15",
+      "estimated": true
+    }
+  ],
+  "amount": "CHF 2,450/month + Swiss health insurance + CHF 600 housing grant + return airfare + half-fare travelcard (figures for Indian applicants; may vary by country)",
+  "duration_months": 12,
+  "other_rules": [
+    "Recent PhD (definition and age limits set per country)",
+    "signed letter of acceptance from a full professor at a Swiss university is mandatory",
+    "apply through the Swiss embassy in your country",
+    "eligible countries and quotas vary"
+  ],
+  "notes": "For India, dossiers due at the Swiss Embassy in New Delhi by mid-November 2026 (date estimated); decisions by May 2027, start 1 Sep 2027. Each country has its own deadline; check the embassy.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

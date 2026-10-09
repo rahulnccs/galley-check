@@ -1,0 +1,66 @@
+{
+  "id": "humboldt-research-fellowship-postdoc",
+  "name": "Humboldt Research Fellowship for Postdocs",
+  "funder": "Alexander von Humboldt Foundation",
+  "url": "https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/humboldt-research-fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 4
+  },
+  "excluded_nationalities": [
+    "DE"
+  ],
+  "host_countries": [
+    "DE"
+  ],
+  "mobility": {
+    "max_months_in_host": 3,
+    "window_years": 1.5
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-11-15",
+      "estimated": true
+    }
+  ],
+  "amount": "EUR 3,000/month plus additional benefits",
+  "duration_months": 24,
+  "other_rules": [
+    "Doctorate within the last 4 years (or completed before the selection meeting)",
+    "publications in internationally reviewed journals",
+    "not a German national (unless abroad more than 10 years)",
+    "no more than 90 days in Germany in the 18 months before applying",
+    "good German or English",
+    "two expert reviews, one from the doctoral supervisor"
+  ],
+  "notes": "Three calls a year opening 15 Mar, 15 Jul and 15 Nov, each closing early once 800 applications arrive; selection meetings in Nov, Mar and Jul. The current call is full; the next opens 15 Nov 2026 (no fixed deadline, so final_deadline is blank). 6-24 months in up to three stays within three years. Host uploads a mentoring agreement and statement. Approval rate about 20-25%.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "CV",
+        "max_pages": 2
+      },
+      {
+        "name": "Research outline",
+        "max_pages": 5
+      },
+      {
+        "name": "List of key publications",
+        "notes": "1-3 papers with a short explanation of each"
+      },
+      {
+        "name": "Expert reviews",
+        "notes": "Two, uploaded by the reviewers; one from the doctoral supervisor"
+      }
+    ],
+    "cv_format": "standard",
+    "cv_notes": "Two pages at most",
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "ada-postdoctoral-fellowship",
+  "name": "American Diabetes Association Postdoctoral Fellowship",
+  "funder": "American Diabetes Association (ADA)",
+  "url": "https://diabetes.org/",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 10
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-04-30",
+      "estimated": true
+    }
+  ],
+  "amount": "Salary stipend, fringe benefits and training allowance (amounts not stated)",
+  "duration_months": 36,
+  "other_rules": [
+    "MD, MD/PhD, PhD, DVM or equivalent",
+    "not eligible with more than 10 years of research experience after the doctorate"
+  ],
+  "notes": "Last listed deadline 30 Apr 2026 (Stanford funding listing), next cycle expected at a similar time. Confirm details with ADA.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

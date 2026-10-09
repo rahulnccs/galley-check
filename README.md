@@ -180,10 +180,12 @@ internal scheme, can be added by hand.
 [`galley/fellowships/data/`](galley/fellowships/data/README.md), one small
 file per scheme, each with the date it was last checked against the funder's
 page; entries older than a year are flagged. The list is still being built: Galley
-ships 81 life-science entries (10 postdoc fellowships, 6 PhD fellowships and
-65 travel grants) gathered from public lists. None has yet been checked
-against its funder's page, so Galley shows them as "worth checking" rather
-than "eligible" until they are, and says so on each one. **Check for Updates**, at the top of Matches,
+ships 166 life-science entries (88 postdoc fellowships, 12 PhD fellowships and
+66 travel grants). 86 of them, including the main Indian schemes (ANRF, DBT,
+DST, ICMR, CSIR, UGC, India Alliance), have been checked against the funder's
+page. The other 80 come from public lists and haven't been checked yet, so
+Galley shows them as "worth checking" rather than "eligible" until they are,
+and says so on each one. **Check for Updates**, at the top of Matches,
 downloads the latest list from this repository, so new and corrected entries
 reach the app without a new release; only the list is downloaded, nothing
 about you is sent. To suggest a scheme, fill in

@@ -1,0 +1,36 @@
+{
+  "id": "dbt-mk-bhan-young-researcher",
+  "name": "M. K. Bhan Research Programme (formerly M K Bhan Young Researcher Fellowship Programme, MKB-YRFP)",
+  "funder": "Department of Biotechnology (DBT), Government of India",
+  "url": "https://fellowships.gov.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "amount": "Rs 90,000/month consolidated + research grant up to Rs 20 lakh/year (manpower, consumables, minor equipment, travel; capital equipment capped at Rs 10 lakh overall)",
+  "duration_months": 36,
+  "other_rules": [
+    "Indian nationals only",
+    "PhD in life sciences, biotechnology or allied areas (submitted thesis allowed, fellowship starts on award)",
+    "maximum age 35 on closing date",
+    "no permanent position",
+    "cannot be held at the PhD institution",
+    "host must be a DBT autonomous institute",
+    "mentor must have at least 5 years before retirement"
+  ],
+  "notes": "Renamed \"M. K. Bhan Research Programme\" by DBT notice of 17 Jun 2026. Up to 50 awards a year; 3 years, extendable by 2 in exceptional cases. Call dates for the 2026-27 round not found; check fellowships.gov.in. Details from a Biotecnika summary of the 2025-26 guidelines.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://fellowships.gov.in/"
+  }
+}

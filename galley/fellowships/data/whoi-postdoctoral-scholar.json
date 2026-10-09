@@ -1,0 +1,38 @@
+{
+  "id": "whoi-postdoctoral-scholar",
+  "name": "Woods Hole Oceanographic Institution Postdoctoral Scholar Program",
+  "funder": "Woods Hole Oceanographic Institution (WHOI)",
+  "url": "https://www.whoi.edu/what-we-do/educate/postdoctoral/postdocs-scholar-fellowship-appointments/apo-postdoctoral-scholar/",
+  "verified": "2026-10-08",
+  "fields": [
+    "ecology_evolution",
+    "microbiology"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-10-15",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "At least USD 73,000/year stipend + independent research budget + relocation and health allowances",
+  "duration_months": 18,
+  "other_rules": [
+    "Doctorate no more than 3 years old at the start date (held by appointment)",
+    "command of English",
+    "MIT-WHOI Joint Program students, recent WHOI postdocs and some former WHOI students not eligible",
+    "at least two-thirds of the appointment spent at WHOI"
+  ],
+  "notes": "Includes biology alongside oceanography, chemistry, engineering, geology, physics, math and marine policy. 2027-28 cycle closes 15 Oct 2026; start between 1 Jan and 1 Oct 2027.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

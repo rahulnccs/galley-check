@@ -1,0 +1,53 @@
+{
+  "id": "hfsp-long-term-fellowship",
+  "name": "HFSP Long-Term Fellowship",
+  "funder": "Human Frontier Science Program Organization (HFSPO)",
+  "url": "https://www.hfsp.org/funding/hfsp-funding/postdoctoral-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-03-12",
+      "estimated": true
+    },
+    {
+      "kind": "pre_proposal",
+      "date": "2026-05-12",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-24",
+      "time": "09:00",
+      "timezone": "America/New_York",
+      "estimated": true
+    }
+  ],
+  "amount": "Living allowance + research and travel allowance (amounts by host country); child, parental leave and relocation allowances",
+  "duration_months": 36,
+  "other_rules": [
+    "PhD in a biological field conferred within 3 years of the full-proposal deadline (exemptions for illness, parental leave, care, military service)",
+    "cannot work in your country of nationality",
+    "must move to a country other than the PhD country",
+    "no more than 12 months in the host country or with the host supervisor by activation",
+    "host supervisor cannot be a former supervisor, collaborator or co-author",
+    "lead-author paper published, in press or accepted by full-proposal stage",
+    "project must be basic life-science research distinct from previous work (no applied, clinical or purely observational projects)",
+    "non-profit host",
+    "one HFSP fellowship application per year"
+  ],
+  "notes": "2027 cycle: letter of intent due 12 May 2026, full proposal 24 Sep 2026 (by invitation), outcomes around March 2027, activation 1 Apr 2027 to 1 Jan 2028. Not renewable; deferral possible. A Cross-Disciplinary Fellowship exists for PhDs outside biology.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://proposalcentral.com/"
+  }
+}

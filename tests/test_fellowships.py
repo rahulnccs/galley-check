@@ -214,6 +214,11 @@ def test_past_deadline_predicts_next_call():
     assert "expected around Mar 2027" in texts(m)
 
 
+def test_past_leap_day_deadline_predicts_next_call():
+    f = fellowship(deadlines=[{"kind": "final", "date": "2024-02-29"}])
+    assert "expected around Feb 2025" in texts(match(f, Researcher(), TODAY))
+
+
 def test_estimated_deadline_is_labelled():
     f = fellowship(deadlines=[{"kind": "final", "date": DEADLINE, "estimated": True}])
     assert "estimated from previous years" in texts(match(f, Researcher(), TODAY))

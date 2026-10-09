@@ -1,0 +1,38 @@
+{
+  "id": "nih-nrsa-f32",
+  "name": "NIH Ruth L. Kirschstein NRSA Individual Postdoctoral Fellowship (F32)",
+  "funder": "US National Institutes of Health (NIH)",
+  "url": "https://www.nimh.nih.gov/funding/training/ruth-l-kirschstein-national-research-service-award-individual-postdoctoral-fellowship-f32",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-12-08",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "NRSA stipend by years of postdoc experience + tuition and fees + institutional allowance",
+  "duration_months": 36,
+  "other_rules": [
+    "US citizens, non-citizen nationals or lawful permanent residents at the time of award",
+    "PhD, MD, DO or equivalent before activation",
+    "up to 3 years of total postdoc NRSA support (T32 plus F32)",
+    "sponsor must be identified",
+    "institute-specific rules apply"
+  ],
+  "notes": "Standard due dates 8 April, 8 August and 8 December (AIDS-related: 7 May, 7 September, 7 January). Payback obligation applies to the first year. Funds research at domestic or foreign institutions.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution",
+    "submission_url": "https://grants.nih.gov/"
+  }
+}

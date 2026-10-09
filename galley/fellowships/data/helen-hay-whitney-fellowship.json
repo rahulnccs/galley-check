@@ -1,0 +1,43 @@
+{
+  "id": "helen-hay-whitney-fellowship",
+  "name": "Helen Hay Whitney Foundation Postdoctoral Fellowship",
+  "funder": "Helen Hay Whitney Foundation",
+  "url": "https://hhwf.org/research-fellowship/",
+  "verified": "2026-10-08",
+  "fields": [
+    "molecular_cell_biology",
+    "biomedical_clinical",
+    "immunology_infection",
+    "microbiology",
+    "neuroscience",
+    "genetics_genomics"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 2
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-06-15",
+      "time": "17:00",
+      "timezone": "America/New_York",
+      "estimated": true
+    }
+  ],
+  "amount": "USD 73,000 / 75,000 / 77,000 stipend (years 1-3) + USD 1,500/year research allowance + USD 1,500/year per child",
+  "duration_months": 36,
+  "other_rules": [
+    "PhD within 2 years of the deadline (MD or MD-PhD within 4 years)",
+    "no more than 1 year in the postdoc lab at the deadline",
+    "US citizens may train in the US, Canada or abroad",
+    "non-US citizens must train in US labs",
+    "academic (not commercial) labs only"
+  ],
+  "notes": "Basic biomedical sciences. Deadline 15 June each year (5 pm EST). Only 3-year awards.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

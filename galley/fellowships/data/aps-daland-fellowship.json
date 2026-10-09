@@ -1,0 +1,34 @@
+{
+  "id": "aps-daland-fellowship",
+  "name": "APS Daland Fellowship in Clinical Investigation",
+  "funder": "American Philosophical Society",
+  "url": "https://www.amphilsoc.org/grants/research",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical"
+  ],
+  "track": "clinical",
+  "career_stage": {
+    "phd_required": false
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-09-15"
+    }
+  ],
+  "amount": "USD 28,000-75,000 (program-group range)",
+  "other_rules": [
+    "US citizens or residents, or Americans abroad",
+    "patient-oriented research in clinical medicine (internal medicine, neurology, pediatrics, psychiatry, surgery etc.)",
+    "for early-career clinical investigators"
+  ],
+  "notes": "Hard-copy application received by 15 Sep each year. APS no longer lists a separate postdoctoral fellowship in biological science; its small Franklin and Lewis and Clark grants are not fellowships.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "email"
+  }
+}

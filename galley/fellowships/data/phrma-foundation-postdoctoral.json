@@ -1,0 +1,39 @@
+{
+  "id": "phrma-foundation-postdoctoral",
+  "name": "PhRMA Foundation Postdoctoral Fellowship (Translational Medicine and other tracks)",
+  "funder": "PhRMA Foundation",
+  "url": "https://www.phrmafoundation.org/",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "molecular_cell_biology"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "pre_proposal",
+      "date": "2026-05-27",
+      "estimated": true
+    }
+  ],
+  "amount": "USD 60,000/year",
+  "duration_months": 24,
+  "other_rules": [
+    "US and non-US citizens",
+    "postdoc at an accredited PhD-granting US university at LOI",
+    "doctorate granted on or after 1 January two years before the cycle",
+    "at least two first-author papers",
+    "no NIH K99/R00 or F award",
+    "one applicant per lab"
+  ],
+  "notes": "Tracks include Translational Medicine, Drug Discovery and Drug Delivery. 2026 LOI was due 27 May 2026. Details from a University of Wisconsin funding listing.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

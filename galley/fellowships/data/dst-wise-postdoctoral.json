@@ -1,0 +1,34 @@
+{
+  "id": "dst-wise-postdoctoral",
+  "name": "DST WISE Post-Doctoral Fellowship (WISE-PDF)",
+  "funder": "Department of Science and Technology (DST), Government of India",
+  "url": "https://dst.gov.in/wise-post-doctoral-fellowship-wise-pdf",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "rolling": true,
+  "amount": "Rs 55,000/month + Rs 2 lakh/year research grant + up to Rs 3 lakh for small equipment + overhead and HRA per DST norms",
+  "duration_months": 36,
+  "other_rules": [
+    "Women only",
+    "age 27 to 60",
+    "PhD in basic or applied science or MD/MS/MDS",
+    "no regular employment (temporary researchers must leave their post if approved)"
+  ],
+  "notes": "Open throughout the year. Women with career breaks are encouraged to apply. Details from the ISTI summary because the DST page did not load.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://online-wosa.gov.in/"
+  }
+}

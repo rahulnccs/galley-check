@@ -1,0 +1,74 @@
+{
+  "id": "icmr-postdoctoral-fellowship",
+  "name": "ICMR Post-Doctoral Fellowship (ICMR-PDF)",
+  "funder": "Indian Council of Medical Research (ICMR), Government of India",
+  "url": "https://www.icmr.gov.in/post-doctoral-research",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "immunology_infection",
+    "microbiology",
+    "molecular_cell_biology",
+    "genetics_genomics"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2023-02-01",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2023-02-28",
+      "time": "17:30",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "annual": false,
+  "amount": "Rs 65,000/month consolidated + HRA + Rs 3 lakh/year contingency",
+  "other_rules": [
+    "Indian nationals only (those abroad considered in absentia)",
+    "PhD awarded within 3 years of the deadline",
+    "maximum age 32 (relaxable 5 years for SC/ST/OBC/PH and women)",
+    "proposed work must continue the PhD research",
+    "PDF guide must be Scientist-C or above"
+  ],
+  "notes": "Last call on the ICMR page was 1-28 Feb 2023; no newer call is posted, so treat these dates as stale. Apply through the host institution with director recommendation; hard copy plus soft copy to pdfhrd.icmr@gmail.com. Selection by interview at ICMR HQ. Two referee testimonials (one from PhD guide) and an RIO-verified plagiarism report needed.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Research proposal",
+        "notes": "Detailed proposal continuing the PhD work"
+      },
+      {
+        "name": "PhD thesis summary",
+        "max_pages": 1
+      },
+      {
+        "name": "Presentation",
+        "notes": "Up to 5 PowerPoint slides"
+      },
+      {
+        "name": "Referee testimonials",
+        "notes": "Two, one from the PhD guide"
+      },
+      {
+        "name": "Plagiarism check report",
+        "notes": "Verified by ICMR Research Integrity Officer"
+      }
+    ],
+    "host_letter": true,
+    "submission": "email"
+  }
+}

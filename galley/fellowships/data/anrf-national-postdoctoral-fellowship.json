@@ -1,0 +1,75 @@
+{
+  "id": "anrf-national-postdoctoral-fellowship",
+  "name": "ANRF National Post-Doctoral Fellowship (N-PDF)",
+  "funder": "Anusandhan National Research Foundation (ANRF), Government of India",
+  "url": "https://serb.gov.in/page/english/awards_fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-01-15",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-02-20",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 80,000/month + HRA (Rs 50,000/month + HRA until PhD is awarded) + Rs 2 lakh/year research grant + Rs 1 lakh/year overhead",
+  "duration_months": 24,
+  "other_rules": [
+    "Indian citizens only",
+    "PhD/MD/MS awarded or thesis submitted",
+    "at least 2 published papers",
+    "upper age limit 35 at submission (5-year relaxation for SC/ST/OBC/PwD and women)",
+    "must apply within 5 years of PhD viva-voce",
+    "can be availed only once",
+    "cannot work with PhD guide/co-guide or at the PhD department/institution",
+    "mentor must hold a regular position in India",
+    "not open to anyone who has previously applied for regular ANRF grants (PMECRG, ARG, IRG etc.)"
+  ],
+  "notes": "2026 call ran 15 Jan to 20 Feb 2026 (ANRF schedule listed 17 Feb, ISTI listed 20 Feb); the 2027 call is expected around the same time. Must join within 3 months of results; no change of mentor or institution after results. Research grant covers minor equipment, consumables, contingencies and domestic travel; no manpower.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Work methodology and research plan",
+        "max_pages": 3,
+        "file_format": "pdf",
+        "notes": "Single PDF, max 10 MB; title, summary, objectives and outcomes entered online"
+      },
+      {
+        "name": "Endorsement certificate from mentor and host institute",
+        "file_format": "pdf",
+        "notes": "Funder template"
+      },
+      {
+        "name": "CV of mentor",
+        "file_format": "pdf",
+        "notes": "Funder template"
+      },
+      {
+        "name": "Plagiarism undertaking",
+        "file_format": "pdf",
+        "notes": "Funder template"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://anrfonline.in/ANRF/npdf"
+  }
+}

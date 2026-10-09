@@ -1,0 +1,36 @@
+{
+  "id": "damon-runyon-fellowship",
+  "name": "Damon Runyon Fellowship Award",
+  "funder": "Damon Runyon Cancer Research Foundation",
+  "url": "https://www.damonrunyon.org/for-scientists/application-guidelines/fellowship",
+  "verified": "2026-10-08",
+  "fields": [
+    "biomedical_clinical",
+    "molecular_cell_biology"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-08-14",
+      "time": "16:00",
+      "timezone": "America/New_York",
+      "estimated": true
+    }
+  ],
+  "amount": "USD 70,000 / 72,000 / 74,000 / 76,000 stipend (years 1-4) + USD 2,000/year expenses + USD 1,000 per child",
+  "duration_months": 48,
+  "other_rules": [
+    "Basic scientists: degree no more than 18 months old at the deadline and no more than 1 year in the sponsor lab",
+    "physician-scientists: residency complete and board eligible, before first faculty post",
+    "non-US citizens must work at a US institution",
+    "US citizens may go abroad only for exceptional opportunities"
+  ],
+  "notes": "Cancer research. Last confirmed deadline 14 Aug 2026 (also a spring round historically); check damonrunyon.org. Years 2-4 depend on progress. A Quantitative Biology Fellowship track also exists.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

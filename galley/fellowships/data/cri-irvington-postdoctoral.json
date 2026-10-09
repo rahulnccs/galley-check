@@ -1,0 +1,37 @@
+{
+  "id": "cri-irvington-postdoctoral",
+  "name": "Cancer Research Institute Irvington Postdoctoral Fellowship",
+  "funder": "Cancer Research Institute (CRI)",
+  "url": "https://www.cancerresearch.org/grants-programs/grants-fellowships/cri-irvington-postdoctoral-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "immunology_infection",
+    "biomedical_clinical"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2027-03-01",
+      "time": "23:59",
+      "timezone": "America/New_York"
+    }
+  ],
+  "amount": "USD 74,000 / 76,000 / 78,000 stipend (years 1-3) + USD 5,000/year institutional allowance",
+  "duration_months": 36,
+  "other_rules": [
+    "Doctorate by activation",
+    "fewer than 5 years of mentored research at activation (residency excluded for MDs)",
+    "3+ years in the sponsor lab only in exceptional cases",
+    "no citizenship restrictions",
+    "US or abroad at non-profit institutions",
+    "sponsor must be assistant professor or above"
+  ],
+  "notes": "Cancer immunology. Two deadlines a year: 1 March and 1 September (next: 1 Mar 2027). Decisions in 10-12 weeks.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

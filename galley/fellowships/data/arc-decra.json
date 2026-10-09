@@ -1,0 +1,38 @@
+{
+  "id": "arc-decra",
+  "name": "Discovery Early Career Researcher Award (DECRA)",
+  "funder": "Australian Research Council (ARC)",
+  "url": "https://www.arc.gov.au/funding-research/funding-schemes/discovery-program/discovery-early-career-researcher-award-decra",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 5,
+    "career_breaks_extend": true
+  },
+  "host_countries": [
+    "AU"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-03-11",
+      "timezone": "Australia/Canberra",
+      "estimated": true
+    }
+  ],
+  "amount": "Salary contribution about AUD 126,693/year (incl. on-costs) + up to AUD 50,000/year project funds",
+  "duration_months": 36,
+  "other_rules": [
+    "PhD awarded within the last 5 years (DE27: on or after 1 March 2021) unless an eligibility exemption is approved for career disruption",
+    "submitted by an eligible Australian university",
+    "ARC Medical Research Policy applies (most clinical and medical research belongs with NHMRC)"
+  ],
+  "notes": "DE27 round closed 11 Mar 2026 (university internal deadlines about a month earlier). Up to 200 awards a year. ARC has signalled changes to the scheme for future rounds.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

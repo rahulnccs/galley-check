@@ -1,0 +1,62 @@
+{
+  "id": "fulbright-nehru-doctoral-research",
+  "name": "Fulbright-Nehru Doctoral Research Fellowship",
+  "funder": "United States-India Educational Foundation (USIEF) / Fulbright Program",
+  "url": "https://www.usief.org.in/fulbright-fellowships/fellowships-for-indian-citizen/fulbright-nehru-doctoral-research-fellowships",
+  "verified": "2026-10-08",
+  "category": "phd",
+  "career_levels": [
+    "phd_student"
+  ],
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "US"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-02-18",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-07-01",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Monthly stipend, round-trip economy airfare, J-1 visa support, accident and sickness cover, applicable allowances (no dependent allowance)",
+  "duration_months": 9,
+  "other_rules": [
+    "Indian citizens registered for a PhD at an Indian institution by 1 November of the year before the deadline",
+    "not for those who already hold a PhD or are about to submit the thesis",
+    "expected thesis submission at least 3 months after the grant ends",
+    "central and state government civil servants not eligible (researchers at CSIR, ICAR, IISc, IITs etc. are eligible)",
+    "employed applicants need employer endorsement of leave",
+    "only one Fulbright-Nehru category per cycle",
+    "2027-28 cycle limited to priority fields (life sciences only via bioengineering)"
+  ],
+  "notes": "Stays of 6-9 months in the US. 2027-28 cycle opened 18 Feb 2026 and closed 1 Jul 2026; the 2028-29 cycle is expected on a similar timeline, but check whether the priority-field list changes. Needs a recommendation letter from the PhD supervisor and a writing sample of up to 20 pages.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Writing sample",
+        "max_pages": 20,
+        "notes": "Published or presented paper, or extract from Master's/MPhil thesis"
+      },
+      {
+        "name": "Recommendation letter from PhD supervisor",
+        "notes": "Must cover research, need for fellowship, registration date and topic"
+      }
+    ],
+    "submission": "portal"
+  }
+}

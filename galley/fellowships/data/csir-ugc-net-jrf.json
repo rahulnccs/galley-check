@@ -1,0 +1,46 @@
+{
+  "id": "csir-ugc-net-jrf",
+  "name": "CSIR-UGC NET Junior Research Fellowship (CSIR-JRF)",
+  "funder": "Council of Scientific and Industrial Research (CSIR), Government of India (exam by NTA)",
+  "url": "https://csirnet.nta.nic.in/",
+  "verified": "2026-10-08",
+  "category": "phd",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2025-09-25",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2025-10-27",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 37,000/month JRF (2 years), then SRF rate; Rs 20,000/year contingency from year 3",
+  "duration_months": 60,
+  "other_rules": [
+    "Master's degree with at least 55% (50% SC/ST/PwD)",
+    "final-year students may apply",
+    "JRF age limit under 30 (relaxation 5 years SC/ST/PwD/women, 3 years OBC)",
+    "qualify in the national exam (held twice a year)"
+  ],
+  "notes": "Dates shown are from the December 2025 session (applications 25 Sep to 27 Oct 2025, exam 18 Dec 2025); check NTA for the next session. Fellowship is taken up on PhD registration.",
+  "requirements": {
+    "submission": "portal",
+    "submission_url": "https://csirnet.nta.nic.in/"
+  }
+}

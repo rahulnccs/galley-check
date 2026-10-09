@@ -1,0 +1,36 @@
+{
+  "id": "fyssen-postdoctoral-study-grant",
+  "name": "Fyssen Foundation Post-doctoral Study Grant",
+  "funder": "Fondation Fyssen",
+  "url": "https://www.fondationfyssen.fr/",
+  "verified": "2026-10-08",
+  "fields": [
+    "neuroscience",
+    "ecology_evolution"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 2
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-03-31",
+      "estimated": true
+    }
+  ],
+  "amount": "Up to EUR 45,000/year (hosting, living and health insurance)",
+  "duration_months": 24,
+  "other_rules": [
+    "French or foreign researchers aged 35 or under at the closing date",
+    "PhD within the last 2 years or viva by 31 December of the application year",
+    "foreign PhDs go to French labs, French PhDs go abroad",
+    "first postdoc fellowship",
+    "no more than 3 months in the host lab by 1 September"
+  ],
+  "notes": "Ethology, paleontology, archaeology, anthropology, psychology, epistemology, logic and nervous-system sciences. 2026 deadline 31 Mar 2026 (from a third-party listing). 12 or 24 months.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

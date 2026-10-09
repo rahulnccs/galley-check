@@ -1,0 +1,47 @@
+{
+  "id": "twas-dbt-postdoctoral",
+  "name": "TWAS-DBT Postdoctoral Fellowship",
+  "funder": "TWAS (The World Academy of Sciences) and Department of Biotechnology, India",
+  "url": "https://twas.org/opportunity/twas-dbt-postdoctoral-fellowship-programme",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "excluded_nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2023-12-15",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2024-03-19",
+      "estimated": true
+    }
+  ],
+  "annual": false,
+  "amount": "Rs 61,000/month + HRA + Rs 600/month health insurance + Rs 50,000/year contingency; TWAS lump sum toward travel",
+  "duration_months": 18,
+  "other_rules": [
+    "Nationals of a developing country other than India",
+    "maximum age 45 on 31 December of the application year",
+    "PhD in bioscience or biotechnology",
+    "regularly employed in a developing country and committed to return",
+    "no residence visa for India or a developed country",
+    "one TWAS/OWSD fellowship application per year"
+  ],
+  "notes": "TWAS says no call will open in 2026; last call closed 19 Mar 2024. 12-18 months at an Indian biotech institution. TWAS-CSIR and TWAS-SN Bose run similar schemes.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

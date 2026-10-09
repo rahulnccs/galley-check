@@ -82,4 +82,16 @@ Put it in `other_rules` in plain words. The matcher only decides what it can
 check reliably; a rule in `other_rules` turns "eligible" into "possibly
 eligible" and is shown to the user, so it is never silently treated as met.
 
+## From the spreadsheet
+
+Fill in `templates/fellowship-database-template.xlsx` (one row per
+fellowship, one row per required document) and run
+
+    python scripts/import_fellowships.py filled-template.xlsx
+
+It writes one file here per row, named after the id, replacing any file
+with the same id. It checks every row first and writes nothing until all
+of them are valid, listing each problem with its row number. Rows whose id
+starts with `example-` are skipped.
+
 `pytest tests/test_fellowships.py` checks every file here loads.

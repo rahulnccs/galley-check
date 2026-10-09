@@ -1,0 +1,31 @@
+{
+  "id": "marshall-sherfield-fellowship",
+  "name": "Marshall Sherfield Fellowship",
+  "funder": "Marshall Aid Commemoration Commission / Marshall Sherfield Fellowship Foundation",
+  "url": "https://marshallscholarship.org/apply/marshall-sherfield/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "nationalities": [
+    "US"
+  ],
+  "host_countries": [
+    "GB"
+  ],
+  "amount": "Stipend and research support (amount not stated)",
+  "duration_months": 24,
+  "other_rules": [
+    "US citizens",
+    "postdoctoral scientists, technologists, engineers and mathematicians",
+    "hosted at a British university or research institute"
+  ],
+  "notes": "1-2 academic years. 2027 competition open; deadline on the applications page.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

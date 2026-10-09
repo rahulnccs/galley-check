@@ -1,0 +1,47 @@
+{
+  "id": "hfsp-cross-disciplinary-fellowship",
+  "name": "HFSP Cross-Disciplinary Fellowship",
+  "funder": "Human Frontier Science Program Organization (HFSPO)",
+  "url": "https://www.hfsp.org/funding/hfsp-funding/postdoctoral-fellowships",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-03-12",
+      "estimated": true
+    },
+    {
+      "kind": "pre_proposal",
+      "date": "2026-05-12",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-24",
+      "time": "09:00",
+      "timezone": "America/New_York",
+      "estimated": true
+    }
+  ],
+  "amount": "Living allowance + research and travel allowance (amounts by host country); child, parental leave and relocation allowances",
+  "duration_months": 36,
+  "other_rules": [
+    "Doctorate in a non-biological field (physics, chemistry, mathematics, engineering, computer science etc.) with little or no life-science experience",
+    "same nationality, mobility, supervisor, publication and timing rules as the Long-Term Fellowship",
+    "one HFSP fellowship application per year"
+  ],
+  "notes": "Same 2027 cycle dates as the Long-Term Fellowship.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal",
+    "submission_url": "https://proposalcentral.com/"
+  }
+}

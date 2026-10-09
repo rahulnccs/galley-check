@@ -1,0 +1,48 @@
+{
+  "id": "iisc-cv-raman-postdoctoral",
+  "name": "IISc C. V. Raman Post-Doctoral Fellowship",
+  "funder": "Indian Institute of Science (IISc), Bengaluru",
+  "url": "https://www.iisc.ac.in/?p=19367",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2024-02-29",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 1.15 lakh/month consolidated (incl. HRA) + Rs 8 lakh/year research grant (up to Rs 2 lakh for travel)",
+  "duration_months": 12,
+  "other_rules": [
+    "PhD with a first-class record (thesis-submitted candidates can join as provisional RA at Rs 45,000/month)",
+    "preferably under 32",
+    "OCI, PIO and foreign nationals eligible",
+    "must have a consenting IISc faculty host"
+  ],
+  "notes": "The only IISc call page found closed 29 Feb 2024; check iisc.ac.in for the current round. One-year appointment. Needs a research plan of up to 500 words and 2-5 key publications.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Research plan",
+        "max_words": 500
+      },
+      {
+        "name": "Key publications",
+        "notes": "2-5 PDFs"
+      }
+    ],
+    "cv_notes": "Include full publication list",
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "id": "embl-ebi-sanger-espod",
+  "name": "EMBL-EBI-Sanger Postdoctoral Fellowship (ESPOD)",
+  "funder": "EMBL-EBI and Wellcome Sanger Institute",
+  "url": "https://www.ebi.ac.uk/research/postdocs/espods",
+  "verified": "2026-10-08",
+  "fields": [
+    "bioinformatics",
+    "genetics_genomics"
+  ],
+  "track": "non_clinical",
+  "career_stage": {
+    "phd_required": true
+  },
+  "host_countries": [
+    "GB"
+  ],
+  "deadlines": [
+    {
+      "kind": "call_opens",
+      "date": "2026-07-27",
+      "estimated": true
+    },
+    {
+      "kind": "final",
+      "date": "2026-09-27",
+      "timezone": "Europe/London",
+      "estimated": true
+    }
+  ],
+  "amount": "EMBL stipend (about GBP 3,536/month after tax, excluding pension and insurance)",
+  "duration_months": 36,
+  "other_rules": [
+    "Projects combining computational (EMBL-EBI) and experimental (Sanger) genomics",
+    "self-proposed projects need prior approval from both group leaders",
+    "start within 12 months of award"
+  ],
+  "notes": "Wellcome Genome Campus, Hinxton. 2026 call ran 27 Jul to 27 Sep 2026; interviews 10 Dec 2026. Apply via EMBL jobs page with cover letter, CV, two references, and (if self-proposed) a project description of up to 1,000 words.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Cover letter"
+      },
+      {
+        "name": "Self-proposed project description",
+        "max_words": 1000,
+        "notes": "Only for self-proposed projects; approved by both group leaders"
+      },
+      {
+        "name": "Reference letters",
+        "notes": "Two recent letters"
+      }
+    ],
+    "host_letter": true,
+    "submission": "portal"
+  }
+}

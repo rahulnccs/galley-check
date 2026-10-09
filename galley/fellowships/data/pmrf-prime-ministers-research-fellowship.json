@@ -1,0 +1,50 @@
+{
+  "id": "pmrf-prime-ministers-research-fellowship",
+  "name": "Prime Minister's Research Fellowship (PMRF)",
+  "funder": "Ministry of Education, Government of India",
+  "url": "https://www.pmrf.in/",
+  "verified": "2026-10-08",
+  "category": "phd",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": false
+  },
+  "nationalities": [
+    "IN"
+  ],
+  "host_countries": [
+    "IN"
+  ],
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2026-10-31",
+      "timezone": "Asia/Kolkata",
+      "estimated": true
+    }
+  ],
+  "amount": "Rs 70,000/month (years 1-2), Rs 75,000 (year 3), Rs 80,000 (years 4-5) + Rs 2 lakh/year research grant",
+  "duration_months": 60,
+  "other_rules": [
+    "PhD fellowship at PMRF-granting institutes (IISc, IITs, IISERs, NITs, IIITs etc.)",
+    "direct entry needs CGPA 8.0 plus route-specific criteria (e.g. GATE 650+ or CSIR/UGC JRF rank under 100 for other institutes)",
+    "lateral entry for current PhD scholars with CGPA 8.5 over four courses",
+    "institute must nominate the applicant"
+  ],
+  "notes": "Two selection cycles a year, around May and December. 31 Oct 2026 is a third-party estimate for the December 2026 cycle; internal institute deadlines come earlier.",
+  "requirements": {
+    "documents": [
+      {
+        "name": "Supervisor bio-data",
+        "max_pages": 3
+      },
+      {
+        "name": "Research synopsis"
+      }
+    ],
+    "submission": "institution",
+    "submission_url": "https://www.pmrf.in/"
+  }
+}

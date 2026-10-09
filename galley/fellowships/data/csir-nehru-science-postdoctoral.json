@@ -1,0 +1,33 @@
+{
+  "id": "csir-nehru-science-postdoctoral",
+  "name": "CSIR Nehru Science Postdoctoral Research Fellowship",
+  "funder": "Council of Scientific and Industrial Research (CSIR), Government of India",
+  "url": "https://csirhrdg.res.in/",
+  "verified": "2026-10-08",
+  "fields": [
+    "any"
+  ],
+  "career_stage": {
+    "phd_required": true,
+    "max_years_since_phd": 3
+  },
+  "host_countries": [
+    "IN"
+  ],
+  "rolling": true,
+  "amount": "Rs 50,000/month + HRA + Rs 3 lakh/year contingency (up to 25% for domestic and international travel)",
+  "duration_months": 24,
+  "other_rules": [
+    "Indian nationals, PIO and OCI (up to 20% of awards to foreign nationals)",
+    "PhD within the last 3 years (or about to submit)",
+    "publications in high-impact SCI journals",
+    "age limit 32 (relaxable 5 years for SC/ST/OBC, PwD and women)",
+    "must be sponsored by a CSIR laboratory",
+    "cannot be hosted at the CSIR lab of the PhD"
+  ],
+  "notes": "Applications accepted any time; selections usually in June and December by presentation and interview. 2 years, extendable by 1 for outstanding performance. Figures from the ISTI summary (updated 2022); confirm on csirhrdg.res.in.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "institution"
+  }
+}

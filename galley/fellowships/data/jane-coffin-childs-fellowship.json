@@ -1,0 +1,37 @@
+{
+  "id": "jane-coffin-childs-fellowship",
+  "name": "Jane Coffin Childs Memorial Fund Postdoctoral Fellowship",
+  "funder": "Jane Coffin Childs Memorial Fund for Medical Research",
+  "url": "https://www.jccfund.org/fellowship-information/",
+  "verified": "2026-10-08",
+  "fields": [
+    "molecular_cell_biology",
+    "biomedical_clinical",
+    "genetics_genomics",
+    "immunology_infection",
+    "microbiology",
+    "neuroscience",
+    "structural_biology"
+  ],
+  "career_stage": {
+    "phd_required": true
+  },
+  "deadlines": [
+    {
+      "kind": "final",
+      "date": "2027-02-01"
+    }
+  ],
+  "amount": "USD 50,000/year stipend + USD 1,000 per child + USD 2,000/year lab research allowance",
+  "duration_months": 36,
+  "other_rules": [
+    "Generally no more than 1 year of postdoc experience (2+ years only in exceptional cases)",
+    "MD applicants within 3 years of degree",
+    "any citizenship, but foreign nationals must train in the US (US citizens may go abroad)"
+  ],
+  "notes": "Cancer biology and basic biomedical research. Deadline 1 February each year. Fellows starting after a year of postdoc usually get 2 years.",
+  "requirements": {
+    "host_letter": true,
+    "submission": "portal"
+  }
+}
