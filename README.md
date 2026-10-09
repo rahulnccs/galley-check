@@ -17,7 +17,6 @@ A galley proof is the draft an author checks before publication. Galley does the
 mechanical part of that check for you.
 
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 **Status:** v1.5. Manuscript checks work on `.docx` files; PDF support is
 experimental and not yet reliable. The Fellowships section is new in v1.5 and
@@ -220,7 +219,7 @@ Projects are saved on your computer only.
 
 ## Download
 
-Ready-to-run apps are on the [releases page](https://github.com/rahulnccs/galley-check/releases):
+Ready-to-run apps are on the [releases page](https://github.com/rahulnccs/galley/releases):
 `Galley-macOS.dmg` for Mac and `Galley-Setup.exe` for Windows.
 Nothing else needs installing.
 
@@ -278,13 +277,26 @@ keeps the checks honest on papers the authors have never seen.
 
 ## Releasing
 
-Builds run automatically. Pushing a version tag publishes the Mac and Windows
-apps to a GitHub release:
+Builds run on every push. Publishing a release with a version tag (for
+example `v1.6.0`) builds the Mac and Windows apps and attaches them to a
+release of the same name in the public repository,
+[rahulnccs/galley](https://github.com/rahulnccs/galley/releases). Whenever the
+fellowship list changes on `main`, the *Publish to the public repository*
+workflow copies it there too, together with [`public/README.md`](public/README.md).
 
-```bash
-git tag v1.6.0
-git push origin v1.6.0
-```
+Both need a token, set up once:
+
+1. Create the public repository `rahulnccs/galley`, ticking **Add a README
+   file** so it isn't empty.
+2. On GitHub, open **Settings → Developer settings → Personal access tokens →
+   Fine-grained tokens → Generate new token**. Give it access to
+   **Only select repositories: rahulnccs/galley**, with **Contents: Read and
+   write** permission.
+3. In this repository, open **Settings → Secrets and variables → Actions → New
+   repository secret**, name it `PUBLIC_REPO_TOKEN` and paste the token.
+
+Until the secret exists, the publishing steps are skipped with a note rather
+than failing.
 
 ## Roadmap
 
@@ -308,7 +320,7 @@ about. Two ways to reach me:
 
 - [Tell me how you're using Galley](https://docs.google.com/forms/d/e/1FAIpQLSf-IEokqhT8mjond7SFDCp90sDzUDCupJPK8p26aVls46QYjg/viewform) — a short form.
   Leave your email if you'd like to hear when new checks land.
-- [Open an issue](https://github.com/rahulnccs/galley-check/issues) for bugs.
+- [Open an issue](https://github.com/rahulnccs/galley/issues) for bugs.
 
 To be notified of new versions, click **Watch** at the top of this page, choose
 **Custom**, and tick **Releases**. GitHub emails you when a release is published;
@@ -335,6 +347,22 @@ In a methods section, something like this is enough:
 > Figure callouts, citations, references and abbreviations were checked with
 > Galley v1.0.0 (Bodkhe, 2026).
 
-## License
+## Licence
 
-MIT — see [LICENSE](LICENSE).
+Galley is free to download and use for personal, academic and research
+purposes. From version 1.6 the source code is **all rights reserved**: it may
+not be copied, modified, redistributed or used to build a competing product
+without written permission. See [LICENSE](LICENSE). Versions up to 1.5 were
+released under the MIT License, and copies of them remain under it.
+
+The fellowship list in [`galley/fellowships/data/`](galley/fellowships/data/)
+is licensed separately under [CC BY 4.0](galley/fellowships/data/LICENSE), so
+it can be reused with credit.
+
+## Repositories
+
+- **This repository (private):** the source code.
+- **[rahulnccs/galley](https://github.com/rahulnccs/galley) (public):** the
+  downloadable apps on its Releases page, the fellowship list that **Check for
+  Updates** reads, and issues. The workflows publish both automatically; see
+  [Releasing](#releasing).

@@ -20,7 +20,7 @@ from .requirements import Requirements
 DATA_DIR = Path(__file__).resolve().parent / "data"
 CUSTOM_PREFIX = "custom-"
 # Where users report an entry that is wrong or out of date.
-REPORT_URL = "https://github.com/rahulnccs/galley-check/issues/new"
+REPORT_URL = "https://github.com/rahulnccs/galley/issues/new"
 
 
 def user_fellowship_dir() -> Path:

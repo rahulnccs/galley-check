@@ -301,7 +301,7 @@ def test_moved_deadline_reported_once():
 def test_report_link_names_the_entry_only():
     url = fellowship().report_problem_url()
     q = parse_qs(urlparse(url).query)
-    assert url.startswith("https://github.com/rahulnccs/galley-check/issues/new")
+    assert url.startswith("https://github.com/rahulnccs/galley/issues/new")
     assert "Test Fellowship" in q["title"][0]
     assert "https://example.org/f" in q["body"][0]
 

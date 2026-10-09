@@ -5,9 +5,8 @@ type: software
 authors:
   - family-names: Bodkhe
     given-names: Rahul
-repository-code: "https://github.com/rahulnccs/galley-check"
+url: "https://github.com/rahulnccs/galley"
 doi: 10.5281/zenodo.22733230
-license: MIT
 version: 1.5.0
 abstract: >-
   An offline desktop tool for life-science researchers. It checks manuscript

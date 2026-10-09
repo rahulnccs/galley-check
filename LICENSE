@@ -1,21 +1,40 @@
-MIT License
+Galley
+Copyright (c) 2026 Rahul Bodkhe. All rights reserved.
 
-Copyright (c) 2026 Rahul Bodkhe
+This licence applies to Galley version 1.6 and later: its source code,
+documentation, user interface and the desktop applications built from them
+(together, "the Software").
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Use. You may download the official Galley desktop application, as
+   published by the copyright holder, and use it free of charge for personal,
+   academic and research purposes.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. Restrictions. Except as allowed in section 1, and unless you have the
+   copyright holder's prior written permission, you may not:
+   a. copy, reproduce or publish the source code, in whole or in part;
+   b. modify, adapt, translate or create derivative works of the Software;
+   c. reverse engineer, decompile or disassemble the application, except to
+      the extent the law expressly permits this despite this restriction;
+   d. distribute, sublicense, rent, sell or otherwise make the Software
+      available to others, including as a hosted or online service;
+   e. use the Software, its design or its workflows to build a competing
+      product or service.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. Earlier versions. Galley versions up to and including 1.5 were published
+   under the MIT License. Copies of those versions obtained under that licence
+   remain under it; this licence does not change them.
+
+4. Fellowship list. The fellowship, PhD fellowship and travel-grant entries
+   in galley/fellowships/data/ are licensed separately under the Creative
+   Commons Attribution 4.0 International licence (CC BY 4.0); see the LICENSE
+   file in that folder.
+
+5. No warranty. The Software is provided "as is", without warranty of any
+   kind, express or implied, including fitness for a particular purpose.
+   Eligibility results and document checks are guidance only; funders' and
+   journals' official rules decide. In no event shall the copyright holder be
+   liable for any claim, damages or other liability arising from the use of
+   the Software.
+
+6. Contact. For permission to use the Software in other ways, open an issue
+   at https://github.com/rahulnccs/galley/issues.

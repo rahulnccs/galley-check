@@ -1,0 +1,67 @@
+name: Publish to the public repository
+
+# The code lives in this private repository. The public repository,
+# rahulnccs/galley, holds what users need: the releases, the fellowship list
+# that "Check for Updates" downloads, and issues. This copies the fellowship
+# list and the public README across whenever they change on main.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "galley/fellowships/data/**"
+      - "public/**"
+  workflow_dispatch:
+
+env:
+  HAS_PUBLIC_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN != '' }}
+
+jobs:
+  publish:
+    name: Fellowship list and README
+    runs-on: ubuntu-latest
+    steps:
+      - name: Note the missing token
+        if: env.HAS_PUBLIC_TOKEN != 'true'
+        run: echo "::warning::PUBLIC_REPO_TOKEN isn't set, so nothing was published. See Releasing in the README."
+
+      - uses: actions/checkout@v5
+        if: env.HAS_PUBLIC_TOKEN == 'true'
+        with:
+          path: source
+
+      - uses: actions/checkout@v5
+        if: env.HAS_PUBLIC_TOKEN == 'true'
+        with:
+          repository: rahulnccs/galley
+          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
+          path: public
+
+      - name: Check every entry loads before publishing
+        if: env.HAS_PUBLIC_TOKEN == 'true'
+        working-directory: source
+        run: |
+          python -m pip install --quiet -e .
+          python -c "from galley.fellowships.model import load_fellowships, DATA_DIR; print(len(load_fellowships(DATA_DIR, include_templates=True, include_custom=False)), 'entries')"
+
+      - name: Copy the fellowship list and README
+        if: env.HAS_PUBLIC_TOKEN == 'true'
+        run: |
+          rm -rf public/fellowships
+          mkdir -p public/fellowships
+          cp source/galley/fellowships/data/*.json public/fellowships/
+          cp source/galley/fellowships/data/README.md source/galley/fellowships/data/LICENSE public/fellowships/
+          cp source/public/README.md public/README.md
+
+      - name: Commit and push if anything changed
+        if: env.HAS_PUBLIC_TOKEN == 'true'
+        working-directory: public
+        run: |
+          git config user.name "Rahul Bodkhe"
+          git config user.email "rahulbiosciences@gmail.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to publish."
+          else
+            git commit -m "Update the fellowship list"
+            git push
+          fi

@@ -1,7 +1,8 @@
-"""Download the latest fellowship list from the project's GitHub repository.
+"""Download the latest fellowship list from Galley's public GitHub repository.
 
 Galley ships with a copy of the list. "Check for Updates" fetches the current
-files from galley/fellowships/data/ on GitHub, checks every one, and keeps
+files from fellowships/ in the public repository (the source code itself is
+kept in a private one), checks every one, and keeps
 them in the user's settings folder. Only the list is downloaded; nothing
 about the user is sent.
 
@@ -19,9 +20,10 @@ from urllib.request import Request, urlopen
 
 from .model import Fellowship
 
-REPO = "rahulnccs/galley-check"
+# The public repository: releases and the fellowship list, not the code.
+REPO = "rahulnccs/galley"
 LISTING_URL = (f"https://api.github.com/repos/{REPO}/contents/"
-               f"galley/fellowships/data?ref=main")
+               f"fellowships?ref=main")
 TIMEOUT = 20
 META = "update-info.meta"   # not *.json, so it is never read as an entry
 

@@ -1,8 +1,9 @@
 name: Build apps
 
 # Builds the Mac and Windows apps. Runs on every push so breakage is caught
-# early; when a version tag is pushed (e.g. v0.2.0) the finished installers are
-# attached to a GitHub release for people to download.
+# early; when a version tag is pushed (e.g. v1.6.0) the finished installers are
+# attached to a release of the same name in the public repository,
+# rahulnccs/galley, where people download them.
 on:
   push:
     branches: [main]
@@ -12,6 +13,10 @@ on:
 
 permissions:
   contents: write
+
+env:
+  # Secrets can't be tested in an `if:` directly; this can.
+  HAS_PUBLIC_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN != '' }}
 
 jobs:
   macos:
@@ -64,10 +69,19 @@ jobs:
           name: Galley-macOS
           path: dist/Galley-macOS.dmg
 
+      - name: Note the missing release token
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN != 'true'
+        run: echo "::warning::PUBLIC_REPO_TOKEN isn't set, so the app wasn't attached to a release. See Releasing in the README."
+
       - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN == 'true'
         uses: softprops/action-gh-release@v3
+        # The code repository is private; releases go to the public one.
         with:
+          repository: rahulnccs/galley
+          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          name: Galley ${{ github.ref_name }}
           files: dist/Galley-macOS.dmg
 
   windows:
@@ -100,8 +114,17 @@ jobs:
           name: Galley-Windows
           path: dist/Galley-Setup.exe
 
+      - name: Note the missing release token
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN != 'true'
+        run: echo "::warning::PUBLIC_REPO_TOKEN isn't set, so the app wasn't attached to a release. See Releasing in the README."
+
       - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN == 'true'
         uses: softprops/action-gh-release@v3
+        # The code repository is private; releases go to the public one.
         with:
+          repository: rahulnccs/galley
+          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
+          tag_name: ${{ github.ref_name }}
+          name: Galley ${{ github.ref_name }}
           files: dist/Galley-Setup.exe
