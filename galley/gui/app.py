@@ -919,21 +919,25 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.start)
         self.stack.addWidget(self.results)
 
-        # Manuscript checks and fellowships are two sections of one window.
+        # Manuscript checks, fellowships, projects and the lab are sections
+        # of one window.
         from .fellowships_page import FellowshipsPage, Segmented
+        from .lab_page import LabPage
         from .projects_page import ProjectsPage
         self.fellowships = FellowshipsPage()
         self.projects = ProjectsPage()
+        self.lab = LabPage()
         self.sections = QStackedWidget()
         self.sections.addWidget(self.stack)
         self.sections.addWidget(self.fellowships)
         self.sections.addWidget(self.projects)
+        self.sections.addWidget(self.lab)
 
         bar = QWidget()
         bar.setObjectName("page")
         bar_lay = QHBoxLayout(bar)
         bar_lay.setContentsMargins(12, 10, 12, 6)
-        self.switcher = Segmented(["Manuscript", "Fellowships", "Projects"])
+        self.switcher = Segmented(["Manuscript", "Fellowships", "Projects", "My Lab"])
         self.switcher.changed.connect(self.sections.setCurrentIndex)
         bar_lay.addStretch(1)
         bar_lay.addWidget(self.switcher)
@@ -977,6 +981,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
         self._update_banner(self.fellowships.attention_count())
         self.fellowships.attentionChanged.connect(self._update_banner)
+        self._update_lab_title(self.lab.attention_count())
+        self.lab.attentionChanged.connect(self._update_lab_title)
 
         self.start.checkRequested.connect(self.check)
         self.results.recheck.connect(lambda: self.current_path and self.check(self.current_path))
@@ -989,6 +995,9 @@ class MainWindow(QMainWindow):
         self.banner.setVisible(count > 0)
         self.banner.parentWidget().setVisible(count > 0)
         self.switcher.set_title(1, f"Fellowships ({count})" if count else "Fellowships")
+
+    def _update_lab_title(self, count: int):
+        self.switcher.set_title(3, f"My Lab ({count})" if count else "My Lab")
 
     def _show_reminders(self):
         self.switcher.select(1)

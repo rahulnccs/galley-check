@@ -25,7 +25,7 @@ a = Analysis(
     # the packaged app and the Journal dropdown comes up empty.
     datas=[(str(ROOT / "galley" / "profiles"), "galley/profiles"),
            (str(ROOT / "galley" / "fellowships" / "data"), "galley/fellowships/data")],
-    hiddenimports=["galley.parsers.docx_parser"],
+    hiddenimports=["galley.parsers.docx_parser", "openpyxl"],
     excludes=EXCLUDES,
     noarchive=False,
 )

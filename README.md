@@ -1,6 +1,6 @@
 # Galley
 
-A desktop app for life-science researchers, in three parts:
+A desktop app for life-science researchers, in four parts:
 
 - **Manuscript checks**: offline checks for manuscript drafts (figures, tables,
   citations, references, abbreviations, species names, consistency and ethics
@@ -10,6 +10,8 @@ A desktop app for life-science researchers, in three parts:
   application, and a check of your documents against the funder's format.
 - **Projects**: a README, a sample tracker that opens each sample's
   sequencing or other data folders, and a lab notebook, per project.
+- **My Lab**: the lab's orders from request to the shelf they end up on, an
+  inventory of where things are, and spending by account and vendor.
 
 Your manuscript, documents and profile never leave your computer.
 
@@ -218,6 +220,42 @@ export it again.
 samples it concerns; a sample's page shows the entries that mention it.
 
 Projects are saved on your computer only.
+
+## My Lab
+
+Switch to **My Lab** to track the lab's orders.
+
+**Orders.** Each order goes Requested → Approved → Ordered → Received (or
+Back-ordered or Cancelled), coloured as on most lab order sheets: red,
+indigo, amber, purple, green. Tiles count and filter them. Click an order to
+move it on. **Mark as Received** records who took the delivery and asks
+where it was put. **Order Again** repeats an earlier order in one click, and
+**Copy Order Details** puts the item, vendor, catalogue number, quantity,
+price and link on the clipboard for an email or purchasing form. Typing an
+item the lab has ordered before fills in its vendor, catalogue number and
+last price, and items ordered more than once are listed under *Order again*.
+**Needs attention** flags requests not ordered after a week and orders not
+received after two weeks (both adjustable), and the count shows on the My
+Lab tab.
+
+**Inventory.** Everything received, grouped by where it was put (bench,
+freezer, cold room), with a "Where is it?" search.
+
+**Spending.** What was ordered this month, this year and over the last 12
+months, by account (grant or cost centre), vendor and month, plus what is on
+order and what is waiting to be ordered.
+
+**Bring your sheet.** Import the lab's existing order spreadsheet (Excel or
+CSV) as it is. Galley finds the header row and recognises the usual columns
+(Status, Date Requested, Item Name, Vendor, Catalog #, Qty, Unit Price, Total
+Price, Received By, Location and so on), and skips orders it already has.
+Export to CSV at any time.
+
+**Share it with the lab.** On the Lab tab, choose a folder on a shared drive
+(OneDrive, Google Drive, Dropbox or a network drive) and have everyone choose
+the same one. Each order is its own small file, so people working at the
+same time don't overwrite each other; press **Refresh** to see their changes.
+Your name and which folder you use stay on your computer.
 
 ## Download
 
