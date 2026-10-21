@@ -160,7 +160,11 @@ def _residence(f: Fellowship, r: Researcher) -> list[Reason]:
 
 
 def _hosts(f: Fellowship, r: Researcher) -> tuple[list[Reason], list[str] | None]:
-    """The reasons, and the host countries still possible (None = any)."""
+    """The reasons, and the host countries still possible (None = any).
+
+    A fellowship that lists no host countries hasn't said where it can be
+    held, which is not the same as "anywhere": many can only be held in the
+    funder's own country. Only an explicit "any" is treated as anywhere."""
     allowed = f.host_countries
     if r.target_hosts:
         possible = [c for c in r.target_hosts
@@ -171,7 +175,13 @@ def _hosts(f: Fellowship, r: Researcher) -> tuple[list[Reason], list[str] | None
                      else f"outside {_names(f.excluded_host_countries)}")
             return [Reason(NOT_MET, f"The work must be {where}; you chose "
                                     f"{_names(r.target_hosts)}.")], []
-        return [Reason(MET, f"Can be held in {_names(possible)}.")], possible
+        if allowed is None and not f.host_anywhere and not f.excluded_host_countries:
+            # Not a footnote: being told "eligible" for a fellowship that
+            # can't be held where you want to go would cost a real application.
+            return [Reason(UNSURE, f"Doesn't say where it can be held; check that "
+                                   f"{_names(possible)} is possible.")], possible
+        where = "anywhere, including" if f.host_anywhere else "in"
+        return [Reason(MET, f"Can be held {where} {_names(possible)}.")], possible
     if allowed is not None:
         return [Reason(INFO, f"The work must be in {_names(allowed)}.")], allowed
     return [], None

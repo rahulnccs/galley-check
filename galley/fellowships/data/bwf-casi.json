@@ -38,5 +38,9 @@
   "requirements": {
     "host_letter": true,
     "submission": "portal"
-  }
+  },
+  "host_countries": [
+    "US",
+    "CA"
+  ]
 }

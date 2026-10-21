@@ -49,5 +49,8 @@
     "host_letter": true,
     "submission": "portal",
     "submission_url": "https://proposalcentral.com/"
-  }
+  },
+  "host_countries": [
+    "any"
+  ]
 }

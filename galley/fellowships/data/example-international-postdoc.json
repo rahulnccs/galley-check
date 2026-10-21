@@ -57,5 +57,8 @@
     "host_letter": true,
     "submission": "portal",
     "submission_url": "https://example.org/apply"
-  }
+  },
+  "host_countries": [
+    "any"
+  ]
 }

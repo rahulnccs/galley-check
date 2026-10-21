@@ -27,5 +27,8 @@
   "requirements": {
     "submission": "portal",
     "submission_url": "https://tatatrusts.goodera.com/"
-  }
+  },
+  "excluded_host_countries": [
+    "IN"
+  ]
 }

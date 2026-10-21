@@ -38,5 +38,8 @@
   "notes": "2027 cohort: institutional nominations by 15 May 2026, preliminary information 1 Jun, full application 13 Jul 2026, interviews Aug 2026 to Feb 2027, selection March 2027, placements start July or October 2027. Placement can be anywhere in the world.",
   "requirements": {
     "submission": "institution"
-  }
+  },
+  "host_countries": [
+    "any"
+  ]
 }

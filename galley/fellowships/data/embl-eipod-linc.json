@@ -47,5 +47,12 @@
     ],
     "host_letter": true,
     "submission": "portal"
-  }
+  },
+  "host_countries": [
+    "DE",
+    "GB",
+    "FR",
+    "IT",
+    "ES"
+  ]
 }

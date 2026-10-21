@@ -131,7 +131,8 @@ def entry(r: dict, documents: list[dict]) -> dict:
     for key in ("nationalities", "excluded_nationalities", "residence",
                 "host_countries", "excluded_host_countries"):
         if r.get(key):
-            e[key] = [c.upper() for c in _list(r[key])]
+            e[key] = [c.lower() if c.lower() == "any" else c.upper()
+                      for c in _list(r[key])]
     months, years = r.get("mobility_max_months_in_host"), r.get("mobility_window_years")
     if months is not None and years is not None:
         e["mobility"] = {"max_months_in_host": _number(months),

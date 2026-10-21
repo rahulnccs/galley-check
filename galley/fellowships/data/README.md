@@ -22,7 +22,7 @@ fellowships, PhD fellowships and travel grants.
 | `nationalities` | no | Countries whose nationals may apply. Leave out for any. |
 | `excluded_nationalities` | no | Countries whose nationals may not. |
 | `residence` | no | Countries the applicant must live in. |
-| `host_countries` | no | Where the fellowship must be held. Leave out for anywhere. |
+| `host_countries` | no | Where the fellowship must be held, or `["any"]` if it can be held anywhere. Leaving it out means "not stated": Galley then shows the fellowship as worth checking rather than eligible, so fill it in for every entry you verify. |
 | `excluded_host_countries` | no | Where it may not be held. |
 | `mobility` | no | `{"max_months_in_host": 12, "window_years": 3}`: no more than 12 months living in the host country in the 3 years before the deadline. |
 | `deadlines` | no | A list, each with `kind`, `date`, and optionally `time`, `timezone` (e.g. `Europe/Berlin`), `estimated` (true if guessed from previous years) and `label`. Kinds: `final`, `internal`, `pre_proposal`, `call_opens`. |

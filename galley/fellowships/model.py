@@ -65,6 +65,12 @@ def _date(value, what: str) -> date | None:
         raise ValueError(f"{what} must be a date written YYYY-MM-DD, not {value!r}")
 
 
+def _is_any(value) -> bool:
+    """host_countries: ["any"] says the work can be done anywhere. Leaving it
+    out says nothing, which is not the same."""
+    return isinstance(value, list) and [str(v).strip().lower() for v in value] == ["any"]
+
+
 def _countries(value, what: str) -> list[str] | None:
     """None means no restriction; otherwise a list of upper-case codes."""
     if value is None:
@@ -113,6 +119,7 @@ class Fellowship:
     excluded_nationalities: list[str] = field(default_factory=list)
     residence: list[str] | None = None              # where applicants must live
     host_countries: list[str] | None = None         # where the work happens
+    host_anywhere: bool = False     # ["any"]: open worldwide, not merely unstated
     excluded_host_countries: list[str] = field(default_factory=list)
     mobility: Mobility | None = None
     deadlines: list[Deadline] = field(default_factory=list)
@@ -203,7 +210,9 @@ class Fellowship:
             excluded_nationalities=_countries(
                 data.get("excluded_nationalities") or [], "excluded_nationalities"),
             residence=_countries(data.get("residence"), "residence"),
-            host_countries=_countries(data.get("host_countries"), "host_countries"),
+            host_countries=(None if _is_any(data.get("host_countries")) else
+                            _countries(data.get("host_countries"), "host_countries")),
+            host_anywhere=_is_any(data.get("host_countries")),
             excluded_host_countries=_countries(
                 data.get("excluded_host_countries") or [], "excluded_host_countries"),
             mobility=(Mobility(int(mob["max_months_in_host"]), int(mob["window_years"]))

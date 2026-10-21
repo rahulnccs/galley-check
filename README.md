@@ -20,9 +20,11 @@ mechanical part of that check for you.
 
 [![Tests](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml/badge.svg)](https://github.com/rahulnccs/galley-check/actions/workflows/tests.yml)
 
-**Status:** v1.5. Manuscript checks work on `.docx` files; PDF support is
-experimental and not yet reliable. The Fellowships section is new in v1.5 and
-its fellowship list is still being built (see [Fellowships](#fellowships)).
+**Status:** v1.6. Manuscript checks work on `.docx` files; PDF support is
+experimental and not yet reliable. The fellowship and journal lists are still
+being built: entries not yet checked against the funder's or journal's own
+pages say so (see [Fellowships](#fellowships)). Projects and My Lab are new in
+v1.6.
 
 ## Manuscript checks
 
@@ -354,11 +356,13 @@ keeps the checks honest on papers the authors have never seen.
 
 ## Releasing
 
-Builds run on every push. Publishing a release with a version tag (for
-example `v1.6.0`) builds the Mac and Windows apps and attaches them to a
-release of the same name in the public repository,
-[rahulnccs/galley](https://github.com/rahulnccs/galley/releases). Whenever the
-fellowship list changes on `main`, the *Publish to the public repository*
+Builds run on every push. To release, open **Actions → Build apps → Run
+workflow** and enter the version (for example `v1.6.0`), or push a tag of
+that name. The Mac and Windows apps are built and attached to a release of
+the same name in the public repository,
+[rahulnccs/galley](https://github.com/rahulnccs/galley/releases); release
+notes come from `.github/release-notes/<version>.md`. Whenever the fellowship
+or journal list changes on `main`, the *Publish to the public repository*
 workflow copies it there too, together with [`public/README.md`](public/README.md).
 
 Both need a token, set up once:
@@ -372,8 +376,9 @@ Both need a token, set up once:
 3. In this repository, open **Settings → Secrets and variables → Actions → New
    repository secret**, name it `PUBLIC_REPO_TOKEN` and paste the token.
 
-Until the secret exists, the publishing steps are skipped with a note rather
-than failing.
+Until the secret exists, the lists aren't published, and a release is made in
+this repository instead, with a warning, so it never goes out without its
+apps.
 
 ## Roadmap
 
@@ -386,8 +391,8 @@ than failing.
 7. Code signing, so the first-launch warning goes away
 8. ~~Fellowships for life-science researchers: postdoc and PhD fellowships
    and travel grants, matching, application tracking, reminders and document
-   checks~~ (v1.5); real fellowship entries and a monthly data refresh still
-   to come
+   checks~~ (v1.5); ~~real fellowship entries, a journal list, Projects and My
+   Lab~~ (v1.6); checking every listed entry against its source still to come
 
 ## Feedback
 

@@ -44,5 +44,8 @@
     "cv_notes": "Four pages at most",
     "host_letter": true,
     "submission": "portal"
-  }
+  },
+  "host_countries": [
+    "any"
+  ]
 }

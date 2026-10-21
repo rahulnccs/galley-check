@@ -34,5 +34,8 @@
     "host_letter": true,
     "submission": "institution",
     "submission_url": "https://grants.nih.gov/"
-  }
+  },
+  "host_countries": [
+    "US"
+  ]
 }

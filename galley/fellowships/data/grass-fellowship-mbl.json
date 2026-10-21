@@ -22,5 +22,8 @@
     "host_letter": true,
     "submission": "portal",
     "submission_url": "https://grassfoundation.org/application-portal/"
-  }
+  },
+  "host_countries": [
+    "US"
+  ]
 }

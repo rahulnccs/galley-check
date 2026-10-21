@@ -163,7 +163,7 @@ MOBILITY = {"max_months_in_host": 12, "window_years": 3}
 
 
 def test_mobility_met():
-    f = fellowship(mobility=MOBILITY)
+    f = fellowship(mobility=MOBILITY, host_countries=["any"])
     r = Researcher(target_hosts=["DE"],
                    stays=[Stay("IN", date(2018, 1, 1)),
                           Stay("DE", date(2019, 1, 1), date(2019, 6, 1))])
@@ -171,7 +171,7 @@ def test_mobility_met():
 
 
 def test_mobility_broken_by_living_in_host():
-    f = fellowship(mobility=MOBILITY)
+    f = fellowship(mobility=MOBILITY, host_countries=["any"])
     r = Researcher(target_hosts=["DE"], stays=[Stay("DE", date(2024, 1, 1))])
     m = match(f, r, TODAY)
     assert m.status == NOT_ELIGIBLE and "lived in DE" in texts(m)
@@ -179,7 +179,7 @@ def test_mobility_broken_by_living_in_host():
 
 def test_mobility_counts_only_the_window():
     # Two years in Germany, but ending well before the 3-year window.
-    f = fellowship(mobility=MOBILITY)
+    f = fellowship(mobility=MOBILITY, host_countries=["any"])
     r = Researcher(target_hosts=["DE"],
                    stays=[Stay("DE", date(2019, 1, 1), date(2021, 1, 1)),
                           Stay("IN", date(2021, 1, 1))])
@@ -187,7 +187,7 @@ def test_mobility_counts_only_the_window():
 
 
 def test_mobility_unknown_without_history():
-    f = fellowship(mobility=MOBILITY)
+    f = fellowship(mobility=MOBILITY, host_countries=["any"])
     assert match(f, Researcher(target_hosts=["DE"]), TODAY).status == POSSIBLE
 
 
@@ -416,3 +416,27 @@ def test_unverified_entry_is_never_called_eligible():
     m = match(f, Researcher(), TODAY)
     assert m.status == POSSIBLE
     assert "haven't been checked against the funder's page" in texts(m)
+
+
+def test_unstated_host_is_not_anywhere():
+    r = Researcher(target_hosts=["IN"])
+    unstated = match(fellowship(), r, TODAY)
+    assert unstated.status == POSSIBLE
+    assert "Doesn't say where it can be held; check that IN is possible." in texts(unstated)
+    anywhere = match(fellowship(host_countries=["any"]), r, TODAY)
+    assert anywhere.status == ELIGIBLE and "Can be held anywhere, including IN." in texts(anywhere)
+    assert anywhere.fellowship.host_anywhere and anywhere.fellowship.host_countries is None
+    us_only = match(fellowship(host_countries=["US"]), r, TODAY)
+    assert us_only.status == NOT_ELIGIBLE
+    abroad = match(fellowship(excluded_host_countries=["IN"]), Researcher(target_hosts=["DE"]),
+                   TODAY)
+    assert abroad.status == ELIGIBLE                    # "anywhere but India" is explicit
+
+
+def test_us_foundation_fellowships_are_not_offered_in_india():
+    entries = {f.id: f for f in load_fellowships(DATA_DIR, include_custom=False)}
+    r = Researcher(phd_date=date(2025, 1, 1), nationalities=["IN"], target_hosts=["IN"])
+    for fid in ("damon-runyon-fellowship", "jane-coffin-childs-fellowship",
+                "lsrf-postdoctoral-fellowship", "helen-hay-whitney-fellowship"):
+        assert match(entries[fid], r, TODAY).status == NOT_ELIGIBLE, fid
+    assert match(entries["alzheimers-association-aarfa"], r, TODAY).status != ELIGIBLE

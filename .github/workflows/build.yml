@@ -1,15 +1,22 @@
 name: Build apps
 
 # Builds the Mac and Windows apps. Runs on every push so breakage is caught
-# early; when a version tag is pushed (e.g. v1.6.0) the finished installers are
-# attached to a release of the same name in the public repository,
-# rahulnccs/galley, where people download them.
+# early. To release, push a version tag (e.g. v1.6.0), or run this workflow
+# by hand with the version filled in: the finished installers are attached to
+# a release of that name in the public repository, rahulnccs/galley, where
+# people download them (or in this repository while PUBLIC_REPO_TOKEN isn't
+# set, so a release never goes out without its apps).
 on:
   push:
     branches: [main]
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      release:
+        description: "Version to release, e.g. v1.6.0 (leave empty to only build)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -69,20 +76,6 @@ jobs:
           name: Galley-macOS
           path: dist/Galley-macOS.dmg
 
-      - name: Note the missing release token
-        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN != 'true'
-        run: echo "::warning::PUBLIC_REPO_TOKEN isn't set, so the app wasn't attached to a release. See Releasing in the README."
-
-      - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN == 'true'
-        uses: softprops/action-gh-release@v3
-        # The code repository is private; releases go to the public one.
-        with:
-          repository: rahulnccs/galley
-          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          name: Galley ${{ github.ref_name }}
-          files: dist/Galley-macOS.dmg
 
   windows:
     name: Windows installer
@@ -114,17 +107,43 @@ jobs:
           name: Galley-Windows
           path: dist/Galley-Setup.exe
 
-      - name: Note the missing release token
-        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN != 'true'
-        run: echo "::warning::PUBLIC_REPO_TOKEN isn't set, so the app wasn't attached to a release. See Releasing in the README."
+  release:
+    name: Publish the release
+    needs: [macos, windows]
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release != '')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
 
-      - name: Attach to the release
-        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_PUBLIC_TOKEN == 'true'
-        uses: softprops/action-gh-release@v3
-        # The code repository is private; releases go to the public one.
-        with:
-          repository: rahulnccs/galley
-          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          name: Galley ${{ github.ref_name }}
-          files: dist/Galley-Setup.exe
+      - name: Collect the apps built above
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download ${{ github.run_id }} --repo ${{ github.repository }} --dir dist
+          find dist -type f
+
+      - name: Create or update the release
+        env:
+          TAG: ${{ inputs.release || github.ref_name }}
+          PUBLIC: ${{ env.HAS_PUBLIC_TOKEN }}
+          GH_TOKEN: ${{ env.HAS_PUBLIC_TOKEN == 'true' && secrets.PUBLIC_REPO_TOKEN || github.token }}
+        run: |
+          if [ "$PUBLIC" = "true" ]; then
+            REPO=rahulnccs/galley
+            TARGET=()
+          else
+            REPO=${{ github.repository }}
+            TARGET=(--target ${{ github.sha }})
+            echo "::warning::PUBLIC_REPO_TOKEN isn't set, so the release was made in this repository instead of rahulnccs/galley. See Releasing in the README."
+          fi
+          NOTES=".github/release-notes/$TAG.md"
+          [ -f "$NOTES" ] || { echo "Galley $TAG" > /tmp/notes.md; NOTES=/tmp/notes.md; }
+          mapfile -t FILES < <(find dist -type f \( -name '*.dmg' -o -name '*.exe' \))
+          [ "${#FILES[@]}" -eq 2 ] || { echo "::error::Expected the Mac and Windows apps, found: ${FILES[*]}"; exit 1; }
+          if gh release view "$TAG" --repo "$REPO" > /dev/null 2>&1; then
+            gh release upload "$TAG" "${FILES[@]}" --repo "$REPO" --clobber
+          else
+            gh release create "$TAG" "${FILES[@]}" --repo "$REPO" --title "Galley $TAG" \
+              --notes-file "$NOTES" "${TARGET[@]}"
+          fi
+          echo "Released $TAG to https://github.com/$REPO/releases/tag/$TAG"
